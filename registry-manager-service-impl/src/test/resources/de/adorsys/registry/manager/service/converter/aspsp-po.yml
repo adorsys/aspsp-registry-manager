@@ -1,0 +1,11 @@
+id: 1234567
+name: John
+bic: BIC
+bankCode: 111111
+url: https://www.example.com
+adapterId: ADAPTER_ID
+idpUrl: https://www.example.com
+scaApproaches:
+  - EMBEDDED
+  - REDIRECT
+paginationId: PAGINATION_ID
