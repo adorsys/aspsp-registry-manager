@@ -17,3 +17,16 @@ server:
 ---
 spring:
   profiles: default
+  datasource:
+    url: jdbc:postgresql://localhost/aspsp-registry
+    username: manager
+    password: manager
+  # Workaround to avoid this issue:
+  # https://github.com/spring-projects/spring-boot/issues/12007#issuecomment-369388646
+  # https://stackoverflow.com/a/52545424
+  jpa:
+    properties:
+      hibernate:
+        jdbc:
+          lob:
+            non_contextual_creation: true
