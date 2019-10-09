@@ -18,13 +18,16 @@ server:
 spring:
   profiles: default
   datasource:
-    url: jdbc:postgresql://localhost/aspsp-registry
+    url: jdbc:postgresql://localhost/aspsp_registry
     username: manager
     password: manager
-  # Workaround to avoid this issue:
-  # https://github.com/spring-projects/spring-boot/issues/12007#issuecomment-369388646
-  # https://stackoverflow.com/a/52545424
   jpa:
+    # TODO replace it with DB migration tool (like Flyway or Liquibase)
+    hibernate:
+      ddl-auto: update
+    # Workaround to avoid this issue:
+    # https://github.com/spring-projects/spring-boot/issues/12007#issuecomment-369388646
+    # https://stackoverflow.com/a/52545424
     properties:
       hibernate:
         jdbc:
