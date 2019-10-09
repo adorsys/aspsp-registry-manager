@@ -34,7 +34,7 @@ public class AspspServiceImpl implements AspspService {
     }
 
     @Override
-    public void deleteById(String aspspId) {
+    public void deleteById(Long aspspId) {
         logger.info("Deleting ASPSP by id={}", aspspId);
 
         repository.deleteById(aspspId);

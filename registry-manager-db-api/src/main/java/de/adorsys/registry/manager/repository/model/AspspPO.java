@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Objects;
 
 public class AspspPO {
-    private String id;
+    private Long id;
     private String name;
     private String bic;
     private String bankCode;
@@ -14,11 +14,11 @@ public class AspspPO {
     private List<AspspScaApproachPO> scaApproaches;
     private String paginationId;
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

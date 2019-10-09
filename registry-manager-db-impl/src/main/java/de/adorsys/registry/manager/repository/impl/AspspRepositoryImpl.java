@@ -33,7 +33,7 @@ public class AspspRepositoryImpl implements AspspRepository {
     }
 
     @Override
-    public void deleteById(String aspspId) {
+    public void deleteById(Long aspspId) {
         repository.deleteById(aspspId);
     }
 

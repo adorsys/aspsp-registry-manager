@@ -17,7 +17,7 @@ import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class AspspRepositoryImplTest {
-    private static final String ID = "1234567";
+    private static final Long ID = 1234567L;
 
     @InjectMocks
     private AspspRepositoryImpl repository;
