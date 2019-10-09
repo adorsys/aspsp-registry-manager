@@ -4,27 +4,31 @@ import javax.persistence.*;
 import java.util.List;
 import java.util.Objects;
 
-// TODO update due to DB design
 @Entity
 @Table(name = "aspsps")
 public class AspspEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private String id;
+    private Long id;
     private String name;
     private String bic;
     private String bankCode;
     private String url;
     private String adapterId;
     private String idpUrl;
+
+    // TODO discuss this field design and look for better approaches (String?)
+    @ElementCollection(targetClass = AspspScaApproachPO.class)
+    @Enumerated(EnumType.STRING)
+    @CollectionTable(name = "sca_approaches")
     private List<AspspScaApproachPO> scaApproaches;
     private String paginationId;
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

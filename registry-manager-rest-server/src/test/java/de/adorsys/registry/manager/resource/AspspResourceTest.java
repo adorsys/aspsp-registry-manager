@@ -33,7 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 public class AspspResourceTest {
-    private static final String ID = "1234567";
+    private static final Long ID = 1234567L;
 
     private MockMvc mockMvc;
 

@@ -58,7 +58,7 @@ public class AspspResource {
 
     @ApiOperation("Delete ASPSP")
     @DeleteMapping(V1_ASPSP_BY_ID)
-    public ResponseEntity deleteById(@PathVariable(("aspspId")) String id) {
+    public ResponseEntity deleteById(@PathVariable(("aspspId")) Long id) {
         logger.info("Delete ASPSP by id={}", id);
 
         aspspService.deleteById(id);

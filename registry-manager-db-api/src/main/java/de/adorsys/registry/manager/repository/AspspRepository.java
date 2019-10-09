@@ -19,7 +19,7 @@ public interface AspspRepository {
      */
     void saveAll(List<AspspPO> aspsps);
 
-    void deleteById(String aspspId);
+    void deleteById(Long aspspId);
 
     /**
      * Deletes all records from the existing Lucene indexes.

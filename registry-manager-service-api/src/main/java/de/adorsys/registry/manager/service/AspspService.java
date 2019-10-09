@@ -11,7 +11,7 @@ public interface AspspService {
 
     void saveAll(List<AspspBO> aspsps);
 
-    void deleteById(String aspspId);
+    void deleteById(Long aspspId);
 
     void deleteAll();
 }

@@ -1,7 +1,15 @@
-FROM openjdk:8-alpine
+FROM adorsys/java:11
 
-WORKDIR /service
-ENV JAVA_OPTS ""
-ENV SERVICE_PARAMS ""
-ADD registry-manager-app/target/registry-manager-app.jar /service/
-CMD java $JAVA_OPTS -jar registry-manager-app.jar $SERVICE_PARAMS
+MAINTAINER https://github.com/adorsys/aspsp-registry-manager/
+
+ENV SERVER_PORT 8089
+ENV JAVA_OPTS -Xmx1024m
+ENV JAVA_TOOL_OPTIONS -Xmx1024m
+
+WORKDIR /opt/aspsp-registry-manager
+
+COPY registry-manager-app/target/registry-manager-app.jar /opt/aspsp-registry-manager/registry-manager-app.jar
+
+EXPOSE 8089
+
+CMD exec $JAVA_HOME/bin/java $JAVA_OPTS -jar /opt/aspsp-registry-manager/registry-manager-app.jar
