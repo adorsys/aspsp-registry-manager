@@ -91,9 +91,9 @@ function search() {
         showTable();
     }
 }
+
 function addRow() {
     let clone = HIDDEN_ROW.cloneNode(true);
-    clone.cells[0].textContent = uuid();
     clone.removeAttribute("class");
     clone.setAttribute("class", "new");
     clone.lastElementChild.childNodes.forEach(e => {
@@ -112,13 +112,6 @@ function addRow() {
     // updating MDL library for making Tooltip working
     componentHandler.upgradeAllRegistered();
 }
-
-function uuid() {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-      let r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
-      return v.toString(16);
-    });
-  }
 
 function greenButton(e) {
     let tableRow = e.parentElement.parentElement;
@@ -191,15 +184,12 @@ function updateButton(e) {
             'Content-Type': 'application/json'
         },
         body: assembleRowData(e)
-    }).then((response) => {
+    }).then(response => {
         if (!response.ok) {
             throw Error(response.statusText);
         }
+        toggleButtons(e);
         return response;
-    }).then(response => {
-        if (response.ok) {
-            toggleButtons(e);
-        }
     }).catch(function (error) {
         console.log(error);
         operationFailed();
@@ -220,11 +210,11 @@ function saveButton(e) {
             throw Error(response.statusText);
         }
         row.removeAttribute("class");
-        return response;
+        toggleButtons(e);
+        return response.text();
     }).then(response => {
-        if (response.status === 201) {
-            toggleButtons(e);
-        }
+        let output = JSON.parse(response);
+        row.cells[0].textContent = output.id;
     }).catch(function (error) {
         console.log(error);
         operationFailed();
@@ -263,7 +253,7 @@ function buildRow(data) {
     componentHandler.upgradeAllRegistered();
 
     function approachParser(data, cell) {
-        if(!data) {
+        if (!data) {
             return;
         }
 
@@ -300,7 +290,11 @@ function clearTable() {
     let body = document.querySelectorAll("tbody>tr");
 
     if (body.length > 1) {
-        body.forEach(e => { if (!e.className) { e.remove(); } })
+        body.forEach(e => {
+            if (!e.className) {
+                e.remove();
+            }
+        })
     }
 }
 
@@ -365,39 +359,58 @@ function clearContent() {
     clearTable();
 
     document.querySelector(".show-more").hidden = true;
-    document.querySelectorAll(".mdl-textfield__input").forEach(element => {element.value = ""; element.parentElement.classList.remove("is-dirty")});
+    document.querySelectorAll(".mdl-textfield__input").forEach(element => {
+        element.value = "";
+        element.parentElement.classList.remove("is-dirty")
+    });
 }
 
 function uploadFailed() {
     let failure = document.querySelector(".failure.upload");
 
-    setTimeout(() => { failure.style.opacity = 1 }, 500);
+    setTimeout(() => {
+        failure.style.opacity = 1
+    }, 500);
 
-    setTimeout(() => { failure.style.opacity = 0 }, 8000);
+    setTimeout(() => {
+        failure.style.opacity = 0
+    }, 8000);
 }
 
 function searchFailed() {
     let failure = document.querySelector(".failure.search");
 
-    setTimeout(() => { failure.style.opacity = 1 }, 500);
+    setTimeout(() => {
+        failure.style.opacity = 1
+    }, 500);
 
-    setTimeout(() => { failure.style.opacity = 0 }, 8000);
+    setTimeout(() => {
+        failure.style.opacity = 0
+    }, 8000);
 }
 
 function operationFailed() {
     let failure = document.querySelector(".failure.operation");
 
-    setTimeout(() => { failure.style.opacity = 1 }, 500);
+    setTimeout(() => {
+        failure.style.opacity = 1
+    }, 500);
 
-    setTimeout(() => { failure.style.opacity = 0 }, 8000);
+    setTimeout(() => {
+        failure.style.opacity = 0
+    }, 8000);
 }
 
 function success() {
     let success = document.querySelector(".success");
 
-    setTimeout(() => { success.style.opacity = 1 }, 500);
+    setTimeout(() => {
+        success.style.opacity = 1
+    }, 500);
 
-    setTimeout(() => { success.style.opacity = 0 }, 8000);
+    setTimeout(() => {
+        success.style.opacity = 0
+    }, 8000);
 }
 
 function addTooltips(e) {
@@ -408,7 +421,9 @@ function addTooltips(e) {
     if (e.className.indexOf("edit") > -1) {
         let helper = e.parentNode.childNodes[7];
 
-        e.addEventListener("click", () => { editButton(e) });
+        e.addEventListener("click", () => {
+            editButton(e)
+        });
         e.setAttribute("id", editId + COUNTER);
 
         helper.setAttribute("data-mdl-for", editId + COUNTER);
@@ -418,7 +433,9 @@ function addTooltips(e) {
     if (e.className.indexOf("update") > -1) {
         let helper = e.parentNode.childNodes[9];
 
-        e.addEventListener("click", () => { greenButton(e) });
+        e.addEventListener("click", () => {
+            greenButton(e)
+        });
         e.setAttribute("id", updateId + COUNTER);
 
         helper.setAttribute("data-mdl-for", updateId + COUNTER);
@@ -428,13 +445,16 @@ function addTooltips(e) {
     if (e.className.indexOf("delete") > -1) {
         let helper = e.parentNode.childNodes[11];
 
-        e.addEventListener("click", () => { redButton(e) });
+        e.addEventListener("click", () => {
+            redButton(e)
+        });
         e.setAttribute("id", deleteId + COUNTER);
 
         helper.setAttribute("data-mdl-for", deleteId + COUNTER);
         helper.setAttribute("class", "mdl-tooltip mdl-tooltip--top");
     }
 }
+
 function persist() {
     fetch("v1/aspsps/persist", {
         method: "POST"
@@ -462,7 +482,7 @@ function paginate(data) {
     total.innerHTML = dataLength;
 
     function addPage() {
-        for (limit = current + Math.min(step, dataLength); current < limit; current++) {
+        for (let limit = current + Math.min(step, dataLength); current < limit; current++) {
             buildRow(data[current]);
         }
         button.hidden = current >= dataLength;
