@@ -28,7 +28,7 @@ public class AspspServiceImpl implements AspspService {
     public AspspBO save(AspspBO aspsp) {
         logger.info("Trying to save ASPSP {}", aspsp);
 
-        ckeckAndUpdateUUID(aspsp);
+        checkAndUpdateUUID(aspsp);
         AspspPO po = converter.toAspspPO(aspsp);
         AspspPO saved = repository.save(po);
 
@@ -47,7 +47,7 @@ public class AspspServiceImpl implements AspspService {
         logger.info("Trying to save ASPSPs {}", aspsps);
 
         for (AspspBO aspsp: aspsps) {
-            ckeckAndUpdateUUID(aspsp);
+            checkAndUpdateUUID(aspsp);
         }
 
         repository.saveAll(converter.toAspspPOList(aspsps));
@@ -60,7 +60,7 @@ public class AspspServiceImpl implements AspspService {
         repository.deleteAll();
     }
 
-    private void ckeckAndUpdateUUID(AspspBO aspsp) {
+    private void checkAndUpdateUUID(AspspBO aspsp) {
         if (aspsp.getId() == null) {
             aspsp.setId(UUID.randomUUID());
         }
