@@ -3,6 +3,7 @@ package de.adorsys.registry.manager.repository;
 import de.adorsys.registry.manager.repository.model.AspspPO;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface AspspRepository {
 
@@ -19,7 +20,7 @@ public interface AspspRepository {
      */
     void saveAll(List<AspspPO> aspsps);
 
-    void deleteById(Long aspspId);
+    void deleteById(UUID aspspId);
 
     /**
      * Deletes all records from the existing Lucene indexes.

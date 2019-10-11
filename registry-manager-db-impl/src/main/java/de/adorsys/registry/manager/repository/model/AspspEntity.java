@@ -3,13 +3,14 @@ package de.adorsys.registry.manager.repository.model;
 import javax.persistence.*;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 @Entity
 @Table(name = "aspsps")
 public class AspspEntity {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private UUID id;
     private String name;
     private String bic;
     private String bankCode;
@@ -20,15 +21,15 @@ public class AspspEntity {
     // TODO discuss this field design and look for better approaches (String?)
     @ElementCollection(targetClass = AspspScaApproachPO.class)
     @Enumerated(EnumType.STRING)
-    @CollectionTable(name = "sca_approaches")
+    @CollectionTable(name = "sca_approaches", joinColumns = @JoinColumn(name = "aspsp_id"))
     private List<AspspScaApproachPO> scaApproaches;
     private String paginationId;
 
-    public Long getId() {
+    public UUID getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 

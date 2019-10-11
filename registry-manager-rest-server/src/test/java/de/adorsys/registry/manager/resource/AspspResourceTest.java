@@ -25,6 +25,7 @@ import pro.javatar.commons.reader.JsonReader;
 import pro.javatar.commons.reader.YamlReader;
 
 import java.io.IOException;
+import java.util.UUID;
 
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -33,7 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 public class AspspResourceTest {
-    private static final Long ID = 1234567L;
+    private static final UUID ID = UUID.randomUUID();
 
     private MockMvc mockMvc;
 

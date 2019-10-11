@@ -4,6 +4,7 @@ package de.adorsys.registry.manager.service;
 import de.adorsys.registry.manager.service.model.AspspBO;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface AspspService {
 
@@ -11,7 +12,7 @@ public interface AspspService {
 
     void saveAll(List<AspspBO> aspsps);
 
-    void deleteById(Long aspspId);
+    void deleteById(UUID aspspId);
 
     void deleteAll();
 }

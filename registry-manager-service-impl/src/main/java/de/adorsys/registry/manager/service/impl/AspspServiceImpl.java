@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class AspspServiceImpl implements AspspService {
@@ -27,6 +28,7 @@ public class AspspServiceImpl implements AspspService {
     public AspspBO save(AspspBO aspsp) {
         logger.info("Trying to save ASPSP {}", aspsp);
 
+        ckeckAndUpdateUUID(aspsp);
         AspspPO po = converter.toAspspPO(aspsp);
         AspspPO saved = repository.save(po);
 
@@ -34,7 +36,7 @@ public class AspspServiceImpl implements AspspService {
     }
 
     @Override
-    public void deleteById(Long aspspId) {
+    public void deleteById(UUID aspspId) {
         logger.info("Deleting ASPSP by id={}", aspspId);
 
         repository.deleteById(aspspId);
@@ -44,6 +46,10 @@ public class AspspServiceImpl implements AspspService {
     public void saveAll(List<AspspBO> aspsps) {
         logger.info("Trying to save ASPSPs {}", aspsps);
 
+        for (AspspBO aspsp: aspsps) {
+            ckeckAndUpdateUUID(aspsp);
+        }
+
         repository.saveAll(converter.toAspspPOList(aspsps));
     }
 
@@ -52,5 +58,11 @@ public class AspspServiceImpl implements AspspService {
         logger.info("Deleting all ASPSPs");
 
         repository.deleteAll();
+    }
+
+    private void ckeckAndUpdateUUID(AspspBO aspsp) {
+        if (aspsp.getId() == null) {
+            aspsp.setId(UUID.randomUUID());
+        }
     }
 }

@@ -13,6 +13,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -20,7 +21,7 @@ import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class AspspServiceImplTest {
-    private static final Long ID = 1234567L;
+    private static final UUID ID = UUID.randomUUID();
 
     @InjectMocks
     private AspspServiceImpl aspspService;
