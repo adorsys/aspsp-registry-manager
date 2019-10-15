@@ -11,13 +11,15 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import java.util.UUID;
+
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class AspspRepositoryImplTest {
-    private static final Long ID = 1234567L;
+    private static final UUID ID = UUID.randomUUID();
 
     @InjectMocks
     private AspspRepositoryImpl repository;

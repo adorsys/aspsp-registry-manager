@@ -8,6 +8,7 @@ import de.adorsys.registry.manager.repository.model.AspspPO;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.UUID;
 
 @Component
 public class AspspRepositoryImpl implements AspspRepository {
@@ -33,7 +34,7 @@ public class AspspRepositoryImpl implements AspspRepository {
     }
 
     @Override
-    public void deleteById(Long aspspId) {
+    public void deleteById(UUID aspspId) {
         repository.deleteById(aspspId);
     }
 

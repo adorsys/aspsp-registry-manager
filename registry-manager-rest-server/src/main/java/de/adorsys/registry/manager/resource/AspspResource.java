@@ -11,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 
 @RestController
 @RequestMapping
@@ -58,7 +60,7 @@ public class AspspResource {
 
     @ApiOperation("Delete ASPSP")
     @DeleteMapping(V1_ASPSP_BY_ID)
-    public ResponseEntity deleteById(@PathVariable(("aspspId")) Long id) {
+    public ResponseEntity deleteById(@PathVariable(("aspspId")) UUID id) {
         logger.info("Delete ASPSP by id={}", id);
 
         aspspService.deleteById(id);

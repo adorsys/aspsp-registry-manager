@@ -4,6 +4,8 @@ import de.adorsys.registry.manager.repository.model.AspspEntity;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.UUID;
+
 @Repository
-public interface AspspJpaRepository extends PagingAndSortingRepository<AspspEntity, Long> {
+public interface AspspJpaRepository extends PagingAndSortingRepository<AspspEntity, UUID> {
 }

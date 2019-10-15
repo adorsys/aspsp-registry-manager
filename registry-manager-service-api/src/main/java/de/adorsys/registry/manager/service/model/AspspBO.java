@@ -2,9 +2,10 @@ package de.adorsys.registry.manager.service.model;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 public class AspspBO {
-    private Long id;
+    private UUID id;
     private String name;
     private String bic;
     private String bankCode;
@@ -14,11 +15,11 @@ public class AspspBO {
     private List<AspspScaApproachBO> scaApproaches;
     private String paginationId;
 
-    public Long getId() {
+    public UUID getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 
