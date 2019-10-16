@@ -395,9 +395,13 @@ function operationFailed() {
 function success() {
     let success = document.querySelector(".success");
 
-    setTimeout(() => { success.style.opacity = 1 }, 500);
+    setTimeout(() => {
+        success.style.opacity = 1
+    }, 500);
 
-    setTimeout(() => { success.style.opacity = 0 }, 8000);
+    setTimeout(() => {
+        success.style.opacity = 0
+    }, 8000);
 }
 
 function addTooltips(e) {
@@ -462,7 +466,7 @@ function paginate(data) {
     total.innerHTML = dataLength;
 
     function addPage() {
-        for (limit = current + Math.min(step, dataLength); current < limit; current++) {
+        for (let limit = current + Math.min(step, dataLength); current < limit; current++) {
             buildRow(data[current]);
         }
         button.hidden = current >= dataLength;

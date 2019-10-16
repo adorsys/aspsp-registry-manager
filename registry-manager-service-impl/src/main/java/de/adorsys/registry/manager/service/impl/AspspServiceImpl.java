@@ -46,9 +46,7 @@ public class AspspServiceImpl implements AspspService {
     public void saveAll(List<AspspBO> aspsps) {
         logger.info("Trying to save ASPSPs {}", aspsps);
 
-        for (AspspBO aspsp: aspsps) {
-            checkAndUpdateUUID(aspsp);
-        }
+        aspsps.forEach(this::checkAndUpdateUUID);
 
         repository.saveAll(converter.toAspspPOList(aspsps));
     }
