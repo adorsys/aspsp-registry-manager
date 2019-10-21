@@ -48,6 +48,12 @@
             <artifactId>mapstruct-jdk8</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.iban4j</groupId>
+            <artifactId>iban4j</artifactId>
+            <version>${iban4j.version}</version>
+        </dependency>
+
         <!-- test dependencies -->
 
         <dependency>

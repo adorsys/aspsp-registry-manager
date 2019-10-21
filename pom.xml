@@ -43,6 +43,7 @@
         <mockito.version>1.10.19</mockito.version>
         <javatar-commons.version>0.6</javatar-commons.version>
         <logback-gelf.version>1.1.0</logback-gelf.version>
+        <iban4j.version>3.2.1</iban4j.version>
     </properties>
 
     <dependencyManagement>

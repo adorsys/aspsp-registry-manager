@@ -7,6 +7,10 @@ import java.util.UUID;
 
 public interface AspspRepository {
 
+    List<AspspPO> findByExample(AspspPO aspsp, int page, int size);
+
+    List<AspspPO> findByBankCode(String bankCode, int page, int size);
+
     AspspPO save(AspspPO aspsp);
 
     /**
