@@ -16,14 +16,10 @@ import java.util.UUID;
 
 
 @RestController
-@RequestMapping
+@RequestMapping("/v1/aspsps")
 public class AspspResource {
 
     private static final Logger logger = LoggerFactory.getLogger(AspspResource.class);
-
-    private static final String ASPSP_ID = "{aspspId}";
-    private static final String V1_APSPS = "/v1/aspsps";
-    private static final String V1_ASPSP_BY_ID = V1_APSPS + "/" + ASPSP_ID;
 
     private final AspspService aspspService;
     private final AspspTOConverter converter;
@@ -33,7 +29,8 @@ public class AspspResource {
         this.converter = converter;
     }
 
-    @RequestMapping(value = V1_APSPS, method = RequestMethod.GET)
+    @ApiOperation("Get ASPSPs")
+    @GetMapping
     ResponseEntity<List<AspspTO>> getAspsps(@RequestParam(value = "name", required = false) String name,
                                             @RequestParam(value = "bic", required = false) String bic,
                                             @RequestParam(value = "bankCode", required = false) String bankCode,
@@ -66,7 +63,7 @@ public class AspspResource {
     }
 
     @ApiOperation("Create new ASPSP")
-    @PostMapping(V1_APSPS)
+    @PostMapping
     public ResponseEntity<AspspTO> create(@RequestBody AspspTO aspsp) {
         logger.info("Create new ASPSP={}", aspsp);
 
@@ -79,7 +76,7 @@ public class AspspResource {
     }
 
     @ApiOperation("Update ASPSP")
-    @PutMapping(V1_APSPS)
+    @PutMapping
     public ResponseEntity update(@RequestBody AspspTO aspsp) {
         logger.info("Update ASPSP={}", aspsp);
 
@@ -92,7 +89,7 @@ public class AspspResource {
     }
 
     @ApiOperation("Delete ASPSP")
-    @DeleteMapping(V1_ASPSP_BY_ID)
+    @DeleteMapping("/{aspspId}")
     public ResponseEntity deleteById(@PathVariable(("aspspId")) UUID id) {
         logger.info("Delete ASPSP by id={}", id);
 
@@ -104,7 +101,7 @@ public class AspspResource {
     }
 
     @ApiOperation("Delete all ASPSPs")
-    @DeleteMapping(V1_APSPS)
+    @DeleteMapping
     public ResponseEntity deleteAll() {
         logger.info("Delete all ASPSPs");
 
