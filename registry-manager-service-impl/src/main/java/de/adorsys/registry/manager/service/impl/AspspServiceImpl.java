@@ -47,7 +47,6 @@ public class AspspServiceImpl implements AspspService {
         try {
             bankCode = Iban.valueOf(iban).getBankCode();
         } catch (Iban4jException e) {
-            logger.error(iban, e);
             throw new IbanException(e.getMessage());
         }
 

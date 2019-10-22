@@ -88,7 +88,6 @@ public class AspspCsvServiceImpl implements AspspCsvService {
         try {
             return mapper.writer(schema).writeValueAsString(aspsp);
         } catch (JsonProcessingException e) {
-            logger.warn("Exception occurred while indexes were being written into a CSV: {}", e.getMessage());
             throw new UncheckedIOException(e);
         }
     }
