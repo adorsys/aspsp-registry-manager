@@ -48,6 +48,21 @@ public class AspspRepositoryImplTest {
     }
 
     @Test
+    public void findAll() {
+        List<AspspEntity> entities = List.of(entity);
+        List<AspspPO> pos = List.of(po);
+
+        when(jpaRepository.findAll()).thenReturn(entities);
+        when(converter.toAspspPOList(entities)).thenReturn(pos);
+
+        List<AspspPO> result = repository.findAll();
+
+        assertNotNull(result);
+        assertThat(result.size(), CoreMatchers.is(1));
+        assertEquals(po, result.get(0));
+    }
+
+    @Test
     public void findByExample() {
         ExampleMatcher matcher = ExampleMatcher.matchingAll()
                                          .withStringMatcher(ExampleMatcher.StringMatcher.STARTING)
