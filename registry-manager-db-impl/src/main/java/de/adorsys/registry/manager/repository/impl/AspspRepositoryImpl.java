@@ -25,6 +25,11 @@ public class AspspRepositoryImpl implements AspspRepository {
     }
 
     @Override
+    public List<AspspPO> findAll() {
+        return converter.toAspspPOList(repository.findAll());
+    }
+
+    @Override
     public List<AspspPO> findByExample(AspspPO aspsp, int page, int size) {
         AspspEntity entity = converter.toAspspEntity(aspsp);
 

@@ -54,6 +54,11 @@
             <version>${iban4j.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-csv</artifactId>
+        </dependency>
+
         <!-- test dependencies -->
 
         <dependency>
