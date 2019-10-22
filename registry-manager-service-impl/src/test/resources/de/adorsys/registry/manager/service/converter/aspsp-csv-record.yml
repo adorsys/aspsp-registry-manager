@@ -1,11 +1,10 @@
 id: 64a78f35-1792-4d3d-9e57-f4bf52a68265
-name: John
+aspspName: John
 bic: BIC
 bankCode: 111111
 url: https://www.example.com
 adapterId: ADAPTER_ID
 idpUrl: https://www.example.com
-scaApproaches:
+aspspScaApproaches:
   - EMBEDDED
   - REDIRECT
-paginationId: PAGINATION_ID
