@@ -15,31 +15,29 @@ import java.util.List;
 @ControllerAdvice
 public class ExceptionHandlingAdvisor {
     private static final Logger logger = LoggerFactory.getLogger(ExceptionHandlingAdvisor.class);
+    private static final String IBAN_EXCEPTION_ERROR_MESSAGE = "Exception during the IBAN processing: IBAN is incorrect";
+    private static final String UNCHECKED_IO_EXCEPTION_ERROR_MESSAGE = "Exception during the IO process";
+    private static final String EXCEPTION_ERROR_MESSAGE = "Server error";
 
     @ExceptionHandler(IbanException.class)
     public ResponseEntity<ErrorResponse> handle(IbanException ex) {
-        logError(ex);
-        String errorMessage = "Exception during the IBAN processing: IBAN is incorrect";
-        return ResponseEntity
-                       .status(HttpStatus.BAD_REQUEST)
-                       .body(new ErrorResponse(List.of(errorMessage)));
+        return handle(ex, IBAN_EXCEPTION_ERROR_MESSAGE, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(UncheckedIOException.class)
     public ResponseEntity<ErrorResponse> handle(UncheckedIOException ex) {
-        logError(ex);
-        String errorMessage = "Exception during the IO process";
-        return ResponseEntity
-                       .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                       .body(new ErrorResponse(List.of(errorMessage)));
+        return handle(ex, UNCHECKED_IO_EXCEPTION_ERROR_MESSAGE, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handle(Exception ex) {
+        return handle(ex, EXCEPTION_ERROR_MESSAGE, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    private ResponseEntity<ErrorResponse> handle(Exception ex, String errorMessage, HttpStatus httpStatus) {
         logError(ex);
-        String errorMessage = "Server error";
         return ResponseEntity
-                       .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                       .status(httpStatus)
                        .body(new ErrorResponse(List.of(errorMessage)));
     }
 
