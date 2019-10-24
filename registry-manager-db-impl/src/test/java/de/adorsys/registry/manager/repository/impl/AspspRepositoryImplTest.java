@@ -8,14 +8,14 @@ import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import org.mockito.*;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -29,12 +29,17 @@ public class AspspRepositoryImplTest {
     private static final int PAGE = 0;
     private static final int SIZE = 10;
     private static final String BANK_CODE = "111111";
+    private static final String BIC = "AABBCC";
 
+    @Spy
     @InjectMocks
     private AspspRepositoryImpl repository;
 
     @Mock
     private AspspJpaRepository jpaRepository;
+
+    @Captor
+    ArgumentCaptor<List<AspspPO>> captor;
 
     @Mock
     private AspspEntityConverter converter;
@@ -122,5 +127,20 @@ public class AspspRepositoryImplTest {
         repository.deleteById(ID);
 
         verify(jpaRepository, times(1)).deleteById(ID);
+    }
+
+    @Test
+    public void deleteAll() {
+        List<AspspPO> target = Arrays.asList(po, po);
+
+        when(jpaRepository.findOneByBicAndBankCode(any(), any())).thenReturn(any());
+
+        repository.deleteAll(target);
+
+        verify(repository, times(1)).deleteAll(captor.capture());
+        verify(jpaRepository, times(2)).findOneByBicAndBankCode(any(), any());
+
+        assertEquals(target.size(), captor.getValue().size());
+        assertThat(target.get(0), is(captor.getValue().get(0)));
     }
 }
