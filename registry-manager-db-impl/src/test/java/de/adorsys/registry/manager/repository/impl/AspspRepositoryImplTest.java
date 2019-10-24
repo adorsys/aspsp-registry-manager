@@ -4,31 +4,24 @@ import de.adorsys.registry.manager.repository.AspspJpaRepository;
 import de.adorsys.registry.manager.repository.converter.AspspEntityConverter;
 import de.adorsys.registry.manager.repository.model.AspspEntity;
 import de.adorsys.registry.manager.repository.model.AspspPO;
-import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class AspspRepositoryImplTest {
     private static final UUID ID = UUID.randomUUID();
-    private static final int PAGE = 0;
-    private static final int SIZE = 10;
-    private static final String BANK_CODE = "111111";
 
     @InjectMocks
     private AspspRepositoryImpl repository;
@@ -40,62 +33,15 @@ public class AspspRepositoryImplTest {
     private AspspEntityConverter converter;
     private AspspEntity entity;
     private AspspPO po;
+    private List<AspspPO> aspspPOList;
+    private List<AspspEntity> aspspEntityList;
 
     @Before
     public void setUp() throws Exception {
         entity = mock(AspspEntity.class);
         po = mock(AspspPO.class);
-    }
-
-    @Test
-    public void findAll() {
-        List<AspspEntity> entities = List.of(entity);
-        List<AspspPO> pos = List.of(po);
-
-        when(jpaRepository.findAll()).thenReturn(entities);
-        when(converter.toAspspPOList(entities)).thenReturn(pos);
-
-        List<AspspPO> result = repository.findAll();
-
-        assertNotNull(result);
-        assertThat(result.size(), CoreMatchers.is(1));
-        assertEquals(po, result.get(0));
-    }
-
-    @Test
-    public void findByExample() {
-        ExampleMatcher matcher = ExampleMatcher.matchingAll()
-                                         .withStringMatcher(ExampleMatcher.StringMatcher.STARTING)
-                                         .withIgnoreCase()
-                                         .withIgnoreNullValues();
-
-        List<AspspEntity> entities = List.of(entity);
-        List<AspspPO> pos = List.of(po);
-
-        when(converter.toAspspEntity(po)).thenReturn(entity);
-        when(jpaRepository.findAll(Example.of(entity, matcher), PageRequest.of(PAGE, SIZE))).thenReturn(new PageImpl<>(entities));
-        when(converter.toAspspPOList(entities)).thenReturn(pos);
-
-        List<AspspPO> result = repository.findByExample(po, PAGE, SIZE);
-
-        assertNotNull(result);
-        assertThat(result.size(), CoreMatchers.is(1));
-        assertEquals(po, result.get(0));
-    }
-
-    @Test
-    public void findByBankCode() {
-        List<AspspEntity> entities = List.of(entity);
-        List<AspspPO> pos = List.of(po);
-
-        when(jpaRepository.findByBankCode(BANK_CODE, PageRequest.of(PAGE, SIZE))).thenReturn(entities);
-        when(converter.toAspspPOList(entities)).thenReturn(pos);
-
-        List<AspspPO> result = repository.findByBankCode(BANK_CODE, PAGE, SIZE);
-
-        assertNotNull(result);
-        assertThat(result.size(), CoreMatchers.is(1));
-        assertEquals(po, result.get(0));
+        aspspPOList = Collections.singletonList(po);
+        aspspEntityList = Collections.singletonList(entity);
     }
 
     @Test
@@ -122,5 +68,17 @@ public class AspspRepositoryImplTest {
         repository.deleteById(ID);
 
         verify(jpaRepository, times(1)).deleteById(ID);
+    }
+
+    @Test
+    public void saveAll() {
+
+        when(converter.toAspspEntityList(aspspPOList)).thenReturn(aspspEntityList);
+        when(jpaRepository.saveAll(aspspEntityList)).thenReturn(any());
+
+        repository.saveAll(aspspPOList);
+
+        verify(converter, times(1)).toAspspEntityList(aspspPOList);
+        verify(jpaRepository, times(1)).saveAll(aspspEntityList);
     }
 }

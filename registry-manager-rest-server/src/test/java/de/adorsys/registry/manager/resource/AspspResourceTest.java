@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.util.UUID;
 
 import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -35,6 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 public class AspspResourceTest {
     private static final UUID ID = UUID.randomUUID();
+    private static final String BASE_URI = "/v1/aspsps";
 
     private MockMvc mockMvc;
 
@@ -70,7 +72,7 @@ public class AspspResourceTest {
         when(aspspService.save(bo)).thenReturn(bo);
 
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders
-                                                      .post("/v1/aspsps")
+                                                      .post(BASE_URI)
                                                       .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
                                                       .content(serialize(to)))
                                       .andDo(print())
@@ -88,7 +90,7 @@ public class AspspResourceTest {
         when(converter.toAspspTO(bo)).thenReturn(to);
 
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders
-                                                      .put("/v1/aspsps")
+                                                      .put(BASE_URI)
                                                       .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
                                                       .content(serialize(to)))
                                       .andDo(print())
@@ -105,7 +107,7 @@ public class AspspResourceTest {
         doNothing().when(aspspService).deleteById(ID);
 
         mockMvc.perform(MockMvcRequestBuilders
-                                .delete("/v1/aspsps/{id}", ID)
+                                .delete(BASE_URI + "/{id}", ID)
                                 .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
                                 .content(serialize(to)))
                 .andDo(print())
@@ -121,7 +123,7 @@ public class AspspResourceTest {
         doNothing().when(aspspService).deleteById(ID);
 
         mockMvc.perform(MockMvcRequestBuilders
-                                .delete("/v1/aspsps")
+                                .delete(BASE_URI)
                                 .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
                                 .content(serialize(to)))
                 .andDo(print())
@@ -129,6 +131,17 @@ public class AspspResourceTest {
                 .andReturn();
 
         verify(aspspService, times(1)).deleteAll();
+    }
+
+    @Test
+    public void merge() throws Exception {
+        doNothing().when(aspspService).convertAndSaveAll(any());
+
+        mockMvc.perform(multipart(BASE_URI + "/merge")
+            .file("file", "content".getBytes()))
+            .andExpect(status().is(HttpStatus.NO_CONTENT.value()));
+
+        verify(aspspService, times(1)).convertAndSaveAll(any());
     }
 
     private <T> T readYml(Class<T> aClass, String fileName) {

@@ -13,6 +13,17 @@
     <artifactId>registry-manager-service-api</artifactId>
     <name>registry-manager-service-api</name>
 
+    <dependencies>
+
+        <!-- other dependencies -->
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-csv</artifactId>
+        </dependency>
+
+    </dependencies>
+
     <build>
         <plugins>
             <plugin>
