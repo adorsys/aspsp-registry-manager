@@ -1,6 +1,6 @@
 package de.adorsys.registry.manager.resource;
 
-import de.adorsys.registry.manager.exception.ExceptionAdvisor;
+import de.adorsys.registry.manager.exception.ExceptionHandlingAdvisor;
 import de.adorsys.registry.manager.service.AspspCsvService;
 import org.junit.Before;
 import org.junit.Test;
@@ -47,7 +47,7 @@ public class AspspCsvResourceTest {
 
         mockMvc = MockMvcBuilders.standaloneSetup(resource)
                           .setMessageConverters()
-                          .setControllerAdvice(new ExceptionAdvisor())
+                          .setControllerAdvice(new ExceptionHandlingAdvisor())
                           .build();
     }
 
