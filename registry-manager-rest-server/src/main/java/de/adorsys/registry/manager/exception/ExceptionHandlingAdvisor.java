@@ -21,7 +21,7 @@ public class ExceptionHandlingAdvisor {
         logError(ex);
         String errorMessage = "Exception during the IBAN processing: IBAN is incorrect";
         return ResponseEntity
-                       .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                       .status(HttpStatus.BAD_REQUEST)
                        .body(new ErrorResponse(List.of(errorMessage)));
     }
 
