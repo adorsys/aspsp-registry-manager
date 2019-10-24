@@ -1,0 +1,43 @@
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  name: {{ .Chart.Name }}-db
+spec:
+  selector:
+    app: {{ .Chart.Name }}-db
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: {{ .Chart.Name }}-db
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}-db
+          image: centos/postgresql-95-centos7
+          env:
+            - name: POSTGRESQL_DATABASE
+              value: {{ .Values.db.name }}
+            - name: POSTGRESQL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: username
+            - name: POSTGRESQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: password
+            - name: POSTGRESQL_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: admin-password
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - name: postgres-data
+              mountPath: /var/lib/pgsql/data
+      volumes:
+        - name: postgres-data
+          persistentVolumeClaim:
+            claimName: {{ .Chart.Name }}-db
