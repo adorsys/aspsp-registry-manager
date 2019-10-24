@@ -1,0 +1,7 @@
+
+oc create secret generic postgres-credentials \
+    --from-literal=username=<username> \
+    --from-literal=password=<pw> \
+    --from-literal=admin-password=<pw>
+
+oc create secret generic config-secret --from-file=application.yml=application.yml

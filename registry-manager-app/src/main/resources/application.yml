@@ -6,13 +6,26 @@ spring:
 info:
   app:
     name: ${spring.application.name}
-    description: "Description"
+    description: @project.description@
     version: @project.version@
+    build: '#@build.number@'
     artifactId: @project.artifactId@
 
 server:
   # Authorization HTTP header requires to enlarge max header size.
   max-http-header-size: 65000
+
+manager:
+  users:
+    - name: user1
+      password: user
+      role: READER
+    - name: user2
+      password: user
+      role: MANAGER
+    - name: user3
+      password: user
+      role: DEPLOYER
 
 ---
 spring:
@@ -33,3 +46,15 @@ spring:
         jdbc:
           lob:
             non_contextual_creation: true
+  jackson:
+    default-property-inclusion: non_null
+    serialization:
+      indent-output: true
+      write-dates-as-timestamps: false
+    deserialization:
+      FAIL_ON_UNKNOWN_PROPERTIES: false
+
+logging.level.de.adorsys.registry.manager.client.AspspOutboundClient: DEBUG
+
+xs2a-adapter:
+  url: http://localhost:8999

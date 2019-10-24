@@ -4,11 +4,13 @@ import de.adorsys.registry.manager.converter.AspspTOConverter;
 import de.adorsys.registry.manager.model.AspspTO;
 import de.adorsys.registry.manager.service.AspspService;
 import de.adorsys.registry.manager.service.model.AspspBO;
+import de.adorsys.registry.manager.service.model.PageBO;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,19 +18,21 @@ import java.util.UUID;
 
 
 @RestController
-@RequestMapping("/v1/aspsps")
+@RequestMapping(AspspResource.ASPSP_URI)
 public class AspspResource {
 
     private static final Logger logger = LoggerFactory.getLogger(AspspResource.class);
+    public static final String ASPSP_URI = "/v1/aspsps";
 
     private final AspspService aspspService;
-    private final AspspTOConverter converter;
+    private AspspTOConverter converter;
 
     public AspspResource(AspspService aspspService, AspspTOConverter converter) {
         this.aspspService = aspspService;
         this.converter = converter;
     }
 
+    @PreAuthorize("isAuthenticated()")
     @ApiOperation("Get ASPSPs")
     @GetMapping
     ResponseEntity<List<AspspTO>> getAspsps(@RequestParam(value = "name", required = false) String name,
@@ -39,17 +43,18 @@ public class AspspResource {
                                             @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
         logger.info("Get all ASPSPs");
 
-        List<AspspBO> aspspBOs;
+        PageBO bos;
 
         if (iban != null && !iban.isEmpty()) {
-            aspspBOs = aspspService.getByIban(iban, page, size);
+            bos = aspspService.getByIban(iban, page, size);
         } else {
-            aspspBOs = aspspService.getByAspsp(buildAspspBO(name, bic, bankCode), page, size);
+            bos = aspspService.getByAspsp(buildAspspBO(name, bic, bankCode), page, size);
         }
 
         return ResponseEntity
                        .status(HttpStatus.OK)
-                       .body(converter.toAspspTOList(aspspBOs));
+                       .header("X-Total-Elements", String.valueOf(bos.getTotalElements()))
+                       .body(converter.toAspspTOList(bos.getContent()));
     }
 
     private AspspBO buildAspspBO(String name, String bic, String bankCode) {
@@ -62,6 +67,7 @@ public class AspspResource {
         return bo;
     }
 
+    @PreAuthorize("hasAnyRole('MANAGER','DEPLOYER')")
     @ApiOperation("Create new ASPSP")
     @PostMapping
     public ResponseEntity<AspspTO> create(@RequestBody AspspTO aspsp) {
@@ -75,6 +81,7 @@ public class AspspResource {
                        .body(converter.toAspspTO(bo));
     }
 
+    @PreAuthorize("hasAnyRole('MANAGER','DEPLOYER')")
     @ApiOperation("Update ASPSP")
     @PutMapping
     public ResponseEntity update(@RequestBody AspspTO aspsp) {
@@ -88,6 +95,7 @@ public class AspspResource {
                        .build();
     }
 
+    @PreAuthorize("hasAnyRole('MANAGER','DEPLOYER')")
     @ApiOperation("Delete ASPSP")
     @DeleteMapping("/{aspspId}")
     public ResponseEntity deleteById(@PathVariable(("aspspId")) UUID id) {
@@ -100,15 +108,12 @@ public class AspspResource {
                        .build();
     }
 
-    @ApiOperation("Delete all ASPSPs")
-    @DeleteMapping
-    public ResponseEntity deleteAll() {
-        logger.info("Delete all ASPSPs");
+    @PreAuthorize("isAuthenticated()")
+    @ApiOperation("Count all ASPSPs")
+    @GetMapping("/count")
+    public ResponseEntity count() {
+        logger.info("Count all records in the database");
 
-        aspspService.deleteAll();
-
-        return ResponseEntity
-                       .noContent()
-                       .build();
+        return ResponseEntity.status(HttpStatus.OK).body(aspspService.count());
     }
 }

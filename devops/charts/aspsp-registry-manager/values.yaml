@@ -1,0 +1,5 @@
+route:
+  host: aspsp-registry-manager-dev.cloud.adorsys.de
+
+db:
+  name: aspsp_registry

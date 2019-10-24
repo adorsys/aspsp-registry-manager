@@ -2,20 +2,20 @@ package de.adorsys.registry.manager.repository.impl;
 
 import de.adorsys.registry.manager.repository.AspspJpaRepository;
 import de.adorsys.registry.manager.repository.converter.AspspEntityConverter;
+import de.adorsys.registry.manager.repository.converter.AspspEntityConverterImpl;
 import de.adorsys.registry.manager.repository.model.AspspEntity;
 import de.adorsys.registry.manager.repository.model.AspspPO;
+import de.adorsys.registry.manager.repository.model.PagePO;
 import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import org.mockito.*;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.*;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -28,7 +28,17 @@ public class AspspRepositoryImplTest {
     private static final UUID ID = UUID.randomUUID();
     private static final int PAGE = 0;
     private static final int SIZE = 10;
+    private static final long TOTAL = 10L;
     private static final String BANK_CODE = "111111";
+    private static final String BIC_FIELD_NAME = "bic";
+    private static final String BANK_CODE_FIELD_NAME = "bankCode";
+    private static final String NAME_FIELD_NAME = "name";
+
+    private static final Sort SORT_BY_BIC_BANKCODE_NAME = Sort.by(
+            Sort.Order.by(BIC_FIELD_NAME).nullsLast(),
+            Sort.Order.by(BANK_CODE_FIELD_NAME).nullsLast(),
+            Sort.Order.by(NAME_FIELD_NAME).nullsLast()
+    );
 
     @InjectMocks
     private AspspRepositoryImpl repository;
@@ -36,8 +46,11 @@ public class AspspRepositoryImplTest {
     @Mock
     private AspspJpaRepository jpaRepository;
 
-    @Mock
-    private AspspEntityConverter converter;
+    @Captor
+    ArgumentCaptor<List<AspspEntity>> captor;
+
+    @Spy
+    private AspspEntityConverter converter = new AspspEntityConverterImpl();
     private AspspEntity entity;
     private AspspPO po;
 
@@ -53,7 +66,7 @@ public class AspspRepositoryImplTest {
         List<AspspPO> pos = List.of(po);
 
         when(jpaRepository.findAll()).thenReturn(entities);
-        when(converter.toAspspPOList(entities)).thenReturn(pos);
+        when(converter.toAspspPOList(any())).thenReturn(pos);
 
         List<AspspPO> result = repository.findAll();
 
@@ -64,7 +77,7 @@ public class AspspRepositoryImplTest {
 
     @Test
     public void findByExample() {
-        ExampleMatcher matcher = ExampleMatcher.matchingAll()
+        ExampleMatcher matcher = ExampleMatcher.matchingAny()
                                          .withStringMatcher(ExampleMatcher.StringMatcher.STARTING)
                                          .withIgnoreCase()
                                          .withIgnoreNullValues();
@@ -72,15 +85,16 @@ public class AspspRepositoryImplTest {
         List<AspspEntity> entities = List.of(entity);
         List<AspspPO> pos = List.of(po);
 
-        when(converter.toAspspEntity(po)).thenReturn(entity);
-        when(jpaRepository.findAll(Example.of(entity, matcher), PageRequest.of(PAGE, SIZE))).thenReturn(new PageImpl<>(entities));
-        when(converter.toAspspPOList(entities)).thenReturn(pos);
+        when(converter.toAspspEntity(any())).thenReturn(entity);
+        when(jpaRepository.findAll(Example.of(entity, matcher), PageRequest.of(PAGE, SIZE, SORT_BY_BIC_BANKCODE_NAME)))
+                .thenReturn(new PageImpl<>(entities));
+        when(converter.toAspspPOList(any())).thenReturn(pos);
 
-        List<AspspPO> result = repository.findByExample(po, PAGE, SIZE);
+        PagePO result = repository.findByExample(po, PAGE, SIZE);
 
         assertNotNull(result);
-        assertThat(result.size(), CoreMatchers.is(1));
-        assertEquals(po, result.get(0));
+        assertThat(result.getContent().size(), CoreMatchers.is(1));
+        assertEquals(po, result.getContent().get(0));
     }
 
     @Test
@@ -88,22 +102,22 @@ public class AspspRepositoryImplTest {
         List<AspspEntity> entities = List.of(entity);
         List<AspspPO> pos = List.of(po);
 
-        when(jpaRepository.findByBankCode(BANK_CODE, PageRequest.of(PAGE, SIZE))).thenReturn(entities);
-        when(converter.toAspspPOList(entities)).thenReturn(pos);
+        when(jpaRepository.findByBankCode(BANK_CODE, PageRequest.of(PAGE, SIZE))).thenReturn(new PageImpl<>(entities));
+        when(converter.toAspspPOList(any())).thenReturn(pos);
 
-        List<AspspPO> result = repository.findByBankCode(BANK_CODE, PAGE, SIZE);
+        PagePO result = repository.findByBankCode(BANK_CODE, PAGE, SIZE);
 
         assertNotNull(result);
-        assertThat(result.size(), CoreMatchers.is(1));
-        assertEquals(po, result.get(0));
+        assertThat(result.getContent().size(), CoreMatchers.is(1));
+        assertEquals(po, result.getContent().get(0));
     }
 
     @Test
     public void save() {
 
-        when(converter.toAspspEntity(po)).thenReturn(entity);
+        when(converter.toAspspEntity(any())).thenReturn(entity);
         when(jpaRepository.save(entity)).thenReturn(entity);
-        when(converter.toAspspPO(entity)).thenReturn(po);
+        when(converter.toAspspPO(any())).thenReturn(po);
 
         AspspPO actual = repository.save(po);
 
@@ -122,5 +136,32 @@ public class AspspRepositoryImplTest {
         repository.deleteById(ID);
 
         verify(jpaRepository, times(1)).deleteById(ID);
+    }
+
+    @Test
+    public void delete_list() {
+        List<AspspEntity> target = Arrays.asList(entity, entity);
+
+        doNothing().when(jpaRepository).deleteAll(any());
+        when(converter.toAspspEntityList(any())).thenReturn(target);
+
+        repository.delete(Collections.singletonList(po));
+
+        verify(converter, times(1)).toAspspEntityList(any());
+        verify(jpaRepository, times(1)).deleteAll(captor.capture());
+
+        assertEquals(target.size(), captor.getValue().size());
+        assertThat(target.get(0), is(captor.getValue().get(0)));
+        assertThat(target.get(1), is(captor.getValue().get(1)));
+    }
+
+    @Test
+    public void count() {
+        when(jpaRepository.count()).thenReturn(TOTAL);
+
+        long result = repository.count();
+
+        assertEquals(result, TOTAL);
+
     }
 }

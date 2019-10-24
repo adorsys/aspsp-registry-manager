@@ -1,19 +1,23 @@
 package de.adorsys.registry.manager.resource;
 
-import de.adorsys.registry.manager.exception.ExceptionAdvisor;
+import de.adorsys.registry.manager.config.SecurityConfig;
+import de.adorsys.registry.manager.converter.CsvFileValidationReportTOConverter;
+import de.adorsys.registry.manager.model.CsvFileValidationReportTO;
+import de.adorsys.registry.manager.model.CsvFileValidationReportTO.ValidationResultTO;
 import de.adorsys.registry.manager.service.AspspCsvService;
-import org.junit.Before;
+import de.adorsys.registry.manager.service.model.CsvFileValidationReportBO;
 import org.junit.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.Arrays;
 
@@ -24,37 +28,31 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
-@AutoConfigureMockMvc
+@RunWith(SpringRunner.class)
+@WebMvcTest(AspspCsvResource.class)
+@Import(SecurityConfig.class)
 public class AspspCsvResourceTest {
+    private static final String BASE_URI = "/v1/aspsps/csv";
+
     private static final byte[] STORED_BYTES_TEMPLATE
             = "81cecc67-6d1b-4169-b67c-2de52b99a0cc,\"BNP Paribas Germany, Consorsbank\",CSDBDE71XXX,https://xs2a-sndbx.consorsbank.de,consors-bank-adapter,76030080"
                       .getBytes();
 
+    @Autowired
     private MockMvc mockMvc;
 
-    @Mock
+    @MockBean
     private AspspCsvService service;
+    @MockBean
+    private CsvFileValidationReportTOConverter converter;
 
-    @InjectMocks
-    private AspspCsvResource resource;
-
-    @Before
-    public void setUp() {
-        MockitoAnnotations.initMocks(this);
-
-        mockMvc = MockMvcBuilders.standaloneSetup(resource)
-                          .setMessageConverters()
-                          .setControllerAdvice(new ExceptionAdvisor())
-                          .build();
-    }
-
+    @WithMockUser(roles = {"MANAGER", "DEPLOYER", "READER"})
     @Test
     public void export() throws Exception {
         when(service.exportCsv()).thenReturn(STORED_BYTES_TEMPLATE);
 
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders
-                                                      .get("/v1/aspsps/csv/export"))
+                                                      .get(BASE_URI + "/download"))
                                       .andExpect(status().is(HttpStatus.OK.value()))
                                       .andReturn();
 
@@ -64,13 +62,119 @@ public class AspspCsvResourceTest {
     }
 
     @Test
+    public void exportToLoginPage() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                                .get(BASE_URI + "/download"))
+                .andExpect(status().is(HttpStatus.FOUND.value()))
+                .andReturn();
+    }
+
+    @WithMockUser(roles = {"MANAGER", "DEPLOYER"})
+    @Test
     public void importCsv() throws Exception {
         doNothing().when(service).importCsv(any());
 
-        mockMvc.perform(multipart("/v1/aspsps/csv/import")
+        mockMvc.perform(multipart(BASE_URI + "/upload")
                                 .file("file", "content".getBytes()))
                 .andExpect(status().is(HttpStatus.OK.value()));
 
         verify(service, times(1)).importCsv(any());
+    }
+
+    @Test
+    public void importCsvRedirectToLoginPage() throws Exception {
+        mockMvc.perform(multipart(BASE_URI + "/upload")
+                                .file("file", "content".getBytes()))
+                .andExpect(status().is(HttpStatus.FOUND.value()));
+    }
+
+    @WithMockUser(roles = "READER")
+    @Test
+    public void importCsvForbidden() throws Exception {
+        mockMvc.perform(multipart(BASE_URI + "/upload")
+                                .file("file", "content".getBytes()))
+                .andExpect(status().is(HttpStatus.FORBIDDEN.value()));
+    }
+
+    @WithMockUser(roles = {"MANAGER", "DEPLOYER"})
+    @Test
+    public void merge() throws Exception {
+        doNothing().when(service).merge(any());
+
+        mockMvc.perform(multipart(BASE_URI + "/merge")
+                                .file("file", "content".getBytes()))
+                .andExpect(status().is(HttpStatus.NO_CONTENT.value()));
+
+        verify(service, times(1)).merge(any());
+    }
+
+    @Test
+    public void mergeRedirectToLoginPage() throws Exception {
+        mockMvc.perform(multipart(BASE_URI + "/merge")
+                                .file("file", "content".getBytes()))
+                .andExpect(status().is(HttpStatus.FOUND.value()));
+    }
+
+    @WithMockUser(roles = "READER")
+    @Test
+    public void mergeForbidden() throws Exception {
+        mockMvc.perform(multipart(BASE_URI + "/merge")
+                                .file("file", "content".getBytes()))
+                .andExpect(status().is(HttpStatus.FORBIDDEN.value()));
+    }
+
+    @WithMockUser(roles = {"MANAGER", "DEPLOYER"})
+    @Test
+    public void validateCsv_Success() throws Exception {
+        CsvFileValidationReportBO validationReportBO = new CsvFileValidationReportBO();
+        validationReportBO.valid();
+
+        CsvFileValidationReportTO validationReportTO = new CsvFileValidationReportTO();
+        validationReportTO.setValidationResult(ValidationResultTO.VALID);
+
+        when(service.validateCsv(any())).thenReturn(validationReportBO);
+        when(converter.toCsvFileValidationReportTO(validationReportBO)).thenReturn(validationReportTO);
+
+        mockMvc.perform(multipart(BASE_URI + "/validate")
+                                .file("file", "content".getBytes()))
+                .andExpect(status().is(HttpStatus.OK.value()));
+
+        verify(service, times(1)).validateCsv(any());
+        verify(converter, times(1)).toCsvFileValidationReportTO(validationReportBO);
+    }
+
+    @WithMockUser(roles = {"MANAGER", "DEPLOYER"})
+    @Test
+    public void validateCsv_Failure() throws Exception {
+        CsvFileValidationReportBO validationReportBO = new CsvFileValidationReportBO();
+        validationReportBO.notValid();
+
+        CsvFileValidationReportTO validationReportTO = new CsvFileValidationReportTO();
+        validationReportTO.setValidationResult(ValidationResultTO.NOT_VALID);
+
+        when(service.validateCsv(any())).thenReturn(validationReportBO);
+        when(converter.toCsvFileValidationReportTO(validationReportBO)).thenReturn(validationReportTO);
+
+        mockMvc.perform(multipart(BASE_URI + "/validate")
+                                .file("file", "content".getBytes()))
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()));
+
+        verify(service, times(1)).validateCsv(any());
+        verify(converter, times(1)).toCsvFileValidationReportTO(validationReportBO);
+    }
+
+    @WithMockUser(roles = "READER")
+    @Test
+    public void validateCsvForbidden() throws Exception {
+        mockMvc.perform(multipart(BASE_URI + "/validate")
+                                .file("file", "content".getBytes()))
+                .andExpect(status().is(HttpStatus.FORBIDDEN.value()));
+    }
+
+    @Test
+    public void validateCsvRedirectToLoginPage() throws Exception {
+        mockMvc.perform(multipart(BASE_URI + "/validate")
+                                .file("file", "content".getBytes()))
+                .andExpect(status().is(HttpStatus.FOUND.value()));
     }
 }

@@ -1,6 +1,9 @@
 package de.adorsys.registry.manager.resource;
 
+import de.adorsys.registry.manager.converter.CsvFileValidationReportTOConverter;
+import de.adorsys.registry.manager.model.CsvFileValidationReportTO;
 import de.adorsys.registry.manager.service.AspspCsvService;
+import de.adorsys.registry.manager.service.model.CsvFileValidationReportBO;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,6 +11,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,13 +24,16 @@ public class AspspCsvResource {
     private static final Logger logger = LoggerFactory.getLogger(AspspCsvResource.class);
 
     private final AspspCsvService aspspCsvService;
+    private final CsvFileValidationReportTOConverter validationReportConverter;
 
-    public AspspCsvResource(AspspCsvService aspspCsvService) {
+    public AspspCsvResource(AspspCsvService aspspCsvService, CsvFileValidationReportTOConverter validationReportConverter) {
         this.aspspCsvService = aspspCsvService;
+        this.validationReportConverter = validationReportConverter;
     }
 
+    @PreAuthorize("isAuthenticated()")
     @ApiOperation("Get all ASPSPs as CSV file")
-    @GetMapping(value = "/export", produces = "text/csv")
+    @GetMapping(value = "/download", produces = "text/csv")
     public ResponseEntity<byte[]> export() {
         logger.info("Get all ASPSPs as CSV file");
 
@@ -41,8 +48,30 @@ public class AspspCsvResource {
         return new ResponseEntity<>(response, responseHeaders, HttpStatus.OK);
     }
 
+    @PreAuthorize("hasAnyRole('MANAGER','DEPLOYER')")
+    @ApiOperation("Validate CSV file with ASPSPs")
+    @PostMapping(value = "/validate", consumes = {"multipart/form-data"})
+    public ResponseEntity<CsvFileValidationReportTO> validateCsv(@RequestParam MultipartFile file) {
+        logger.info("Validate the CSV file with ASPSPs");
+
+        try {
+            CsvFileValidationReportBO validationReportBO = aspspCsvService.validateCsv(file.getBytes());
+            CsvFileValidationReportTO validationReportTO = validationReportConverter.toCsvFileValidationReportTO(validationReportBO);
+
+            if (validationReportBO.isNotValid()) {
+                return ResponseEntity.badRequest()
+                               .body(validationReportTO);
+            }
+
+            return ResponseEntity.ok(validationReportTO);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    @PreAuthorize("hasAnyRole('MANAGER','DEPLOYER')")
     @ApiOperation("Post all ASPSPs from CSV file")
-    @PostMapping(value = "/import", consumes = {"multipart/form-data"})
+    @PostMapping(value = "/upload", consumes = {"multipart/form-data"})
     public void importCsv(@RequestParam MultipartFile file) {
         logger.info("Post all ASPSPs from CSV file");
 
@@ -51,5 +80,18 @@ public class AspspCsvResource {
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
+    }
+
+    @PreAuthorize("hasAnyRole('MANAGER','DEPLOYER')")
+    @ApiOperation("Merge ASPSPs")
+    @PostMapping(value = "/merge", consumes = {"multipart/form-data"})
+    public ResponseEntity merge(@RequestParam MultipartFile file) throws IOException {
+        logger.info("Merge ASPSPs");
+
+        aspspCsvService.merge(file.getBytes());
+
+        return ResponseEntity
+            .noContent()
+            .build();
     }
 }
