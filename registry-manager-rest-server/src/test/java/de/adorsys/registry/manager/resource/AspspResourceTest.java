@@ -3,7 +3,7 @@ package de.adorsys.registry.manager.resource;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.adorsys.registry.manager.converter.AspspTOConverter;
-import de.adorsys.registry.manager.exception.ExceptionAdvisor;
+import de.adorsys.registry.manager.exception.ExceptionHandlingAdvisor;
 import de.adorsys.registry.manager.model.AspspTO;
 import de.adorsys.registry.manager.service.AspspService;
 import de.adorsys.registry.manager.service.model.AspspBO;
@@ -55,7 +55,7 @@ public class AspspResourceTest {
 
         mockMvc = MockMvcBuilders
                           .standaloneSetup(resource)
-                          .setControllerAdvice(new ExceptionAdvisor())
+                          .setControllerAdvice(new ExceptionHandlingAdvisor())
                           .setMessageConverters(new MappingJackson2HttpMessageConverter())
                           .build();
 
