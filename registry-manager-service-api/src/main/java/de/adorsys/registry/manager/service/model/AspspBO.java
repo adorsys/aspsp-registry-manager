@@ -1,13 +1,9 @@
 package de.adorsys.registry.manager.service.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-@JsonPropertyOrder({"id", "name", "bic", "url", "adapterId", "bankCode", "idpUrl", "aspspScaApproaches"})
 public class AspspBO {
     private UUID id;
     private String name;
@@ -83,7 +79,6 @@ public class AspspBO {
         this.scaApproaches = scaApproaches;
     }
 
-    @JsonIgnore
     public String getPaginationId() {
         return paginationId;
     }

@@ -10,22 +10,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
 
 
 @RestController
-@RequestMapping
+@RequestMapping("/v1/aspsps")
 public class AspspResource {
 
     private static final Logger logger = LoggerFactory.getLogger(AspspResource.class);
-
-    private static final String ASPSP_ID = "{aspspId}";
-    private static final String V1_APSPS = "/v1/aspsps";
-    private static final String V1_ASPSP_BY_ID = V1_APSPS + "/" + ASPSP_ID;
-    private static final String V1_ASPSP_MERGE = V1_APSPS + "/merge";
 
     private final AspspService aspspService;
     private final AspspTOConverter converter;
@@ -35,8 +29,41 @@ public class AspspResource {
         this.converter = converter;
     }
 
+    @ApiOperation("Get ASPSPs")
+    @GetMapping
+    ResponseEntity<List<AspspTO>> getAspsps(@RequestParam(value = "name", required = false) String name,
+                                            @RequestParam(value = "bic", required = false) String bic,
+                                            @RequestParam(value = "bankCode", required = false) String bankCode,
+                                            @RequestParam(value = "iban", required = false) String iban, // if present - other params ignored
+                                            @RequestParam(value = "page", required = false, defaultValue = "0") int page,
+                                            @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
+        logger.info("Get all ASPSPs");
+
+        List<AspspBO> aspspBOs;
+
+        if (iban != null && !iban.isEmpty()) {
+            aspspBOs = aspspService.getByIban(iban, page, size);
+        } else {
+            aspspBOs = aspspService.getByAspsp(buildAspspBO(name, bic, bankCode), page, size);
+        }
+
+        return ResponseEntity
+                       .status(HttpStatus.OK)
+                       .body(converter.toAspspTOList(aspspBOs));
+    }
+
+    private AspspBO buildAspspBO(String name, String bic, String bankCode) {
+        AspspBO bo = new AspspBO();
+
+        bo.setName(name);
+        bo.setBic(bic);
+        bo.setBankCode(bankCode);
+
+        return bo;
+    }
+
     @ApiOperation("Create new ASPSP")
-    @PostMapping(V1_APSPS)
+    @PostMapping
     public ResponseEntity<AspspTO> create(@RequestBody AspspTO aspsp) {
         logger.info("Create new ASPSP={}", aspsp);
 
@@ -49,7 +76,7 @@ public class AspspResource {
     }
 
     @ApiOperation("Update ASPSP")
-    @PutMapping(V1_APSPS)
+    @PutMapping
     public ResponseEntity update(@RequestBody AspspTO aspsp) {
         logger.info("Update ASPSP={}", aspsp);
 
@@ -62,7 +89,7 @@ public class AspspResource {
     }
 
     @ApiOperation("Delete ASPSP")
-    @DeleteMapping(V1_ASPSP_BY_ID)
+    @DeleteMapping("/{aspspId}")
     public ResponseEntity deleteById(@PathVariable(("aspspId")) UUID id) {
         logger.info("Delete ASPSP by id={}", id);
 
@@ -71,29 +98,5 @@ public class AspspResource {
         return ResponseEntity
                        .noContent()
                        .build();
-    }
-
-    @ApiOperation("Delete all ASPSPs")
-    @DeleteMapping(V1_APSPS)
-    public ResponseEntity deleteAll() {
-        logger.info("Delete all ASPSPs");
-
-        aspspService.deleteAll();
-
-        return ResponseEntity
-                       .noContent()
-                       .build();
-    }
-
-    @ApiOperation("Merge ASPSPs")
-    @PostMapping(value = V1_ASPSP_MERGE, consumes = {"multipart/form-data"})
-    public ResponseEntity merge(@RequestParam MultipartFile file) throws IOException {
-        logger.info("Merge ASPSPs");
-
-        aspspService.convertAndSaveAll(file.getBytes());
-
-        return ResponseEntity
-            .noContent()
-            .build();
     }
 }
