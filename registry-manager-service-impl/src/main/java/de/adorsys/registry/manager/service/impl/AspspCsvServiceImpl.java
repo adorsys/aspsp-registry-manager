@@ -87,7 +87,7 @@ public class AspspCsvServiceImpl implements AspspCsvService {
                 }
 
 //                no match, match by id, or id is NULL and no match by BIC and BLZ
-                forSave.add(item);
+                forSave.add(element);
             });
         });
 
@@ -98,22 +98,22 @@ public class AspspCsvServiceImpl implements AspspCsvService {
         aspspRepository.saveAll(uuidGeneratorService.checkAndUpdateUUID(forSave));
     }
 
-    private void logicForProcessingWithNullId(List<AspspPO> input, List<AspspPO> forSave, AspspPO checker, AspspPO target) {
+    private void logicForProcessingWithNullId(List<AspspPO> input, List<AspspPO> forSave, AspspPO item, AspspPO element) {
 //        input id is NULL, but match by BIC and BLZ
-        if (areBicAndBlzEqual(checker, target)) {
-            AspspPO copy = copyContent(target);
-            copy.setId(target.getId());
+        if (areBicAndBlzEqual(item, element)) {
+            AspspPO copy = copyContent(element);
+            copy.setId(item.getId());
             forSave.add(copy);
-            input.remove(checker);
+            input.remove(element);
         }
     }
 
-    private boolean areBicAndBlzEqual(AspspPO checker, AspspPO target) {
-        return target.getBic().equals(checker.getBic()) && target.getBankCode().equals(checker.getBankCode());
+    private boolean areBicAndBlzEqual(AspspPO item, AspspPO element) {
+        return element.getBic().equals(item.getBic()) && element.getBankCode().equals(item.getBankCode());
     }
 
-    private boolean areBicAndBlzEqualWithDifferentId(AspspPO checker, AspspPO target) {
-        return !target.getId().equals(checker.getId()) && target.getBic().equals(checker.getBic()) && target.getBankCode().equals(checker.getBankCode());
+    private boolean areBicAndBlzEqualWithDifferentId(AspspPO item, AspspPO element) {
+        return !element.getId().equals(item.getId()) && element.getBic().equals(item.getBic()) && element.getBankCode().equals(item.getBankCode());
     }
 
     private AspspPO copyContent(AspspPO from) {
