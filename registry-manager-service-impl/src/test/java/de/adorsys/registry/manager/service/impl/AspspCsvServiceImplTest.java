@@ -153,7 +153,7 @@ public class AspspCsvServiceImplTest {
 //        get forDeleting list
         assertEquals(POS.size(), captor.getAllValues().get(1).size());
         assertThat(PO, is(captor.getAllValues().get(1).get(0)));
-//        get forSafe list
+//        get forSave list
         assertEquals(test.size(), captor.getAllValues().get(0).size());
         assertThat(POS_updated, is(captor.getAllValues().get(0).get(0)));
     }

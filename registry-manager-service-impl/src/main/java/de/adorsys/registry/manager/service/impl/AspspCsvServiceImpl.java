@@ -100,7 +100,7 @@ public class AspspCsvServiceImpl implements AspspCsvService {
 
     private void logicForProcessingWithNullId(List<AspspPO> input, List<AspspPO> forSave, AspspPO checker, AspspPO target) {
 //        input id is NULL, but match by BIC and BLZ
-        if (areBicAbdBlzEqual(checker, target)) {
+        if (areBicAndBlzEqual(checker, target)) {
             AspspPO copy = copyContent(target);
             copy.setId(target.getId());
             forSave.add(copy);
@@ -108,7 +108,7 @@ public class AspspCsvServiceImpl implements AspspCsvService {
         }
     }
 
-    private boolean areBicAbdBlzEqual(AspspPO checker, AspspPO target) {
+    private boolean areBicAndBlzEqual(AspspPO checker, AspspPO target) {
         return target.getBic().equals(checker.getBic()) && target.getBankCode().equals(checker.getBankCode());
     }
 
