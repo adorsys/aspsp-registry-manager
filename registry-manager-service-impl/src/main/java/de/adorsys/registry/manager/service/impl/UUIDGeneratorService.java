@@ -9,13 +9,15 @@ import java.util.UUID;
 @Component
 public class UUIDGeneratorService {
 
-    void checkAndUpdateUUID (List<AspspPO> aspsps) {
+    List<AspspPO> checkAndUpdateUUID (List<AspspPO> aspsps) {
         aspsps.forEach(this::checkAndUpdateUUID);
+        return aspsps;
     }
 
-    void checkAndUpdateUUID (AspspPO aspsp) {
+    AspspPO checkAndUpdateUUID (AspspPO aspsp) {
         if (aspsp.getId() == null) {
             aspsp.setId(UUID.randomUUID());
         }
+        return aspsp;
     }
 }

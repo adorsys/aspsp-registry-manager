@@ -10,7 +10,6 @@ import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
@@ -73,15 +72,7 @@ public class AspspRepositoryImpl implements AspspRepository {
         repository.deleteAll();
     }
 
-    @Override
     public void deleteAll(List<AspspPO> aspsps) {
-        List<AspspEntity> target = new LinkedList<>();
-
-        aspsps.forEach(element -> target.add(repository.findOneByBicAndBankCode(element.getBic(), element.getBankCode())));
-        deleteList(target);
-    }
-
-    private void deleteList(List<AspspEntity> aspspEntities) {
-        repository.deleteAll(aspspEntities);
+        repository.deleteAll(converter.toAspspEntityList(aspsps));
     }
 }

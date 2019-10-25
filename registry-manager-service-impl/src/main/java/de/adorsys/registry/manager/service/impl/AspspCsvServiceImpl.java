@@ -67,49 +67,53 @@ public class AspspCsvServiceImpl implements AspspCsvService {
     @Override
     public void importCsv(byte[] file) {
         List<AspspPO> aspsps = readAllRecords(file);
-        uuidGeneratorService.checkAndUpdateUUID(aspsps);
         aspspRepository.deleteAll();
-        aspspRepository.saveAll(aspsps);
+        aspspRepository.saveAll(uuidGeneratorService.checkAndUpdateUUID(aspsps));
     }
 
     @Override
     public void deserializeAndMerge(byte[] file) {
         List<AspspPO> input = readAllRecords(file);
         List<AspspPO> database = aspspRepository.findAll();
-        List<AspspPO> forUpdate = new LinkedList<>(), forSave = new LinkedList<>();
+        List<AspspPO> forDeleting = new LinkedList<>(), forSave = new LinkedList<>();
 
-        input.forEach(in -> {
-            if (in.getId() != null) {
-//                match on BIC and BLZ but NOT Id
-                database.stream().filter(element -> in.getBic().equals(element.getBic()) && in.getBankCode().equals(element.getBankCode()) && !in.getId().equals(element.getId()))
-                    .forEach(element -> {
-                        AspspPO copy = copyContent(in);
-                        forUpdate.add(copy);
-                        input.remove(in);
-                    });
-                forSave.add(in);
-            } else {
-//                match on BIC and BLZ, input id is NULL
-                database.stream().filter(element -> in.getBic().equals(element.getBic()) && in.getBankCode().equals(element.getBankCode()))
-                    .forEach(element -> {
-                        AspspPO copy = copyContent(in);
-                        copy.setId(element.getId());
-                        forSave.add(copy);
-                        input.remove(in);
-                    });
-//                no match, input id is NULL
-                forSave.add(in);
-            }
+        database.forEach(item -> {
+            input.forEach(element -> {
+                if (element.getId() == null) {
+                    logicForProcessingWithNullId(input, forSave, item, element);
+//                no match by id, but match by BIC and BLZ
+                } else if (areBicAndBlzEqualWithDifferentId(item, element)) {
+                    forDeleting.add(item);
+                }
+
+//                no match, match by id, or id is NULL and no match by BIC and BLZ
+                forSave.add(item);
+            });
         });
 
-//        everything that has been matched by id, no match by id (new entries), id is NULL and matched by BIC and BLZ and no match with NULL id (new entries)
-        uuidGeneratorService.checkAndUpdateUUID(forSave);
-        aspspRepository.saveAll(forSave);
-
 //        everything that has been matched by BIC and BLZ but not by id (id is NOT NULL)
-        aspspRepository.deleteAll(forUpdate);
-        uuidGeneratorService.checkAndUpdateUUID(forUpdate);
-        aspspRepository.saveAll(forUpdate);
+        aspspRepository.deleteAll(forDeleting);
+
+//        everything that has been matched by id, no match by id (new entries), id is NULL and matched by BIC and BLZ and no match with NULL id (new entries)
+        aspspRepository.saveAll(uuidGeneratorService.checkAndUpdateUUID(forSave));
+    }
+
+    private void logicForProcessingWithNullId(List<AspspPO> input, List<AspspPO> forSave, AspspPO checker, AspspPO target) {
+//        input id is NULL, but match by BIC and BLZ
+        if (areBicAbdBlzEqual(checker, target)) {
+            AspspPO copy = copyContent(target);
+            copy.setId(target.getId());
+            forSave.add(copy);
+            input.remove(checker);
+        }
+    }
+
+    private boolean areBicAbdBlzEqual(AspspPO checker, AspspPO target) {
+        return target.getBic().equals(checker.getBic()) && target.getBankCode().equals(checker.getBankCode());
+    }
+
+    private boolean areBicAndBlzEqualWithDifferentId(AspspPO checker, AspspPO target) {
+        return !target.getId().equals(checker.getId()) && target.getBic().equals(checker.getBic()) && target.getBankCode().equals(checker.getBankCode());
     }
 
     private AspspPO copyContent(AspspPO from) {

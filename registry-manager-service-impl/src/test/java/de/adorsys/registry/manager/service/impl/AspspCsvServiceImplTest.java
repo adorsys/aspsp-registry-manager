@@ -5,7 +5,6 @@ import de.adorsys.registry.manager.repository.model.AspspPO;
 import de.adorsys.registry.manager.repository.model.AspspScaApproachPO;
 import de.adorsys.registry.manager.service.converter.AspspCsvRecordConverter;
 import de.adorsys.registry.manager.service.converter.AspspCsvRecordConverterImpl;
-import de.adorsys.registry.manager.service.model.AspspBO;
 import de.adorsys.registry.manager.service.model.AspspCsvRecord;
 import de.adorsys.registry.manager.service.model.AspspScaApproachBO;
 import org.junit.Test;
@@ -73,10 +72,12 @@ public class AspspCsvServiceImplTest {
     public void importCsv() {
         doNothing().when(repository).deleteAll();
         when(converter.toAspspPOList(CSV_RECORDS)).thenReturn(POS);
+        when(uuidGeneratorService.checkAndUpdateUUID(anyListOf(AspspPO.class))).thenReturn(POS);
         doNothing().when(repository).saveAll(POS);
 
         service.importCsv(STORED_BYTES_TEMPLATE);
 
+        verify(uuidGeneratorService, times(1)).checkAndUpdateUUID(anyListOf(AspspPO.class));
         verify(repository, times(1)).deleteAll();
         verify(repository, times(1)).saveAll(POS);
     }
@@ -85,10 +86,12 @@ public class AspspCsvServiceImplTest {
     public void importCsv_scaApproachesWithSpaces() {
         doNothing().when(repository).deleteAll();
         when(converter.toAspspPOList(CSV_RECORDS)).thenReturn(POS);
+        when(uuidGeneratorService.checkAndUpdateUUID(anyListOf(AspspPO.class))).thenReturn(POS);
         doNothing().when(repository).saveAll(POS);
 
         service.importCsv(STORED_BYTES_TEMPLATE_WITH_SPACES_IN_SCA_APPROACHES);
 
+        verify(uuidGeneratorService, times(1)).checkAndUpdateUUID(anyListOf(AspspPO.class));
         verify(repository, times(1)).deleteAll();
         verify(repository, times(1)).saveAll(POS);
     }
@@ -97,10 +100,12 @@ public class AspspCsvServiceImplTest {
     public void importCsv_lowercaseScaApproaches() {
         doNothing().when(repository).deleteAll();
         when(converter.toAspspPOList(CSV_RECORDS)).thenReturn(POS);
+        when(uuidGeneratorService.checkAndUpdateUUID(anyListOf(AspspPO.class))).thenReturn(POS);
         doNothing().when(repository).saveAll(POS);
 
         service.importCsv(STORED_BYTES_TEMPLATE_WITH_LOWERCASE_SCA_APPROACHES);
 
+        verify(uuidGeneratorService, times(1)).checkAndUpdateUUID(anyListOf(AspspPO.class));
         verify(repository, times(1)).deleteAll();
         verify(repository, times(1)).saveAll(POS);
     }
@@ -110,11 +115,13 @@ public class AspspCsvServiceImplTest {
         doNothing().when(repository).saveAll(anyListOf(AspspPO.class));
         doNothing().when(repository).deleteAll(anyListOf(AspspPO.class));
         when(repository.findAll()).thenReturn(POS);
+        when(uuidGeneratorService.checkAndUpdateUUID(anyListOf(AspspPO.class))).thenReturn(POS);
 
         service.deserializeAndMerge(STORED_BYTES_TEMPLATE);
 
+        verify(uuidGeneratorService, times(1)).checkAndUpdateUUID(anyListOf(AspspPO.class));
         verify(repository, times(1)).findAll();
-        verify(repository, times(2)).saveAll(captor.capture());
+        verify(repository, times(1)).saveAll(captor.capture());
         verify(repository, times(1)).deleteAll(anyListOf(AspspPO.class));
 
 //        get forSave list
@@ -123,7 +130,7 @@ public class AspspCsvServiceImplTest {
     }
 
     @Test
-    public void deserializeAndMerge_forUpdate() {
+    public void deserializeAndMerge_forDeleting() {
         AspspPO POS_updated = buildAspspPO();
         POS_updated.setId(UUID.randomUUID());
         List<AspspPO> test = new LinkedList<>();
@@ -133,17 +140,22 @@ public class AspspCsvServiceImplTest {
         doNothing().when(repository).deleteAll(anyListOf(AspspPO.class));
         when(repository.findAll()).thenReturn(POS);
         when(converter.toAspspPOList(anyListOf(AspspCsvRecord.class))).thenReturn(test);
+        when(uuidGeneratorService.checkAndUpdateUUID(anyListOf(AspspPO.class))).thenReturn(test);
 
         service.deserializeAndMerge(STORED_BYTES_TEMPLATE);
 
+        verify(uuidGeneratorService, times(1)).checkAndUpdateUUID(anyListOf(AspspPO.class));
         verify(converter, times(1)).toAspspPOList(anyListOf(AspspCsvRecord.class));
         verify(repository, times(1)).findAll();
-        verify(repository, times(2)).saveAll(captor.capture());
-        verify(repository, times(1)).deleteAll(anyListOf(AspspPO.class));
+        verify(repository, times(1)).saveAll(captor.capture());
+        verify(repository, times(1)).deleteAll(captor.capture());
 
-//        get forUpdate list
+//        get forDeleting list
         assertEquals(POS.size(), captor.getAllValues().get(1).size());
-        assertThat(POS_updated, is(captor.getAllValues().get(1).get(0)));
+        assertThat(PO, is(captor.getAllValues().get(1).get(0)));
+//        get forSafe list
+        assertEquals(test.size(), captor.getAllValues().get(0).size());
+        assertThat(POS_updated, is(captor.getAllValues().get(0).get(0)));
     }
 
     private static AspspPO buildAspspPO() {

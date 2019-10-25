@@ -12,16 +12,4 @@ import java.util.UUID;
 public interface AspspJpaRepository extends JpaRepository<AspspEntity, UUID> {
 
     List<AspspEntity> findByBankCode(String bankCode, Pageable pageable);
-
-    /**
-     * Looks for and returns a found entity from the database by input params
-     * <p>
-     * Searches for {@link AspspEntity} that has BIC and Bank Code specified
-     * in method parameters
-     *
-     * @param bic
-     * @param bankCode
-     * @return AspspEntity object
-     */
-    AspspEntity findOneByBicAndBankCode(String bic, String bankCode);
 }

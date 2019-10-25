@@ -64,8 +64,7 @@ public class AspspServiceImpl implements AspspService {
         logger.info("Trying to save ASPSP {}", aspsp);
 
         AspspPO po = converter.toAspspPO(aspsp);
-        uuidGeneratorService.checkAndUpdateUUID(po);
-        AspspPO saved = repository.save(po);
+        AspspPO saved = repository.save(uuidGeneratorService.checkAndUpdateUUID(po));
 
         return converter.toAspspBO(saved);
     }
@@ -82,9 +81,8 @@ public class AspspServiceImpl implements AspspService {
         logger.info("Trying to save ASPSPs {}", aspsps);
 
         List<AspspPO> aspspPOList = converter.toAspspPOList(aspsps);
-        uuidGeneratorService.checkAndUpdateUUID(aspspPOList);
 
-        repository.saveAll(aspspPOList);
+        repository.saveAll(uuidGeneratorService.checkAndUpdateUUID(aspspPOList));
     }
 
     @Override
