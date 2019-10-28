@@ -22,5 +22,5 @@ public interface AspspCsvService {
      *
      * @param file as an array of bytes
      */
-    void deserializeAndMerge(byte[] file);
+    void merge(byte[] file);
 }

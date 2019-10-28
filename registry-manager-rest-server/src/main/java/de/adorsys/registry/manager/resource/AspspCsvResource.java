@@ -58,7 +58,7 @@ public class AspspCsvResource {
     public ResponseEntity merge(@RequestParam MultipartFile file) throws IOException {
         logger.info("Merge ASPSPs");
 
-        aspspCsvService.deserializeAndMerge(file.getBytes());
+        aspspCsvService.merge(file.getBytes());
 
         return ResponseEntity
             .noContent()

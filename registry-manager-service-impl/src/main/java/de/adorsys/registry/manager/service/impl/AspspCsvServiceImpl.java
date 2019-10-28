@@ -72,22 +72,22 @@ public class AspspCsvServiceImpl implements AspspCsvService {
     }
 
     @Override
-    public void deserializeAndMerge(byte[] file) {
+    public void merge(byte[] file) {
         List<AspspPO> input = readAllRecords(file);
         List<AspspPO> database = aspspRepository.findAll();
         List<AspspPO> forDeleting = new LinkedList<>(), forSave = new LinkedList<>();
 
-        database.forEach(item -> {
-            input.forEach(element -> {
-                if (element.getId() == null) {
-                    logicForProcessingWithNullId(input, forSave, item, element);
+        database.forEach(dbItem -> {
+            input.forEach(inputItem -> {
+                if (inputItem.getId() == null) {
+                    logicForProcessingWithNullId(input, forSave, dbItem, inputItem);
 //                no match by id, but match by BIC and BLZ
-                } else if (areBicAndBlzEqualWithDifferentId(item, element)) {
-                    forDeleting.add(item);
+                } else if (areBicAndBlzEqualWithDifferentId(dbItem, inputItem)) {
+                    forDeleting.add(dbItem);
                 }
 
 //                no match, match by id, or id is NULL and no match by BIC and BLZ
-                forSave.add(element);
+                forSave.add(inputItem);
             });
         });
 
@@ -98,22 +98,22 @@ public class AspspCsvServiceImpl implements AspspCsvService {
         aspspRepository.saveAll(uuidGeneratorService.checkAndUpdateUUID(forSave));
     }
 
-    private void logicForProcessingWithNullId(List<AspspPO> input, List<AspspPO> forSave, AspspPO item, AspspPO element) {
+    private void logicForProcessingWithNullId(List<AspspPO> input, List<AspspPO> forSave, AspspPO dbItem, AspspPO inputItem) {
 //        input id is NULL, but match by BIC and BLZ
-        if (areBicAndBlzEqual(item, element)) {
-            AspspPO copy = copyContent(element);
-            copy.setId(item.getId());
+        if (areBicAndBlzEqual(dbItem, inputItem)) {
+            AspspPO copy = copyContent(inputItem);
+            copy.setId(dbItem.getId());
             forSave.add(copy);
-            input.remove(element);
+            input.remove(inputItem);
         }
     }
 
-    private boolean areBicAndBlzEqual(AspspPO item, AspspPO element) {
-        return element.getBic().equals(item.getBic()) && element.getBankCode().equals(item.getBankCode());
+    private boolean areBicAndBlzEqual(AspspPO dbItem, AspspPO inputItem) {
+        return inputItem.getBic().equals(dbItem.getBic()) && inputItem.getBankCode().equals(dbItem.getBankCode());
     }
 
-    private boolean areBicAndBlzEqualWithDifferentId(AspspPO item, AspspPO element) {
-        return !element.getId().equals(item.getId()) && element.getBic().equals(item.getBic()) && element.getBankCode().equals(item.getBankCode());
+    private boolean areBicAndBlzEqualWithDifferentId(AspspPO dbItem, AspspPO inputItem) {
+        return !inputItem.getId().equals(dbItem.getId()) && areBicAndBlzEqual(dbItem, inputItem);
     }
 
     private AspspPO copyContent(AspspPO from) {

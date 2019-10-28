@@ -117,7 +117,7 @@ public class AspspCsvServiceImplTest {
         when(repository.findAll()).thenReturn(POS);
         when(uuidGeneratorService.checkAndUpdateUUID(anyListOf(AspspPO.class))).thenReturn(POS);
 
-        service.deserializeAndMerge(STORED_BYTES_TEMPLATE);
+        service.merge(STORED_BYTES_TEMPLATE);
 
         verify(uuidGeneratorService, times(1)).checkAndUpdateUUID(anyListOf(AspspPO.class));
         verify(repository, times(1)).findAll();
@@ -142,7 +142,7 @@ public class AspspCsvServiceImplTest {
         when(converter.toAspspPOList(anyListOf(AspspCsvRecord.class))).thenReturn(test);
         when(uuidGeneratorService.checkAndUpdateUUID(anyListOf(AspspPO.class))).thenReturn(test);
 
-        service.deserializeAndMerge(STORED_BYTES_TEMPLATE);
+        service.merge(STORED_BYTES_TEMPLATE);
 
         verify(uuidGeneratorService, times(1)).checkAndUpdateUUID(anyListOf(AspspPO.class));
         verify(converter, times(1)).toAspspPOList(anyListOf(AspspCsvRecord.class));

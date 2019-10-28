@@ -78,12 +78,12 @@ public class AspspCsvResourceTest {
 
     @Test
     public void merge() throws Exception {
-        doNothing().when(service).deserializeAndMerge(any());
+        doNothing().when(service).merge(any());
 
         mockMvc.perform(multipart(BASE_URI + "/merge")
             .file("file", "content".getBytes()))
             .andExpect(status().is(HttpStatus.NO_CONTENT.value()));
 
-        verify(service, times(1)).deserializeAndMerge(any());
+        verify(service, times(1)).merge(any());
     }
 }
