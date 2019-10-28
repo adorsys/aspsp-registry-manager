@@ -109,7 +109,7 @@ public class AspspCsvServiceImpl implements AspspCsvService {
     }
 
     private boolean areBicAndBlzEqual(AspspPO dbItem, AspspPO inputItem) {
-        return inputItem.getBic().equals(dbItem.getBic()) && inputItem.getBankCode().equals(dbItem.getBankCode());
+        return inputItem.getBic().equalsIgnoreCase(dbItem.getBic()) && inputItem.getBankCode().equals(dbItem.getBankCode());
     }
 
     private boolean areBicAndBlzEqualWithDifferentId(AspspPO dbItem, AspspPO inputItem) {
