@@ -89,6 +89,6 @@ public class AspspServiceImpl implements AspspService {
     public void deleteAll() {
         logger.info("Deleting all ASPSPs");
 
-        repository.deleteAll();
+        repository.delete();
     }
 }

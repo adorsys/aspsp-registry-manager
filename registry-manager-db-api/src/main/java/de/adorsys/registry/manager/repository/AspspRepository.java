@@ -32,12 +32,12 @@ public interface AspspRepository {
     /**
      * Deletes all records from the existing database.
      */
-    void deleteAll();
+    void delete();
 
     /**
      * Deletes a list of {@link AspspPO} from the existing database.
      *
      * @param aspsps, a list of objects
      */
-    void deleteAll(List<AspspPO> aspsps);
+    void delete(List<AspspPO> aspsps);
 }

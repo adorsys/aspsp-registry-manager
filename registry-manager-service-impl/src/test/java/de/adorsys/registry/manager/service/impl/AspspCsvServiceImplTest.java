@@ -70,7 +70,7 @@ public class AspspCsvServiceImplTest {
 
     @Test
     public void importCsv() {
-        doNothing().when(repository).deleteAll();
+        doNothing().when(repository).delete();
         when(converter.toAspspPOList(CSV_RECORDS)).thenReturn(POS);
         when(uuidGeneratorService.checkAndUpdateUUID(anyListOf(AspspPO.class))).thenReturn(POS);
         doNothing().when(repository).saveAll(POS);
@@ -78,13 +78,13 @@ public class AspspCsvServiceImplTest {
         service.importCsv(STORED_BYTES_TEMPLATE);
 
         verify(uuidGeneratorService, times(1)).checkAndUpdateUUID(anyListOf(AspspPO.class));
-        verify(repository, times(1)).deleteAll();
+        verify(repository, times(1)).delete();
         verify(repository, times(1)).saveAll(POS);
     }
 
     @Test
     public void importCsv_scaApproachesWithSpaces() {
-        doNothing().when(repository).deleteAll();
+        doNothing().when(repository).delete();
         when(converter.toAspspPOList(CSV_RECORDS)).thenReturn(POS);
         when(uuidGeneratorService.checkAndUpdateUUID(anyListOf(AspspPO.class))).thenReturn(POS);
         doNothing().when(repository).saveAll(POS);
@@ -92,13 +92,13 @@ public class AspspCsvServiceImplTest {
         service.importCsv(STORED_BYTES_TEMPLATE_WITH_SPACES_IN_SCA_APPROACHES);
 
         verify(uuidGeneratorService, times(1)).checkAndUpdateUUID(anyListOf(AspspPO.class));
-        verify(repository, times(1)).deleteAll();
+        verify(repository, times(1)).delete();
         verify(repository, times(1)).saveAll(POS);
     }
 
     @Test
     public void importCsv_lowercaseScaApproaches() {
-        doNothing().when(repository).deleteAll();
+        doNothing().when(repository).delete();
         when(converter.toAspspPOList(CSV_RECORDS)).thenReturn(POS);
         when(uuidGeneratorService.checkAndUpdateUUID(anyListOf(AspspPO.class))).thenReturn(POS);
         doNothing().when(repository).saveAll(POS);
@@ -106,14 +106,14 @@ public class AspspCsvServiceImplTest {
         service.importCsv(STORED_BYTES_TEMPLATE_WITH_LOWERCASE_SCA_APPROACHES);
 
         verify(uuidGeneratorService, times(1)).checkAndUpdateUUID(anyListOf(AspspPO.class));
-        verify(repository, times(1)).deleteAll();
+        verify(repository, times(1)).delete();
         verify(repository, times(1)).saveAll(POS);
     }
 
     @Test
     public void deserializeAndMerge_forSave() {
         doNothing().when(repository).saveAll(anyListOf(AspspPO.class));
-        doNothing().when(repository).deleteAll(anyListOf(AspspPO.class));
+        doNothing().when(repository).delete(anyListOf(AspspPO.class));
         when(repository.findAll()).thenReturn(POS);
         when(uuidGeneratorService.checkAndUpdateUUID(anyListOf(AspspPO.class))).thenReturn(POS);
 
@@ -122,7 +122,7 @@ public class AspspCsvServiceImplTest {
         verify(uuidGeneratorService, times(1)).checkAndUpdateUUID(anyListOf(AspspPO.class));
         verify(repository, times(1)).findAll();
         verify(repository, times(1)).saveAll(captor.capture());
-        verify(repository, times(1)).deleteAll(anyListOf(AspspPO.class));
+        verify(repository, times(1)).delete(anyListOf(AspspPO.class));
 
 //        get forSave list
         assertEquals(POS.size(), captor.getAllValues().get(0).size());
@@ -137,7 +137,7 @@ public class AspspCsvServiceImplTest {
         test.add(POS_updated);
 
         doNothing().when(repository).saveAll(anyListOf(AspspPO.class));
-        doNothing().when(repository).deleteAll(anyListOf(AspspPO.class));
+        doNothing().when(repository).delete(anyListOf(AspspPO.class));
         when(repository.findAll()).thenReturn(POS);
         when(converter.toAspspPOList(anyListOf(AspspCsvRecord.class))).thenReturn(test);
         when(uuidGeneratorService.checkAndUpdateUUID(anyListOf(AspspPO.class))).thenReturn(test);
@@ -148,7 +148,7 @@ public class AspspCsvServiceImplTest {
         verify(converter, times(1)).toAspspPOList(anyListOf(AspspCsvRecord.class));
         verify(repository, times(1)).findAll();
         verify(repository, times(1)).saveAll(captor.capture());
-        verify(repository, times(1)).deleteAll(captor.capture());
+        verify(repository, times(1)).delete(captor.capture());
 
 //        get forDeleting list
         assertEquals(POS.size(), captor.getAllValues().get(1).size());

@@ -127,13 +127,13 @@ public class AspspRepositoryImplTest {
     }
 
     @Test
-    public void deleteAll() {
+    public void delete_list() {
         List<AspspEntity> target = Arrays.asList(entity, entity);
 
         doNothing().when(jpaRepository).deleteAll(any());
         when(converter.toAspspEntityList(any())).thenReturn(target);
 
-        repository.deleteAll(Collections.singletonList(po));
+        repository.delete(Collections.singletonList(po));
 
         verify(converter, times(1)).toAspspEntityList(any());
         verify(jpaRepository, times(1)).deleteAll(captor.capture());

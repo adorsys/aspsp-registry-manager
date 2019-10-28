@@ -67,7 +67,7 @@ public class AspspCsvServiceImpl implements AspspCsvService {
     @Override
     public void importCsv(byte[] file) {
         List<AspspPO> aspsps = readAllRecords(file);
-        aspspRepository.deleteAll();
+        aspspRepository.delete();
         aspspRepository.saveAll(uuidGeneratorService.checkAndUpdateUUID(aspsps));
     }
 
@@ -92,7 +92,7 @@ public class AspspCsvServiceImpl implements AspspCsvService {
         });
 
 //        everything that has been matched by BIC and BLZ but not by id (id is NOT NULL)
-        aspspRepository.deleteAll(forDeleting);
+        aspspRepository.delete(forDeleting);
 
 //        everything that has been matched by id, no match by id (new entries), id is NULL and matched by BIC and BLZ and no match with NULL id (new entries)
         aspspRepository.saveAll(uuidGeneratorService.checkAndUpdateUUID(forSave));
