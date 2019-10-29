@@ -15,8 +15,33 @@
 <body>
 <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
 <div class="mdl-layout--fixed-drawer mdl-layout mdl-js-layout">
-    <div class="mdl-layout__drawer">
-        <nav class="mdl-navigatiion">
+    <div class="mdl-layout__drawer animated is-hidden">
+        <nav class="mdl-navigation">
+            <div class="upload-button" id="upload">
+                <input type="file" name="import file" id="import-field" hidden>
+                <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--fab">
+                    <i class="material-icons">
+                        cloud_upload
+                    </i>
+                </button>
+            </div>
+            <div class="download-button" id="download">
+                <a href="/v1/aspsps/csv/export" download="aspsps.csv">
+                    <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--fab mdl-button--colored">
+                        <i class="material-icons">
+                            cloud_download
+                        </i>
+                    </button>
+                </a>
+            </div>
+            <div class="merge-button" id="merge">
+                <input type="file" name="merge file" id="merge-field" hidden>
+                <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--fab mdl-button--primary">
+                    <i class="material-icons">
+                        merge_type
+                    </i>
+                </button>
+            </div>
             <div class="add-button" id="add">
                 <button class="mdl-button mdl-js-button mdl-button--fab" onclick="addRow();">
                     <i class="material-icons">
@@ -24,48 +49,37 @@
                     </i>
                 </button>
             </div>
-            <div class="import-button" id="save">
-                <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--fab" onclick="persist();">
-                    <i class="material-icons">
-                        save
-                    </i>
-                </button>
-            </div>
-            <div class="export-button" id="export">
-                <a href="/v1/aspsps/csv/export" download="aspsps.csv">
-                    <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--fab mdl-button--colored">
-                        <i class="material-icons">
-                            arrow_downward
-                        </i>
-                    </button>
-                </a>
-            </div>
-            <div class="import-button" id="import">
-                <input type="file" name="import file" id="import-field" hidden>
-                <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--fab mdl-button--primary">
-                    <i class="material-icons">
-                        arrow_upward
+            <div class="expand margin-top__zero">
+                <button class="mdl-button mdl-js-button mdl-button--icon" onclick="showButton()">
+                    <i class="material-icons opacity__none animated">
+                        arrow_drop_down
                     </i>
                 </button>
             </div>
         </nav>
     </div>
     <div class="tooltips">
-        <div class="mdl-tooltip" data-mdl-for="add">
-            Add new Aspsp
-        </div>
-        <div class="mdl-tooltip" data-mdl-for="save">
-            Save
-        </div>
-        <div class="mdl-tooltip" data-mdl-for="export">
-            Export all Aspsps
+        <div class="mdl-tooltip" data-mdl-for="merge">
+            Bulk upload <br>(Save and update)
         </div>
         <div class="mdl-tooltip" data-mdl-for="import">
-            Import Aspsps
+            Import from Adapter
+        </div>
+        <div class="mdl-tooltip" data-mdl-for="export">
+            Export into Adapter
+        </div>
+        <div class="mdl-tooltip" data-mdl-for="download">
+            Download CSV file
+        </div>
+        <div class="mdl-tooltip" data-mdl-for="upload">
+            Upload CSV file
+        </div>
+        <div class="mdl-tooltip" data-mdl-for="add">
+            Add new record
         </div>
     </div>
 </div>
-<div class="flex-containder">
+<div class="flex-container">
     <header class="registry-header">
         <div class="header">
             <h1 class="registry-header">Aspsp Registry Manager</h1>
@@ -97,27 +111,27 @@
         <table class="mdl-data-table mdl-js-data-table mdl-shadow--2dp">
             <thead>
                 <tr>
-                    <th class="mdl-data-table__cell--non-numeric text-align__right column__short">Id</th>
+                    <th class="column__short">Id</th>
                     <th class="mdl-data-table__cell--non-numeric">Bank Name</th>
                     <th class="mdl-data-table__cell--non-numeric">BIC</th>
                     <th class="mdl-data-table__cell--non-numeric">URL</th>
                     <th class="mdl-data-table__cell--non-numeric">Adapter Id</th>
                     <th>Bank Code</th>
                     <th class="mdl-data-table__cell--non-numeric">IDP URL</th>
-                    <th class="mdl-data-table__cell--non-numeric text-align__right">Approach</th>
+                    <th >Approach</th>
                     <th class="mdl-data-table__cell--non-numeric edit-cell"></th>
                 </tr>
             </thead>
             <tbody>
                 <tr class="hidden">
-                    <td class="mdl-data-table__cell--non-numeric text-align__right column__short"></td>
+                    <td class="mdl-data-table__cell--non-numeric column__short"></td>
                     <td class="mdl-data-table__cell--non-numeric" onfocusout="validateBankName(this);"></td>
                     <td class="mdl-data-table__cell--non-numeric" onfocusout="validateBic(this);"></td>
                     <td class="mdl-data-table__cell--non-numeric" onfocusout="validateUrl(this);"></td>
                     <td class="mdl-data-table__cell--non-numeric" onfocusout="validateAdapterId(this);"></td>
                     <td onfocusout="validateBankCode(this);"></td>
                     <td class="mdl-data-table__cell--non-numeric" onfocusout="validateUrl(this);"></td>
-                    <td class="mdl-data-table__cell--non-numeric text-align__right">
+                    <td>
                         <div class="approaches">
                             <div id="embedded">
                                 <input type="checkbox" name="EMBEDDED" disabled>
@@ -173,10 +187,10 @@
 </div>
 
 <footer class="registry-footer">
-    <h6 class="footer-text">Golden Dimention. Made with </h6>
+    <h6 class="footer-text">Golden Dimension. Made with </h6>
 </footer>
 </div>
-<div class="allerts margin-top__zero">
+<div class="alerts margin-top__zero">
     <div class="alert failure">
         <strong>Operation failed.</strong>
         <br>

@@ -115,22 +115,6 @@ public class AspspResourceTest {
         verify(aspspService, times(1)).deleteById(ID);
     }
 
-    @Test
-    public void deleteAll() throws Exception {
-
-        doNothing().when(aspspService).deleteById(ID);
-
-        mockMvc.perform(MockMvcRequestBuilders
-                                .delete("/v1/aspsps")
-                                .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
-                                .content(serialize(to)))
-                .andDo(print())
-                .andExpect(status().is(HttpStatus.NO_CONTENT.value()))
-                .andReturn();
-
-        verify(aspspService, times(1)).deleteAll();
-    }
-
     private <T> T readYml(Class<T> aClass, String fileName) {
         try {
             return YamlReader.getInstance().getObjectFromResource(AspspTOConverter.class, fileName, aClass);

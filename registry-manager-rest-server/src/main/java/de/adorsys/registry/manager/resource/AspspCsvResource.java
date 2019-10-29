@@ -52,4 +52,16 @@ public class AspspCsvResource {
             throw new UncheckedIOException(e);
         }
     }
+
+    @ApiOperation("Merge ASPSPs")
+    @PostMapping(value = "/merge", consumes = {"multipart/form-data"})
+    public ResponseEntity merge(@RequestParam MultipartFile file) throws IOException {
+        logger.info("Merge ASPSPs");
+
+        aspspCsvService.merge(file.getBytes());
+
+        return ResponseEntity
+            .noContent()
+            .build();
+    }
 }

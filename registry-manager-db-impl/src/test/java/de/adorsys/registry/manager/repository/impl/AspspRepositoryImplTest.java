@@ -2,22 +2,21 @@ package de.adorsys.registry.manager.repository.impl;
 
 import de.adorsys.registry.manager.repository.AspspJpaRepository;
 import de.adorsys.registry.manager.repository.converter.AspspEntityConverter;
+import de.adorsys.registry.manager.repository.converter.AspspEntityConverterImpl;
 import de.adorsys.registry.manager.repository.model.AspspEntity;
 import de.adorsys.registry.manager.repository.model.AspspPO;
 import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import org.mockito.*;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
@@ -36,8 +35,11 @@ public class AspspRepositoryImplTest {
     @Mock
     private AspspJpaRepository jpaRepository;
 
-    @Mock
-    private AspspEntityConverter converter;
+    @Captor
+    ArgumentCaptor<List<AspspEntity>> captor;
+
+    @Spy
+    private AspspEntityConverter converter = new AspspEntityConverterImpl();
     private AspspEntity entity;
     private AspspPO po;
 
@@ -53,7 +55,7 @@ public class AspspRepositoryImplTest {
         List<AspspPO> pos = List.of(po);
 
         when(jpaRepository.findAll()).thenReturn(entities);
-        when(converter.toAspspPOList(entities)).thenReturn(pos);
+        when(converter.toAspspPOList(any())).thenReturn(pos);
 
         List<AspspPO> result = repository.findAll();
 
@@ -72,9 +74,9 @@ public class AspspRepositoryImplTest {
         List<AspspEntity> entities = List.of(entity);
         List<AspspPO> pos = List.of(po);
 
-        when(converter.toAspspEntity(po)).thenReturn(entity);
+        when(converter.toAspspEntity(any())).thenReturn(entity);
         when(jpaRepository.findAll(Example.of(entity, matcher), PageRequest.of(PAGE, SIZE))).thenReturn(new PageImpl<>(entities));
-        when(converter.toAspspPOList(entities)).thenReturn(pos);
+        when(converter.toAspspPOList(any())).thenReturn(pos);
 
         List<AspspPO> result = repository.findByExample(po, PAGE, SIZE);
 
@@ -89,7 +91,7 @@ public class AspspRepositoryImplTest {
         List<AspspPO> pos = List.of(po);
 
         when(jpaRepository.findByBankCode(BANK_CODE, PageRequest.of(PAGE, SIZE))).thenReturn(entities);
-        when(converter.toAspspPOList(entities)).thenReturn(pos);
+        when(converter.toAspspPOList(any())).thenReturn(pos);
 
         List<AspspPO> result = repository.findByBankCode(BANK_CODE, PAGE, SIZE);
 
@@ -101,9 +103,9 @@ public class AspspRepositoryImplTest {
     @Test
     public void save() {
 
-        when(converter.toAspspEntity(po)).thenReturn(entity);
+        when(converter.toAspspEntity(any())).thenReturn(entity);
         when(jpaRepository.save(entity)).thenReturn(entity);
-        when(converter.toAspspPO(entity)).thenReturn(po);
+        when(converter.toAspspPO(any())).thenReturn(po);
 
         AspspPO actual = repository.save(po);
 
@@ -122,5 +124,22 @@ public class AspspRepositoryImplTest {
         repository.deleteById(ID);
 
         verify(jpaRepository, times(1)).deleteById(ID);
+    }
+
+    @Test
+    public void delete_list() {
+        List<AspspEntity> target = Arrays.asList(entity, entity);
+
+        doNothing().when(jpaRepository).deleteAll(any());
+        when(converter.toAspspEntityList(any())).thenReturn(target);
+
+        repository.delete(Collections.singletonList(po));
+
+        verify(converter, times(1)).toAspspEntityList(any());
+        verify(jpaRepository, times(1)).deleteAll(captor.capture());
+
+        assertEquals(target.size(), captor.getValue().size());
+        assertThat(target.get(0), is(captor.getValue().get(0)));
+        assertThat(target.get(1), is(captor.getValue().get(1)));
     }
 }

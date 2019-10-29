@@ -35,6 +35,9 @@ public class AspspServiceImplTest {
     private AspspRepository repository;
 
     @Mock
+    private UUIDGeneratorService uuidGeneratorService;
+
+    @Mock
     private AspspBOConverter converter;
     private AspspPO po;
     private AspspBO bo;
@@ -86,11 +89,13 @@ public class AspspServiceImplTest {
         when(converter.toAspspPO(bo)).thenReturn(po);
         when(repository.save(po)).thenReturn(po);
         when(converter.toAspspBO(po)).thenReturn(bo);
+        when(uuidGeneratorService.checkAndUpdateUUID(any(AspspPO.class))).thenReturn(po);
 
         AspspBO actual = aspspService.save(bo);
 
         assertThat(actual, is(bo));
 
+        verify(uuidGeneratorService, times(1)).checkAndUpdateUUID(any(AspspPO.class));
         verify(converter, times(1)).toAspspPO(bo);
         verify(repository, times(1)).save(po);
         verify(converter, times(1)).toAspspBO(po);
@@ -103,9 +108,11 @@ public class AspspServiceImplTest {
 
         doNothing().when(repository).saveAll(pos);
         when(converter.toAspspPOList(bos)).thenReturn(pos);
+        when(uuidGeneratorService.checkAndUpdateUUID(anyListOf(AspspPO.class))).thenReturn(pos);
 
         aspspService.saveAll(List.of(bo));
 
+        verify(uuidGeneratorService, times(1)).checkAndUpdateUUID(anyListOf(AspspPO.class));
         verify(converter, times(1)).toAspspPOList(bos);
         verify(repository, times(1)).saveAll(pos);
     }
@@ -117,14 +124,5 @@ public class AspspServiceImplTest {
         aspspService.deleteById(ID);
 
         verify(repository, times(1)).deleteById(ID);
-    }
-
-    @Test
-    public void deleteAll() {
-        doNothing().when(repository).deleteAll();
-
-        aspspService.deleteAll();
-
-        verify(repository, times(1)).deleteAll();
     }
 }

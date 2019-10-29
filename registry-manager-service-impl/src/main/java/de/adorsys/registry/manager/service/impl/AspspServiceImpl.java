@@ -21,10 +21,12 @@ public class AspspServiceImpl implements AspspService {
 
     private final AspspRepository repository;
     private final AspspBOConverter converter;
+    private final UUIDGeneratorService uuidGeneratorService;
 
-    public AspspServiceImpl(AspspRepository repository, AspspBOConverter converter) {
+    public AspspServiceImpl(AspspRepository repository, AspspBOConverter converter, UUIDGeneratorService uuidGeneratorService) {
         this.repository = repository;
         this.converter = converter;
+        this.uuidGeneratorService = uuidGeneratorService;
     }
 
     @Override
@@ -61,9 +63,8 @@ public class AspspServiceImpl implements AspspService {
     public AspspBO save(AspspBO aspsp) {
         logger.info("Trying to save ASPSP {}", aspsp);
 
-        checkAndUpdateUUID(aspsp);
         AspspPO po = converter.toAspspPO(aspsp);
-        AspspPO saved = repository.save(po);
+        AspspPO saved = repository.save(uuidGeneratorService.checkAndUpdateUUID(po));
 
         return converter.toAspspBO(saved);
     }
@@ -79,21 +80,15 @@ public class AspspServiceImpl implements AspspService {
     public void saveAll(List<AspspBO> aspsps) {
         logger.info("Trying to save ASPSPs {}", aspsps);
 
-        aspsps.forEach(this::checkAndUpdateUUID);
+        List<AspspPO> aspspPOList = converter.toAspspPOList(aspsps);
 
-        repository.saveAll(converter.toAspspPOList(aspsps));
+        repository.saveAll(uuidGeneratorService.checkAndUpdateUUID(aspspPOList));
     }
 
     @Override
     public void deleteAll() {
         logger.info("Deleting all ASPSPs");
 
-        repository.deleteAll();
-    }
-
-    private void checkAndUpdateUUID(AspspBO aspsp) {
-        if (aspsp.getId() == null) {
-            aspsp.setId(UUID.randomUUID());
-        }
+        repository.delete();
     }
 }
