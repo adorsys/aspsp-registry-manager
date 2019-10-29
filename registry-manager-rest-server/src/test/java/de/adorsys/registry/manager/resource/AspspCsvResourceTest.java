@@ -27,6 +27,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 public class AspspCsvResourceTest {
+    private static final String BASE_URI = "/v1/aspsps/csv";
+
     private static final byte[] STORED_BYTES_TEMPLATE
             = "81cecc67-6d1b-4169-b67c-2de52b99a0cc,\"BNP Paribas Germany, Consorsbank\",CSDBDE71XXX,https://xs2a-sndbx.consorsbank.de,consors-bank-adapter,76030080"
                       .getBytes();
@@ -54,7 +56,7 @@ public class AspspCsvResourceTest {
         when(service.exportCsv()).thenReturn(STORED_BYTES_TEMPLATE);
 
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders
-                                                      .get("/v1/aspsps/csv/export"))
+                                                      .get(BASE_URI + "/export"))
                                       .andExpect(status().is(HttpStatus.OK.value()))
                                       .andReturn();
 
@@ -67,10 +69,21 @@ public class AspspCsvResourceTest {
     public void importCsv() throws Exception {
         doNothing().when(service).importCsv(any());
 
-        mockMvc.perform(multipart("/v1/aspsps/csv/import")
+        mockMvc.perform(multipart(BASE_URI + "/import")
                                 .file("file", "content".getBytes()))
                 .andExpect(status().is(HttpStatus.OK.value()));
 
         verify(service, times(1)).importCsv(any());
+    }
+
+    @Test
+    public void merge() throws Exception {
+        doNothing().when(service).merge(any());
+
+        mockMvc.perform(multipart(BASE_URI + "/merge")
+            .file("file", "content".getBytes()))
+            .andExpect(status().is(HttpStatus.NO_CONTENT.value()));
+
+        verify(service, times(1)).merge(any());
     }
 }

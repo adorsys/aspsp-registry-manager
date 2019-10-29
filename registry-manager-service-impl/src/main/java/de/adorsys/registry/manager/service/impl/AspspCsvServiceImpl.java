@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,6 +29,7 @@ public class AspspCsvServiceImpl implements AspspCsvService {
 
     private final AspspRepository aspspRepository;
     private final AspspCsvRecordConverter csvRecordConverter;
+    private final UUIDGeneratorService uuidGeneratorService;
 
     static {
         CSV_OBJECT_READER = new CsvMapper()
@@ -45,9 +46,10 @@ public class AspspCsvServiceImpl implements AspspCsvService {
                                     });
     }
 
-    public AspspCsvServiceImpl(AspspRepository aspspRepository, AspspCsvRecordConverter csvRecordConverter) {
+    public AspspCsvServiceImpl(AspspRepository aspspRepository, AspspCsvRecordConverter csvRecordConverter, UUIDGeneratorService uuidGeneratorService) {
         this.aspspRepository = aspspRepository;
         this.csvRecordConverter = csvRecordConverter;
+        this.uuidGeneratorService = uuidGeneratorService;
     }
 
     @Override
@@ -64,8 +66,69 @@ public class AspspCsvServiceImpl implements AspspCsvService {
     @Override
     public void importCsv(byte[] file) {
         List<AspspPO> aspsps = readAllRecords(file);
-        aspspRepository.deleteAll();
-        aspspRepository.saveAll(aspsps);
+        aspspRepository.delete();
+        aspspRepository.saveAll(uuidGeneratorService.checkAndUpdateUUID(aspsps));
+    }
+
+    @Override
+    public void merge(byte[] file) {
+        List<AspspPO> input = readAllRecords(file);
+        List<AspspPO> database = aspspRepository.findAll();
+        List<AspspPO> forDeleting = new LinkedList<>();
+        Set<AspspPO> forSave = new HashSet<>();
+
+        database.forEach(dbItem -> {
+            input.forEach(inputItem -> {
+                if (inputItem.getId() == null) {
+                    logicForProcessingWithNullId(input, forSave, dbItem, inputItem);
+//                no match by id, but match by BIC and BLZ
+                } else if (areBicAndBlzEqualWithDifferentId(dbItem, inputItem)) {
+                    forDeleting.add(dbItem);
+                }
+
+//                no match, match by id, or id is NULL and no match by BIC and BLZ
+                forSave.add(inputItem);
+            });
+        });
+
+//        everything that has been matched by BIC and BLZ but not by id (id is NOT NULL)
+        aspspRepository.delete(forDeleting);
+
+//        everything that has been matched by id, no match by id (new entries), id is NULL and matched by BIC and BLZ and no match with NULL id (new entries)
+        aspspRepository.saveAll(uuidGeneratorService.checkAndUpdateUUID(new LinkedList<>(forSave)));
+    }
+
+    private void logicForProcessingWithNullId(List<AspspPO> input, Set<AspspPO> forSave, AspspPO dbItem, AspspPO inputItem) {
+//        input id is NULL, but match by BIC and BLZ
+        if (areBicAndBlzEqual(dbItem, inputItem)) {
+            AspspPO copy = copyContent(inputItem);
+            copy.setId(dbItem.getId());
+            forSave.add(copy);
+            input.remove(inputItem);
+        }
+    }
+
+    private boolean areBicAndBlzEqual(AspspPO dbItem, AspspPO inputItem) {
+        return inputItem.getBic().equalsIgnoreCase(dbItem.getBic()) && inputItem.getBankCode().equals(dbItem.getBankCode());
+    }
+
+    private boolean areBicAndBlzEqualWithDifferentId(AspspPO dbItem, AspspPO inputItem) {
+        return !inputItem.getId().equals(dbItem.getId()) && areBicAndBlzEqual(dbItem, inputItem);
+    }
+
+    private AspspPO copyContent(AspspPO from) {
+        AspspPO copy = new AspspPO();
+
+        copy.setId(from.getId());
+        copy.setName(from.getName());
+        copy.setBic(from.getBic());
+        copy.setUrl(from.getUrl());
+        copy.setBankCode(from.getBankCode());
+        copy.setAdapterId(from.getAdapterId());
+        copy.setIdpUrl(from.getIdpUrl());
+        copy.setScaApproaches(from.getScaApproaches());
+
+        return copy;
     }
 
     private String toCsvString(AspspCsvRecord aspsp) {

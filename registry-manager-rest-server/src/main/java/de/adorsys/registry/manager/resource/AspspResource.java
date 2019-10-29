@@ -99,16 +99,4 @@ public class AspspResource {
                        .noContent()
                        .build();
     }
-
-    @ApiOperation("Delete all ASPSPs")
-    @DeleteMapping
-    public ResponseEntity deleteAll() {
-        logger.info("Delete all ASPSPs");
-
-        aspspService.deleteAll();
-
-        return ResponseEntity
-                       .noContent()
-                       .build();
-    }
 }
