@@ -17,8 +17,7 @@ import java.util.*;
 import static de.adorsys.registry.manager.repository.model.AspspScaApproachPO.EMBEDDED;
 import static de.adorsys.registry.manager.repository.model.AspspScaApproachPO.REDIRECT;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -49,7 +48,7 @@ public class AspspCsvServiceImplTest {
     private AspspRepository repository;
     @Spy
     private AspspCsvRecordConverter converter = new AspspCsvRecordConverterImpl();
-    @Mock
+    @Spy
     private UUIDGeneratorService uuidGeneratorService;
 
     @Captor
@@ -111,13 +110,17 @@ public class AspspCsvServiceImplTest {
     }
 
     @Test
-    public void deserializeAndMerge_forSave() {
+    public void merge_forSave() {
+        List<AspspPO> database;
+        byte[] input = generateInput();
+
+        database = Arrays.asList(PO, PO, PO, PO);
+
         doNothing().when(repository).saveAll(anyListOf(AspspPO.class));
         doNothing().when(repository).delete(anyListOf(AspspPO.class));
-        when(repository.findAll()).thenReturn(POS);
-        when(uuidGeneratorService.checkAndUpdateUUID(anyListOf(AspspPO.class))).thenReturn(POS);
+        when(repository.findAll()).thenReturn(database);
 
-        service.merge(STORED_BYTES_TEMPLATE);
+        service.merge(input);
 
         verify(uuidGeneratorService, times(1)).checkAndUpdateUUID(anyListOf(AspspPO.class));
         verify(repository, times(1)).findAll();
@@ -125,12 +128,12 @@ public class AspspCsvServiceImplTest {
         verify(repository, times(1)).delete(anyListOf(AspspPO.class));
 
 //        get forSave list
-        assertEquals(POS.size(), captor.getAllValues().get(0).size());
-        assertThat(POS.get(0), is(captor.getAllValues().get(0).get(0)));
+        assertEquals(3, captor.getValue().size());
+        assertTrue(captor.getValue().contains(PO));
     }
 
     @Test
-    public void deserializeAndMerge_forDeleting() {
+    public void merge_forDeleting() {
         AspspPO POS_updated = buildAspspPO();
         POS_updated.setId(UUID.randomUUID());
         List<AspspPO> test = new LinkedList<>();
@@ -186,5 +189,14 @@ public class AspspCsvServiceImplTest {
         aspsp.setAspspScaApproaches(SCA_APPROACHES_BO);
 
         return aspsp;
+    }
+
+    private byte[] generateInput() {
+        String records =
+            "81cecc67-6d1b-4169-b67c-2de52b99a0cc,\"BNP Paribas Germany, Consorsbank\",CSDBDE71XXX,https://xs2a-sndbx.consorsbank.de,consors-bank-adapter,76030080,https://example.com,EMBEDDED;REDIRECT\n" +
+            "9ec1702e-fa39-11e9-8f0b-362b9e155667,\"BNP Paribas Germany, Consorsbank\",CSDBDE71111,https://xs2a-sndbx.consorsbank.de,consors-bank-adapter,76030080,https://example.com,EMBEDDED;REDIRECT\n" +
+            "9ec1729a-fa39-11e9-8f0b-362b9e155667,\"BNP Paribas Germany, Consorsbank\",CSDBDE71222,https://xs2a-sndbx.consorsbank.de,consors-bank-adapter,76030080,https://example.com,EMBEDDED;REDIRECT\n";
+
+        return records.getBytes();
     }
 }

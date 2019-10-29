@@ -18,8 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -75,7 +74,8 @@ public class AspspCsvServiceImpl implements AspspCsvService {
     public void merge(byte[] file) {
         List<AspspPO> input = readAllRecords(file);
         List<AspspPO> database = aspspRepository.findAll();
-        List<AspspPO> forDeleting = new LinkedList<>(), forSave = new LinkedList<>();
+        List<AspspPO> forDeleting = new LinkedList<>();
+        Set<AspspPO> forSave = new HashSet<>();
 
         database.forEach(dbItem -> {
             input.forEach(inputItem -> {
@@ -95,10 +95,10 @@ public class AspspCsvServiceImpl implements AspspCsvService {
         aspspRepository.delete(forDeleting);
 
 //        everything that has been matched by id, no match by id (new entries), id is NULL and matched by BIC and BLZ and no match with NULL id (new entries)
-        aspspRepository.saveAll(uuidGeneratorService.checkAndUpdateUUID(forSave));
+        aspspRepository.saveAll(uuidGeneratorService.checkAndUpdateUUID(new LinkedList<>(forSave)));
     }
 
-    private void logicForProcessingWithNullId(List<AspspPO> input, List<AspspPO> forSave, AspspPO dbItem, AspspPO inputItem) {
+    private void logicForProcessingWithNullId(List<AspspPO> input, Set<AspspPO> forSave, AspspPO dbItem, AspspPO inputItem) {
 //        input id is NULL, but match by BIC and BLZ
         if (areBicAndBlzEqual(dbItem, inputItem)) {
             AspspPO copy = copyContent(inputItem);
