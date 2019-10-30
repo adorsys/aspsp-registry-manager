@@ -1,10 +1,12 @@
 package de.adorsys.registry.manager.service;
 
-import java.io.File;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 public interface AspspOutboundService {
 
-    File importFile(File file);
+    void importData(byte[] data);
 
-    byte[] exportFile();
+    MultipartFile exportData() throws IOException;
 }

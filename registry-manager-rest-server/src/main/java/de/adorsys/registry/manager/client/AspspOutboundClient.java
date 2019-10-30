@@ -1,19 +1,22 @@
 package de.adorsys.registry.manager.client;
 
-import feign.Headers;
-import feign.Param;
-import feign.RequestLine;
+import de.adorsys.registry.manager.config.ClientConfiguration;
+import feign.*;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-@FeignClient(value = "aspspoutboundservice", url = "http://localhost:8999/v1/aspsps/csv")
+
+@FeignClient(value = "aspsp-outbound-service", url = "${xs2a-adapter.url}",
+    configuration = ClientConfiguration.class)
 public interface AspspOutboundClient {
 
-    @RequestLine("POST /import")
-    @Headers("Content-Type: multipart/form-data")
-    MultipartFile importFile(@Param("file") MultipartFile file);
+    @RequestMapping(method = RequestMethod.GET, value = "/export")
+    byte[] importFile();
 
-    @RequestLine("GET /export")
-    @Headers("Content-Type: text/csv")
-    byte[] exportFile(@Param("file") byte[] file);
+    @RequestMapping(method = RequestMethod.POST, value = "/import", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    void exportFile(@Param("file") MultipartFile file);
+
+
 }

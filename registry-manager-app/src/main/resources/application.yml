@@ -46,3 +46,8 @@ spring:
         jdbc:
           lob:
             non_contextual_creation: true
+
+logging.level.de.adorsys.registry.manager.client.AspspOutboundClient: DEBUG
+
+xs2a-adapter:
+  url: http://localhost:8999/v1/aspsps/csv

@@ -22,6 +22,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
@@ -46,7 +47,7 @@ public class AspspCsvResourceTest {
         when(service.exportCsv()).thenReturn(STORED_BYTES_TEMPLATE);
 
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders
-                                                      .get(BASE_URI + "/export"))
+                                                      .get(BASE_URI + "/download"))
                                       .andExpect(status().is(HttpStatus.OK.value()))
                                       .andReturn();
 
@@ -68,7 +69,7 @@ public class AspspCsvResourceTest {
     public void importCsv() throws Exception {
         doNothing().when(service).importCsv(any());
 
-        mockMvc.perform(multipart(BASE_URI + "/import")
+        mockMvc.perform(multipart(BASE_URI + "/upload")
                                 .file("file", "content".getBytes()))
                 .andExpect(status().is(HttpStatus.OK.value()));
 
