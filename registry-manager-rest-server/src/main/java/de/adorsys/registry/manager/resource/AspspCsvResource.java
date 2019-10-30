@@ -8,6 +8,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,6 +26,7 @@ public class AspspCsvResource {
         this.aspspCsvService = aspspCsvService;
     }
 
+    @PreAuthorize("isAuthenticated()")
     @ApiOperation("Get all ASPSPs as CSV file")
     @GetMapping(value = "/export", produces = "text/csv")
     public ResponseEntity<byte[]> export() {
@@ -41,6 +43,7 @@ public class AspspCsvResource {
         return new ResponseEntity<>(response, responseHeaders, HttpStatus.OK);
     }
 
+    @PreAuthorize("hasAnyRole('MANAGER','DEPLOYER')")
     @ApiOperation("Post all ASPSPs from CSV file")
     @PostMapping(value = "/import", consumes = {"multipart/form-data"})
     public void importCsv(@RequestParam MultipartFile file) {
@@ -53,6 +56,7 @@ public class AspspCsvResource {
         }
     }
 
+    @PreAuthorize("hasAnyRole('MANAGER','DEPLOYER')")
     @ApiOperation("Merge ASPSPs")
     @PostMapping(value = "/merge", consumes = {"multipart/form-data"})
     public ResponseEntity merge(@RequestParam MultipartFile file) throws IOException {

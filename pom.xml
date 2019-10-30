@@ -8,6 +8,7 @@
     <version>0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>aspsp-registry-manager</name>
+    <description>ASPSP Registry Manager</description>
 
     <modules>
         <module>registry-manager-db-api</module>
