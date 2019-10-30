@@ -7,25 +7,25 @@ volumes:
   aspsp-registry-manager-data:
 
 services:
-#  registry-manager-app:
-#    image: registry-manager-app
-#    build:
-#      context: registry-manager-app
-#      dockerfile: Dockerfile
-#    restart: on-failure
-#    ports:
-#      - "8089:8089"
-#    networks:
-#      - registry-manager-net
-#    environment:
-#      - JAVA_TOOL_OPTIONS="-Xmx1024m"
-#      - SPRING_DATASOURCE_URL=jdbc:postgresql://aspsp-registry-postgres/aspsp_registry
-#      - SPRING_DATASOURCE_USERNAME=manager
-#      - SPRING_DATASOURCE_PASSWORD=manager
-#    expose:
-#      - 8089
-#    depends_on:
-#      - aspsp-registry-postgres
+  registry-manager-app:
+    image: registry-manager-app
+    build:
+      context: registry-manager-app
+      dockerfile: Dockerfile
+    restart: on-failure
+    ports:
+      - "8089:8089"
+    networks:
+      - registry-manager-net
+    environment:
+      - JAVA_TOOL_OPTIONS="-Xmx1024m"
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://aspsp-registry-postgres/aspsp_registry
+      - SPRING_DATASOURCE_USERNAME=manager
+      - SPRING_DATASOURCE_PASSWORD=manager
+    expose:
+      - 8089
+    depends_on:
+      - aspsp-registry-postgres
 
   aspsp-registry-postgres:
     image: centos/postgresql-95-centos7
