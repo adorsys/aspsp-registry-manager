@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -17,6 +18,7 @@ public class ExceptionHandlingAdvisor {
     private static final Logger logger = LoggerFactory.getLogger(ExceptionHandlingAdvisor.class);
     private static final String IBAN_EXCEPTION_ERROR_MESSAGE = "Exception during the IBAN processing: IBAN is incorrect";
     private static final String UNCHECKED_IO_EXCEPTION_ERROR_MESSAGE = "Exception during the IO process";
+    private static final String ACCESS_DENIED_EXCEPTION_ERROR_MESSAGE = "Access denied";
     private static final String EXCEPTION_ERROR_MESSAGE = "Server error";
 
     @ExceptionHandler(IbanException.class)
@@ -27,6 +29,11 @@ public class ExceptionHandlingAdvisor {
     @ExceptionHandler(UncheckedIOException.class)
     public ResponseEntity<ErrorResponse> handle(UncheckedIOException ex) {
         return handle(ex, UNCHECKED_IO_EXCEPTION_ERROR_MESSAGE, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handle(AccessDeniedException ex) {
+        return handle(ex, ACCESS_DENIED_EXCEPTION_ERROR_MESSAGE, HttpStatus.FORBIDDEN);
     }
 
     @ExceptionHandler(Exception.class)
