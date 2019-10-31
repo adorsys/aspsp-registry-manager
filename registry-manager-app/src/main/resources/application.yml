@@ -6,13 +6,26 @@ spring:
 info:
   app:
     name: ${spring.application.name}
-    description: "Description"
+    description: @project.description@
     version: @project.version@
+    build: '#@build.number@'
     artifactId: @project.artifactId@
 
 server:
   # Authorization HTTP header requires to enlarge max header size.
   max-http-header-size: 65000
+
+manager:
+  users:
+    - name: user1
+      password: user
+      role: READER
+    - name: user2
+      password: user
+      role: MANAGER
+    - name: user3
+      password: user
+      role: DEPLOYER
 
 ---
 spring:

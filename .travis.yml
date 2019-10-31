@@ -17,7 +17,7 @@ env:
     - OC_VERSION_COMMIT=0cbc58b
     - HELM_VERSION=v2.12.2
 script:
-  - mvn install -B
+  - mvn install -B -Dbuild.number=${TRAVIS_BUILD_NUMBER}
   - docker build -t $IMAGE .
 deploy:
   - provider: script

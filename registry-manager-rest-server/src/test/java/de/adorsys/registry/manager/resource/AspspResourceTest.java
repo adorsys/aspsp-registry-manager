@@ -2,110 +2,165 @@ package de.adorsys.registry.manager.resource;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.adorsys.registry.manager.config.SecurityConfig;
 import de.adorsys.registry.manager.converter.AspspTOConverter;
-import de.adorsys.registry.manager.exception.ExceptionHandlingAdvisor;
 import de.adorsys.registry.manager.model.AspspTO;
 import de.adorsys.registry.manager.service.AspspService;
 import de.adorsys.registry.manager.service.model.AspspBO;
-import org.junit.Before;
 import org.junit.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import pro.javatar.commons.reader.JsonReader;
 import pro.javatar.commons.reader.YamlReader;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.UUID;
 
+import static de.adorsys.registry.manager.resource.AspspResource.ASPSP_URI;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
-@AutoConfigureMockMvc
+@RunWith(SpringRunner.class)
+@WebMvcTest(AspspResource.class)
+@Import(SecurityConfig.class)
 public class AspspResourceTest {
     private static final UUID ID = UUID.randomUUID();
+    private static final String ASPSP_BY_ID_URI = ASPSP_URI + "/{id}";
 
+    @Autowired
     private MockMvc mockMvc;
 
-    @InjectMocks
-    private AspspResource resource;
-
-    @Mock
+    @MockBean
     private AspspService aspspService;
 
-    @Mock
-    private AspspTOConverter converter;
-    private AspspBO bo;
-    private AspspTO to;
+    private AspspBO bo = readYml(AspspBO.class, "aspsp-bo.yml");
+    private AspspTO to = readYml(AspspTO.class, "aspsp-to.yml");
 
-    @Before
-    public void setUp() {
-        MockitoAnnotations.initMocks(this);
 
-        mockMvc = MockMvcBuilders
-                          .standaloneSetup(resource)
-                          .setControllerAdvice(new ExceptionHandlingAdvisor())
-                          .setMessageConverters(new MappingJackson2HttpMessageConverter())
-                          .build();
+    @WithMockUser("user")
+    @Test
+    public void getAspsps() throws Exception {
 
-        bo = readYml(AspspBO.class, "aspsp-bo.yml");
-        to = readYml(AspspTO.class, "aspsp-to.yml");
+        when(aspspService.getByAspsp(any(), anyInt(), anyInt())).thenReturn(Collections.emptyList());
+
+        mockMvc.perform(MockMvcRequestBuilders
+                                .get(ASPSP_URI)
+                                .param("bic", "00000000"))
+                .andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andReturn();
+        verify(aspspService, times(1)).getByAspsp(any(), anyInt(), anyInt());
     }
 
+    @Test
+    public void getAspspsRedirectToLoginPage() throws Exception {
+
+        mockMvc.perform(MockMvcRequestBuilders
+                                .get(ASPSP_URI)
+                                .param("bic", "00000000"))
+                .andDo(print())
+                .andExpect(status().is(HttpStatus.FOUND.value()))
+                .andReturn();
+    }
+
+    @WithMockUser(roles = {"MANAGER", "DEPLOYER"})
     @Test
     public void create() throws Exception {
 
-        when(converter.toAspspBO(to)).thenReturn(bo);
         when(aspspService.save(bo)).thenReturn(bo);
 
-        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders
-                                                      .post("/v1/aspsps")
-                                                      .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
-                                                      .content(serialize(to)))
-                                      .andDo(print())
-                                      .andExpect(status().is(HttpStatus.CREATED.value()))
-                                      .andReturn();
+        mockMvc.perform(MockMvcRequestBuilders
+                                .post(ASPSP_URI)
+                                .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+                                .content(serialize(to)))
+                .andDo(print())
+                .andExpect(status().is(HttpStatus.CREATED.value()))
+                .andReturn();
 
-        verify(converter, times(1)).toAspspBO(to);
         verify(aspspService, times(1)).save(bo);
     }
 
     @Test
+    public void createRedirectToLoginPage() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                                .post(ASPSP_URI)
+                                .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+                                .content(serialize(to)))
+                .andDo(print())
+                .andExpect(status().is(HttpStatus.FOUND.value()))
+                .andReturn();
+    }
+
+    @WithMockUser(roles = "READER")
+    @Test
+    public void createForbidden() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                                .post(ASPSP_URI)
+                                .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+                                .content(serialize(to)))
+                .andDo(print())
+                .andExpect(status().is(HttpStatus.FORBIDDEN.value()))
+                .andReturn();
+    }
+
+    @WithMockUser(roles = {"MANAGER", "DEPLOYER"})
+    @Test
     public void update() throws Exception {
-        when(converter.toAspspBO(to)).thenReturn(bo);
         when(aspspService.save(bo)).thenReturn(bo);
-        when(converter.toAspspTO(bo)).thenReturn(to);
 
-        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders
-                                                      .put("/v1/aspsps")
-                                                      .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
-                                                      .content(serialize(to)))
-                                      .andDo(print())
-                                      .andExpect(status().is(HttpStatus.ACCEPTED.value()))
-                                      .andReturn();
+        mockMvc.perform(MockMvcRequestBuilders
+                                .put(ASPSP_URI)
+                                .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+                                .content(serialize(to)))
+                .andDo(print())
+                .andExpect(status().is(HttpStatus.ACCEPTED.value()))
+                .andReturn();
 
-        verify(converter, times(1)).toAspspBO(to);
         verify(aspspService, times(1)).save(bo);
     }
 
+    @Test
+    public void updateRedirectToLoginPage() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                                .put(ASPSP_URI)
+                                .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+                                .content(serialize(to)))
+                .andDo(print())
+                .andExpect(status().is(HttpStatus.FOUND.value()))
+                .andReturn();
+    }
+
+    @WithMockUser(roles = "READER")
+    @Test
+    public void updateForbidden() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                                .put(ASPSP_URI)
+                                .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+                                .content(serialize(to)))
+                .andDo(print())
+                .andExpect(status().is(HttpStatus.FORBIDDEN.value()))
+                .andReturn();
+    }
+
+    @WithMockUser(roles = {"MANAGER", "DEPLOYER"})
     @Test
     public void delete() throws Exception {
 
         doNothing().when(aspspService).deleteById(ID);
 
         mockMvc.perform(MockMvcRequestBuilders
-                                .delete("/v1/aspsps/{id}", ID)
+                                .delete(ASPSP_BY_ID_URI, ID)
                                 .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
                                 .content(serialize(to)))
                 .andDo(print())
@@ -113,6 +168,29 @@ public class AspspResourceTest {
                 .andReturn();
 
         verify(aspspService, times(1)).deleteById(ID);
+    }
+
+    @Test
+    public void deleteRedirectToLoginPage() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                                .delete(ASPSP_BY_ID_URI, ID)
+                                .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+                                .content(serialize(to)))
+                .andDo(print())
+                .andExpect(status().is(HttpStatus.FOUND.value()))
+                .andReturn();
+    }
+
+    @WithMockUser(roles = "READER")
+    @Test
+    public void deleteForbidden() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+                                .delete(ASPSP_BY_ID_URI, ID)
+                                .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+                                .content(serialize(to)))
+                .andDo(print())
+                .andExpect(status().is(HttpStatus.FORBIDDEN.value()))
+                .andReturn();
     }
 
     private <T> T readYml(Class<T> aClass, String fileName) {
