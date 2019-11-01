@@ -22,7 +22,6 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
@@ -59,7 +58,7 @@ public class AspspCsvResourceTest {
     @Test
     public void exportToLoginPage() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders
-                                .get(BASE_URI + "/export"))
+                                .get(BASE_URI + "/download"))
                 .andExpect(status().is(HttpStatus.FOUND.value()))
                 .andReturn();
     }
@@ -78,7 +77,7 @@ public class AspspCsvResourceTest {
 
     @Test
     public void importCsvRedirectToLoginPage() throws Exception {
-        mockMvc.perform(multipart(BASE_URI + "/import")
+        mockMvc.perform(multipart(BASE_URI + "/upload")
                                 .file("file", "content".getBytes()))
                 .andExpect(status().is(HttpStatus.FOUND.value()));
     }
@@ -86,7 +85,7 @@ public class AspspCsvResourceTest {
     @WithMockUser(roles = "READER")
     @Test
     public void importCsvForbidden() throws Exception {
-        mockMvc.perform(multipart(BASE_URI + "/import")
+        mockMvc.perform(multipart(BASE_URI + "/upload")
                                 .file("file", "content".getBytes()))
                 .andExpect(status().is(HttpStatus.FORBIDDEN.value()));
     }

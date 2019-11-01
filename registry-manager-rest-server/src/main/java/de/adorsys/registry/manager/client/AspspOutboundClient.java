@@ -17,7 +17,7 @@ public interface AspspOutboundClient {
      *
      * @return records as an array of bytes
      */
-    @RequestMapping(method = RequestMethod.GET, value = "/export")
+    @RequestMapping(method = RequestMethod.GET, value = "/v1/aspsps/csv/export")
     byte[] importFile();
 
     /**
@@ -25,8 +25,6 @@ public interface AspspOutboundClient {
      *
      * @param file as a {@link MultipartFile}
      */
-    @RequestMapping(method = RequestMethod.POST, value = "/import", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @RequestMapping(method = RequestMethod.POST, value = "/v1/aspsps/csv/import", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     void exportFile(@Param("file") MultipartFile file);
-
-
 }
