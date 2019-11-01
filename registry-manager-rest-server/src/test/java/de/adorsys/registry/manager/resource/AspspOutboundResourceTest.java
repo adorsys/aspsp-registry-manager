@@ -61,7 +61,7 @@ public class AspspOutboundResourceTest {
     public void exportData() throws Exception {
         doNothing().when(client).exportFile(any());
 
-        mockMvc.perform(MockMvcRequestBuilders.get(BASE_URI + "/export"))
+        mockMvc.perform(MockMvcRequestBuilders.post(BASE_URI + "/export"))
             .andExpect(status().is(HttpStatus.NO_CONTENT.value()))
             .andReturn();
 

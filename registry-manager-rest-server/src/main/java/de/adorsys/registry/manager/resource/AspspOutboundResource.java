@@ -19,7 +19,7 @@ public class AspspOutboundResource {
         this.aspspOutboundClient = aspspOutboundClient;
     }
 
-    @GetMapping("/export")
+    @PostMapping("/export")
     public ResponseEntity<Void> exportData() throws IOException {
         aspspOutboundClient.exportFile(aspspOutboundService.exportData());
 

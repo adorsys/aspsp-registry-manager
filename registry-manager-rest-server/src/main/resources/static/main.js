@@ -484,7 +484,9 @@ function importButton() {
 }
 
 function exportButton() {
-    fetch("/v1/aspsps/outbound/export").then(response => {
+    fetch("/v1/aspsps/outbound/export", {
+        method: 'POST'
+    }).then(response => {
         if (!response.ok) {
             throw Error(response.statusText);
         }
