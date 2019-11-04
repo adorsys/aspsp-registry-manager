@@ -13,6 +13,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -52,7 +56,7 @@ public class AspspResourceTest {
     @Test
     public void getAspsps() throws Exception {
 
-        when(aspspService.getByAspsp(any(), anyInt(), anyInt())).thenReturn(Collections.emptyList());
+        when(aspspService.getByAspsp(any(AspspBO.class), any())).thenReturn(any());
 
         mockMvc.perform(MockMvcRequestBuilders
                                 .get(ASPSP_URI)
@@ -60,7 +64,7 @@ public class AspspResourceTest {
                 .andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andReturn();
-        verify(aspspService, times(1)).getByAspsp(any(), anyInt(), anyInt());
+        verify(aspspService, times(1)).getByAspsp(any(AspspBO.class), any());
     }
 
     @Test

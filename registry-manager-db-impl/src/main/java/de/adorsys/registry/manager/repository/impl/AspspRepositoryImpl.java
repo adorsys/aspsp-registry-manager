@@ -5,9 +5,7 @@ import de.adorsys.registry.manager.repository.AspspRepository;
 import de.adorsys.registry.manager.repository.converter.AspspEntityConverter;
 import de.adorsys.registry.manager.repository.model.AspspEntity;
 import de.adorsys.registry.manager.repository.model.AspspPO;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -30,7 +28,7 @@ public class AspspRepositoryImpl implements AspspRepository {
     }
 
     @Override
-    public List<AspspPO> findByExample(AspspPO aspsp, int page, int size) {
+    public Page<AspspPO> findByExample(AspspPO aspsp, Pageable pageable) {
         AspspEntity entity = converter.toAspspEntity(aspsp);
 
         ExampleMatcher matcher = ExampleMatcher.matchingAll()
@@ -38,16 +36,15 @@ public class AspspRepositoryImpl implements AspspRepository {
                                          .withIgnoreCase()
                                          .withIgnoreNullValues();
 
-        List<AspspEntity> entities = repository.findAll(Example.of(entity, matcher), PageRequest.of(page, size))
-                                                 .getContent();
+        Page<AspspEntity> entities = repository.findAll(Example.of(entity, matcher), pageable);
 
-        return converter.toAspspPOList(entities);
+        return new PageImpl<>(converter.toAspspPOList(entities.getContent()), entities.getPageable(), entities.getTotalElements());
     }
 
     @Override
-    public List<AspspPO> findByBankCode(String bankCode, int page, int size) {
-        List<AspspEntity> entities = repository.findByBankCode(bankCode, PageRequest.of(page, size));
-        return converter.toAspspPOList(entities);
+    public Page<AspspPO> findByBankCode(String bankCode, Pageable pageable) {
+        Page<AspspEntity> entities = repository.findByBankCode(bankCode, pageable);
+        return new PageImpl<>(converter.toAspspPOList(entities.getContent()), entities.getPageable(), entities.getTotalElements());
     }
 
     @Override

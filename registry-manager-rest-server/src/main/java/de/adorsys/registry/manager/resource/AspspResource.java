@@ -7,6 +7,11 @@ import de.adorsys.registry.manager.service.model.AspspBO;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -14,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 
 @RestController
@@ -34,7 +40,7 @@ public class AspspResource {
     @PreAuthorize("isAuthenticated()")
     @ApiOperation("Get ASPSPs")
     @GetMapping
-    ResponseEntity<List<AspspTO>> getAspsps(@RequestParam(value = "name", required = false) String name,
+    ResponseEntity<Page<AspspTO>> getAspsps(@RequestParam(value = "name", required = false) String name,
                                             @RequestParam(value = "bic", required = false) String bic,
                                             @RequestParam(value = "bankCode", required = false) String bankCode,
                                             @RequestParam(value = "iban", required = false) String iban, // if present - other params ignored
@@ -42,17 +48,17 @@ public class AspspResource {
                                             @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
         logger.info("Get all ASPSPs");
 
-        List<AspspBO> aspspBOs;
+        Page<AspspBO> bos;
 
         if (iban != null && !iban.isEmpty()) {
-            aspspBOs = aspspService.getByIban(iban, page, size);
+            bos = aspspService.getByIban(iban, PageRequest.of(page, size));
         } else {
-            aspspBOs = aspspService.getByAspsp(buildAspspBO(name, bic, bankCode), page, size);
+            bos = aspspService.getByAspsp(buildAspspBO(name, bic, bankCode), PageRequest.of(page, size));
         }
 
         return ResponseEntity
                        .status(HttpStatus.OK)
-                       .body(converter.toAspspTOList(aspspBOs));
+                       .body(new PageImpl<>(converter.toAspspTOList(bos.getContent()), bos.getPageable(), bos.getTotalElements()));
     }
 
     private AspspBO buildAspspBO(String name, String bic, String bankCode) {

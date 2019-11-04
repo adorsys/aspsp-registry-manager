@@ -10,10 +10,14 @@ import org.iban4j.Iban;
 import org.iban4j.Iban4jException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class AspspServiceImpl implements AspspService {
@@ -30,18 +34,18 @@ public class AspspServiceImpl implements AspspService {
     }
 
     @Override
-    public List<AspspBO> getByAspsp(AspspBO aspsp, int page, int size) {
+    public Page<AspspBO> getByAspsp(AspspBO aspsp, Pageable pageable) {
         logger.info("Trying to get ASPSPs by name [{}], bic [{}] and bankCode [{}]",
                 aspsp.getName(), aspsp.getBic(), aspsp.getBankCode());
 
         AspspPO po = converter.toAspspPO(aspsp);
-        List<AspspPO> pos = repository.findByExample(po, page, size);
+        Page<AspspPO> pos = repository.findByExample(po, pageable);
 
-        return converter.toAspspBOList(pos);
+        return new PageImpl<>(converter.toAspspBOList(pos.get().collect(Collectors.toList())), pos.getPageable(), pos.getTotalElements());
     }
 
     @Override
-    public List<AspspBO> getByIban(String iban, int page, int size) {
+    public Page<AspspBO> getByIban(String iban, Pageable pageable) {
         logger.info("Trying to get ASPSPs by IBAN {}", iban);
 
         String bankCode;
@@ -56,7 +60,9 @@ public class AspspServiceImpl implements AspspService {
             throw new IbanException("Failed to extract the bank code from the IBAN");
         }
 
-        return converter.toAspspBOList(repository.findByBankCode(bankCode, page, size));
+        Page<AspspPO> pos = repository.findByBankCode(bankCode, pageable);
+
+        return new PageImpl<>(converter.toAspspBOList(pos.get().collect(Collectors.toList())), pos.getPageable(), pos.getTotalElements());
     }
 
     @Override

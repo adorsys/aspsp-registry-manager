@@ -11,10 +11,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.*;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.*;
 
 import java.util.*;
 
@@ -78,11 +75,11 @@ public class AspspRepositoryImplTest {
         when(jpaRepository.findAll(Example.of(entity, matcher), PageRequest.of(PAGE, SIZE))).thenReturn(new PageImpl<>(entities));
         when(converter.toAspspPOList(any())).thenReturn(pos);
 
-        List<AspspPO> result = repository.findByExample(po, PAGE, SIZE);
+        Page<AspspPO> result = repository.findByExample(po, PageRequest.of(PAGE, SIZE));
 
         assertNotNull(result);
-        assertThat(result.size(), CoreMatchers.is(1));
-        assertEquals(po, result.get(0));
+        assertThat(result.getContent().size(), CoreMatchers.is(1));
+        assertEquals(po, result.getContent().get(0));
     }
 
     @Test
@@ -90,14 +87,14 @@ public class AspspRepositoryImplTest {
         List<AspspEntity> entities = List.of(entity);
         List<AspspPO> pos = List.of(po);
 
-        when(jpaRepository.findByBankCode(BANK_CODE, PageRequest.of(PAGE, SIZE))).thenReturn(entities);
+        when(jpaRepository.findByBankCode(BANK_CODE, PageRequest.of(PAGE, SIZE))).thenReturn(new PageImpl<>(entities));
         when(converter.toAspspPOList(any())).thenReturn(pos);
 
-        List<AspspPO> result = repository.findByBankCode(BANK_CODE, PAGE, SIZE);
+        Page<AspspPO> result = repository.findByBankCode(BANK_CODE, PageRequest.of(PAGE, SIZE));
 
         assertNotNull(result);
-        assertThat(result.size(), CoreMatchers.is(1));
-        assertEquals(po, result.get(0));
+        assertThat(result.getContent().size(), CoreMatchers.is(1));
+        assertEquals(po, result.getContent().get(0));
     }
 
     @Test

@@ -2,15 +2,17 @@ package de.adorsys.registry.manager.service;
 
 
 import de.adorsys.registry.manager.service.model.AspspBO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.UUID;
 
 public interface AspspService {
 
-    List<AspspBO> getByAspsp(AspspBO aspsp, int page, int size);
+    Page<AspspBO> getByAspsp(AspspBO aspsp, Pageable pageable);
 
-    List<AspspBO> getByIban(String iban, int page, int size);
+    Page<AspspBO> getByIban(String iban, Pageable pageable);
 
     AspspBO save(AspspBO aspsp);
 
