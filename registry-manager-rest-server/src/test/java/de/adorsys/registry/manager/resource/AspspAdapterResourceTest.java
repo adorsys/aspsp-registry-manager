@@ -24,7 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(AspspAdapterResource.class)
 @Import(SecurityConfig.class)
 public class AspspAdapterResourceTest {
-    private static final String BASE_URI = "/v1/aspsps/outbound";
+    private static final String BASE_URI = "/v1/aspsps/adapter";
 
     @Autowired
     private MockMvc mockMvc;
