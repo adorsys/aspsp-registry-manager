@@ -28,7 +28,7 @@ public class AspspCsvResource {
 
     @PreAuthorize("isAuthenticated()")
     @ApiOperation("Get all ASPSPs as CSV file")
-    @GetMapping(value = "/export", produces = "text/csv")
+    @GetMapping(value = "/download", produces = "text/csv")
     public ResponseEntity<byte[]> export() {
         logger.info("Get all ASPSPs as CSV file");
 
@@ -45,7 +45,7 @@ public class AspspCsvResource {
 
     @PreAuthorize("hasAnyRole('MANAGER','DEPLOYER')")
     @ApiOperation("Post all ASPSPs from CSV file")
-    @PostMapping(value = "/import", consumes = {"multipart/form-data"})
+    @PostMapping(value = "/upload", consumes = {"multipart/form-data"})
     public void importCsv(@RequestParam MultipartFile file) {
         logger.info("Post all ASPSPs from CSV file");
 

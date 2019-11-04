@@ -17,6 +17,20 @@
 <div class="mdl-layout--fixed-drawer mdl-layout mdl-js-layout">
     <div class="mdl-layout__drawer animated is-hidden">
         <nav class="mdl-navigation">
+            <div class="import-button" id="import" onclick="importButton();">
+                <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--fab">
+                    <i class="material-icons">
+                        arrow_downward
+                    </i>
+                </button>
+            </div>
+            <div class="export-button" id="export" onclick="exportButton();">
+                <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--fab">
+                    <i class="material-icons">
+                        arrow_upward
+                    </i>
+                </button>
+            </div>
             <div class="upload-button" id="upload">
                 <input type="file" name="import file" id="import-field" hidden>
                 <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--fab">
@@ -26,7 +40,7 @@
                 </button>
             </div>
             <div class="download-button" id="download">
-                <a href="/v1/aspsps/csv/export" download="aspsps.csv">
+                <a href="/v1/aspsps/csv/download" download="aspsps.csv">
                     <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--fab mdl-button--colored">
                         <i class="material-icons">
                             cloud_download
@@ -59,9 +73,6 @@
         </nav>
     </div>
     <div class="tooltips">
-        <div class="mdl-tooltip" data-mdl-for="merge">
-            Bulk upload <br>(Save and update)
-        </div>
         <div class="mdl-tooltip" data-mdl-for="import">
             Import from Adapter
         </div>
@@ -74,8 +85,11 @@
         <div class="mdl-tooltip" data-mdl-for="upload">
             Upload CSV file
         </div>
+        <div class="mdl-tooltip" data-mdl-for="merge">
+            Bulk upload <br>(Save and update)
+        </div>
         <div class="mdl-tooltip" data-mdl-for="add">
-            Add new record
+            Add new Aspsp
         </div>
     </div>
 </div>

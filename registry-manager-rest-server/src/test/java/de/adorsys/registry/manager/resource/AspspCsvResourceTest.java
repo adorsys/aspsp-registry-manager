@@ -46,7 +46,7 @@ public class AspspCsvResourceTest {
         when(service.exportCsv()).thenReturn(STORED_BYTES_TEMPLATE);
 
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders
-                                                      .get(BASE_URI + "/export"))
+                                                      .get(BASE_URI + "/download"))
                                       .andExpect(status().is(HttpStatus.OK.value()))
                                       .andReturn();
 
@@ -58,7 +58,7 @@ public class AspspCsvResourceTest {
     @Test
     public void exportToLoginPage() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders
-                                .get(BASE_URI + "/export"))
+                                .get(BASE_URI + "/download"))
                 .andExpect(status().is(HttpStatus.FOUND.value()))
                 .andReturn();
     }
@@ -68,7 +68,7 @@ public class AspspCsvResourceTest {
     public void importCsv() throws Exception {
         doNothing().when(service).importCsv(any());
 
-        mockMvc.perform(multipart(BASE_URI + "/import")
+        mockMvc.perform(multipart(BASE_URI + "/upload")
                                 .file("file", "content".getBytes()))
                 .andExpect(status().is(HttpStatus.OK.value()));
 
@@ -77,7 +77,7 @@ public class AspspCsvResourceTest {
 
     @Test
     public void importCsvRedirectToLoginPage() throws Exception {
-        mockMvc.perform(multipart(BASE_URI + "/import")
+        mockMvc.perform(multipart(BASE_URI + "/upload")
                                 .file("file", "content".getBytes()))
                 .andExpect(status().is(HttpStatus.FOUND.value()));
     }
@@ -85,7 +85,7 @@ public class AspspCsvResourceTest {
     @WithMockUser(roles = "READER")
     @Test
     public void importCsvForbidden() throws Exception {
-        mockMvc.perform(multipart(BASE_URI + "/import")
+        mockMvc.perform(multipart(BASE_URI + "/upload")
                                 .file("file", "content".getBytes()))
                 .andExpect(status().is(HttpStatus.FORBIDDEN.value()));
     }
