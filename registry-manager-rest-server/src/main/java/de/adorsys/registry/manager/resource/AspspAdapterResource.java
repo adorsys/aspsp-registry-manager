@@ -37,7 +37,7 @@ public class AspspAdapterResource {
 
     @PreAuthorize("hasRole('DEPLOYER')")
     @ApiOperation("Import ASPSPs from Adapter")
-    @GetMapping("/import")
+    @PostMapping("/import")
     public ResponseEntity<Void> importData() {
         logger.info("Import all ASPSPs from Adapter");
 

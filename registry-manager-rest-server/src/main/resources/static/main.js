@@ -473,7 +473,9 @@ function search() {
 }
 
 function importButton() {
-    fetch("/v1/aspsps/adapter/import").then(response => {
+    fetch("/v1/aspsps/adapter/import", {
+        method: 'POST'
+    }).then(response => {
         if (!response.ok) {
             throw Error(response.statusText);
         }

@@ -38,7 +38,7 @@ public class AspspAdapterResourceTest {
     @Test
     public void importDataRedirectToLoginPage() throws Exception {
 
-        mockMvc.perform(MockMvcRequestBuilders.get(BASE_URI + "/import"))
+        mockMvc.perform(MockMvcRequestBuilders.post(BASE_URI + "/import"))
             .andExpect(status().is(HttpStatus.FOUND.value()))
             .andReturn();
     }
@@ -48,7 +48,7 @@ public class AspspAdapterResourceTest {
     public void importData() throws Exception {
         doNothing().when(service).importData(any());
 
-        mockMvc.perform(MockMvcRequestBuilders.get(BASE_URI + "/import"))
+        mockMvc.perform(MockMvcRequestBuilders.post(BASE_URI + "/import"))
             .andExpect(status().is(HttpStatus.NO_CONTENT.value()))
             .andReturn();
 
@@ -59,7 +59,7 @@ public class AspspAdapterResourceTest {
     @Test
     public void importDataForbidden() throws Exception {
 
-        mockMvc.perform(MockMvcRequestBuilders.get(BASE_URI + "/import"))
+        mockMvc.perform(MockMvcRequestBuilders.post(BASE_URI + "/import"))
             .andExpect(status().is(HttpStatus.FORBIDDEN.value()))
             .andReturn();
     }
