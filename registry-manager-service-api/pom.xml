@@ -13,6 +13,18 @@
     <artifactId>registry-manager-service-api</artifactId>
     <name>registry-manager-service-api</name>
 
+    <dependencies>
+
+        <!-- feign -->
+
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-openfeign</artifactId>
+            <version>${feign.version}</version>
+        </dependency>
+
+    </dependencies>
+
     <build>
         <plugins>
             <plugin>
