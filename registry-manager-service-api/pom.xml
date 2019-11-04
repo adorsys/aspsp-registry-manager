@@ -13,9 +13,6 @@
     <artifactId>registry-manager-service-api</artifactId>
     <name>registry-manager-service-api</name>
 
-    <properties>
-    </properties>
-
     <dependencies>
 
         <!-- feign -->
