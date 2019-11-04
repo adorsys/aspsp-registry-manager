@@ -21,5 +21,6 @@ helm init --client-only
 helm upgrade --install --wait \
   --tiller-namespace xs2a-adapter-tiller \
   --namespace aspsp-registry-manager-dev \
+  --set image=${IMAGE} \
   aspsp-registry-manager-dev \
   devops/charts/aspsp-registry-manager
