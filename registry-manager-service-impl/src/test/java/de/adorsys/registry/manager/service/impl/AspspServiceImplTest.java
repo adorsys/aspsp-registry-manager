@@ -7,7 +7,6 @@ import de.adorsys.registry.manager.service.exception.IbanException;
 import de.adorsys.registry.manager.service.model.AspspBO;
 import org.iban4j.Iban;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -15,10 +14,8 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.data.domain.*;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
@@ -64,8 +61,8 @@ public class AspspServiceImplTest {
         Page<AspspBO> result = aspspService.getByAspsp(bo, PageRequest.of(PAGE, SIZE));
 
         assertNotNull(result);
-        assertThat((int) result.get().count(), is(1));
-        assertEquals(bo, result.get().collect(Collectors.toList()).get(0));
+        assertThat(result.getContent().size(), is(1));
+        assertEquals(bo, result.getContent().get(0));
     }
 
     @Test(expected = IbanException.class)
@@ -84,8 +81,8 @@ public class AspspServiceImplTest {
         Page<AspspBO> result = aspspService.getByIban(CORRECT_IBAN, PageRequest.of(PAGE, SIZE));
 
         assertNotNull(result);
-        assertThat((int) result.get().count(), is(1));
-        assertEquals(bo, result.get().collect(Collectors.toList()).get(0));
+        assertThat(result.getContent().size(), is(1));
+        assertEquals(bo, result.getContent().get(0));
     }
 
     @Test
