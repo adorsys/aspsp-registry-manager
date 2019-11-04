@@ -8,9 +8,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 
-@FeignClient(value = "aspsp-outbound-service", url = "${xs2a-adapter.url}",
+@FeignClient(value = "aspsp-adapter-service", url = "${xs2a-adapter.url}",
     configuration = ClientConfiguration.class)
-public interface AspspOutboundClient {
+public interface AspspAdapterClient {
 
     /**
      * Requests for data from Adapter for putting it into the existing database

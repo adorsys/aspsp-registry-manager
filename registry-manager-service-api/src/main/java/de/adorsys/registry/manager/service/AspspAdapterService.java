@@ -4,7 +4,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
-public interface AspspOutboundService {
+public interface AspspAdapterService {
 
     /**
      * Receives an array of bytes and transfers it for further saving into the

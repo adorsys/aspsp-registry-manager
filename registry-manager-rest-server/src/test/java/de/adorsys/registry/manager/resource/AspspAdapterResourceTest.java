@@ -1,19 +1,12 @@
 package de.adorsys.registry.manager.resource;
 
-import de.adorsys.registry.manager.client.AspspOutboundClient;
+import de.adorsys.registry.manager.client.AspspAdapterClient;
 import de.adorsys.registry.manager.config.SecurityConfig;
-import de.adorsys.registry.manager.exception.ExceptionHandlingAdvisor;
-import de.adorsys.registry.manager.service.AspspOutboundService;
-import org.junit.Before;
+import de.adorsys.registry.manager.service.AspspAdapterService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
@@ -21,7 +14,6 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -29,19 +21,19 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
-@WebMvcTest(AspspOutboundResource.class)
+@WebMvcTest(AspspAdapterResource.class)
 @Import(SecurityConfig.class)
-public class AspspOutboundResourceTest {
+public class AspspAdapterResourceTest {
     private static final String BASE_URI = "/v1/aspsps/outbound";
 
     @Autowired
     private MockMvc mockMvc;
 
     @MockBean
-    private AspspOutboundService service;
+    private AspspAdapterService service;
 
     @MockBean
-    private AspspOutboundClient client;
+    private AspspAdapterClient client;
 
     @Test
     public void importDataRedirectToLoginPage() throws Exception {

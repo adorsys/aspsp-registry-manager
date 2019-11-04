@@ -12,19 +12,18 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
-import static com.google.common.base.CharMatcher.is;
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
-public class AspspOutboundServiceImplTest {
+public class AspspAdapterServiceImplTest {
 
     private static final byte[] STORED_BYTES_TEMPLATE
         = "81cecc67-6d1b-4169-b67c-2de52b99a0cc,\"BNP Paribas Germany, Consorsbank\",CSDBDE71XXX,https://xs2a-sndbx.consorsbank.de,consors-bank-adapter,76030080,https://example.com,EMBEDDED;REDIRECT\n".getBytes();
 
     @InjectMocks
-    private AspspOutboundServiceImpl service;
+    private AspspAdapterServiceImpl service;
 
     @Mock
     private AspspCsvService aspspCsvService;

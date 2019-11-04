@@ -1,7 +1,7 @@
 package de.adorsys.registry.manager.resource;
 
-import de.adorsys.registry.manager.client.AspspOutboundClient;
-import de.adorsys.registry.manager.service.AspspOutboundService;
+import de.adorsys.registry.manager.client.AspspAdapterClient;
+import de.adorsys.registry.manager.service.AspspAdapterService;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,16 +12,16 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 
 @RestController
-@RequestMapping("/v1/aspsps/outbound")
-public class AspspOutboundResource {
+@RequestMapping("/v1/aspsps/adapter")
+public class AspspAdapterResource {
 
     private static final Logger logger = LoggerFactory.getLogger(AspspResource.class);
-    private AspspOutboundService aspspOutboundService;
-    private AspspOutboundClient aspspOutboundClient;
+    private AspspAdapterService aspspAdapterService;
+    private AspspAdapterClient aspspAdapterClient;
 
-    public AspspOutboundResource(AspspOutboundService aspspOutboundService, AspspOutboundClient aspspOutboundClient) {
-        this.aspspOutboundService = aspspOutboundService;
-        this.aspspOutboundClient = aspspOutboundClient;
+    public AspspAdapterResource(AspspAdapterService aspspAdapterService, AspspAdapterClient aspspAdapterClient) {
+        this.aspspAdapterService = aspspAdapterService;
+        this.aspspAdapterClient = aspspAdapterClient;
     }
 
     @PreAuthorize("hasRole('DEPLOYER')")
@@ -30,7 +30,7 @@ public class AspspOutboundResource {
     public ResponseEntity<Void> exportData() throws IOException {
         logger.info("Export all ASPSPs into Adapter");
 
-        aspspOutboundClient.exportFile(aspspOutboundService.exportData());
+        aspspAdapterClient.exportFile(aspspAdapterService.exportData());
 
         return ResponseEntity.noContent().build();
     }
@@ -41,7 +41,7 @@ public class AspspOutboundResource {
     public ResponseEntity<Void> importData() {
         logger.info("Import all ASPSPs from Adapter");
 
-        aspspOutboundService.importData(aspspOutboundClient.importFile());
+        aspspAdapterService.importData(aspspAdapterClient.importFile());
 
         return ResponseEntity.noContent().build();
     }

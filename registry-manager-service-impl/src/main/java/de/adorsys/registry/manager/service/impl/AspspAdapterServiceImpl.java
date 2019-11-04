@@ -1,7 +1,7 @@
 package de.adorsys.registry.manager.service.impl;
 
 import de.adorsys.registry.manager.service.AspspCsvService;
-import de.adorsys.registry.manager.service.AspspOutboundService;
+import de.adorsys.registry.manager.service.AspspAdapterService;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.io.IOUtils;
@@ -14,11 +14,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 @Service
-public class AspspOutboundServiceImpl implements AspspOutboundService {
+public class AspspAdapterServiceImpl implements AspspAdapterService {
 
     private AspspCsvService aspspCsvService;
 
-    public AspspOutboundServiceImpl(AspspCsvService aspspCsvService) {
+    public AspspAdapterServiceImpl(AspspCsvService aspspCsvService) {
         this.aspspCsvService = aspspCsvService;
     }
 
