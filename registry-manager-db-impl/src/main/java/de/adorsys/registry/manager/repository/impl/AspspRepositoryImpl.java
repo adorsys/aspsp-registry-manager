@@ -5,6 +5,7 @@ import de.adorsys.registry.manager.repository.AspspRepository;
 import de.adorsys.registry.manager.repository.converter.AspspEntityConverter;
 import de.adorsys.registry.manager.repository.model.AspspEntity;
 import de.adorsys.registry.manager.repository.model.AspspPO;
+import de.adorsys.registry.manager.repository.model.PagePO;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Component;
 
@@ -28,7 +29,7 @@ public class AspspRepositoryImpl implements AspspRepository {
     }
 
     @Override
-    public Page<AspspPO> findByExample(AspspPO aspsp, Pageable pageable) {
+    public PagePO findByExample(AspspPO aspsp, int page, int size) {
         AspspEntity entity = converter.toAspspEntity(aspsp);
 
         ExampleMatcher matcher = ExampleMatcher.matchingAll()
@@ -36,15 +37,15 @@ public class AspspRepositoryImpl implements AspspRepository {
                                          .withIgnoreCase()
                                          .withIgnoreNullValues();
 
-        Page<AspspEntity> entities = repository.findAll(Example.of(entity, matcher), pageable);
+        Page<AspspEntity> entities = repository.findAll(Example.of(entity, matcher), PageRequest.of(page, size));
 
-        return new PageImpl<>(converter.toAspspPOList(entities.getContent()), entities.getPageable(), entities.getTotalElements());
+        return new PagePO(converter.toAspspPOList(entities.getContent()), entities.getTotalElements());
     }
 
     @Override
-    public Page<AspspPO> findByBankCode(String bankCode, Pageable pageable) {
-        Page<AspspEntity> entities = repository.findByBankCode(bankCode, pageable);
-        return new PageImpl<>(converter.toAspspPOList(entities.getContent()), entities.getPageable(), entities.getTotalElements());
+    public PagePO findByBankCode(String bankCode, int page, int size) {
+        Page<AspspEntity> entities = repository.findByBankCode(bankCode, PageRequest.of(page, size));
+        return new PagePO(converter.toAspspPOList(entities.getContent()), entities.getTotalElements());
     }
 
     @Override

@@ -4,11 +4,10 @@ import de.adorsys.registry.manager.converter.AspspTOConverter;
 import de.adorsys.registry.manager.model.AspspTO;
 import de.adorsys.registry.manager.service.AspspService;
 import de.adorsys.registry.manager.service.model.AspspBO;
+import de.adorsys.registry.manager.service.model.PageBO;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -44,12 +43,12 @@ public class AspspResource {
                                             @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
         logger.info("Get all ASPSPs");
 
-        Page<AspspBO> bos;
+        PageBO bos;
 
         if (iban != null && !iban.isEmpty()) {
-            bos = aspspService.getByIban(iban, PageRequest.of(page, size));
+            bos = aspspService.getByIban(iban, page, size);
         } else {
-            bos = aspspService.getByAspsp(buildAspspBO(name, bic, bankCode), PageRequest.of(page, size));
+            bos = aspspService.getByAspsp(buildAspspBO(name, bic, bankCode), page, size);
         }
 
         return ResponseEntity

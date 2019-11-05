@@ -1,8 +1,7 @@
 package de.adorsys.registry.manager.repository;
 
 import de.adorsys.registry.manager.repository.model.AspspPO;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import de.adorsys.registry.manager.repository.model.PagePO;
 
 import java.util.List;
 import java.util.UUID;
@@ -11,9 +10,9 @@ public interface AspspRepository {
 
     List<AspspPO> findAll();
 
-    Page<AspspPO> findByExample(AspspPO aspsp, Pageable pageable);
+    PagePO findByExample(AspspPO aspsp, int page, int size);
 
-    Page<AspspPO> findByBankCode(String bankCode, Pageable pageable);
+    PagePO findByBankCode(String bankCode, int page, int size);
 
     AspspPO save(AspspPO aspsp);
 

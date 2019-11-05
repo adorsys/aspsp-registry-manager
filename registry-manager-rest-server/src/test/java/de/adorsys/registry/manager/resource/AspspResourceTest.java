@@ -7,13 +7,13 @@ import de.adorsys.registry.manager.converter.AspspTOConverter;
 import de.adorsys.registry.manager.model.AspspTO;
 import de.adorsys.registry.manager.service.AspspService;
 import de.adorsys.registry.manager.service.model.AspspBO;
+import de.adorsys.registry.manager.service.model.PageBO;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -25,6 +25,7 @@ import pro.javatar.commons.reader.YamlReader;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 import static de.adorsys.registry.manager.resource.AspspResource.ASPSP_URI;
@@ -53,7 +54,7 @@ public class AspspResourceTest {
     @Test
     public void getAspsps() throws Exception {
 
-        when(aspspService.getByAspsp(any(), any())).thenReturn(new PageImpl<>(Collections.emptyList()));
+        when(aspspService.getByAspsp(any(), anyInt(), anyInt())).thenReturn(new PageBO(List.of(bo), 1L));
 
         mockMvc.perform(MockMvcRequestBuilders
                                 .get(ASPSP_URI)
@@ -61,7 +62,7 @@ public class AspspResourceTest {
                 .andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andReturn();
-        verify(aspspService, times(1)).getByAspsp(any(), any());
+        verify(aspspService, times(1)).getByAspsp(any(), anyInt(), anyInt());
     }
 
     @Test

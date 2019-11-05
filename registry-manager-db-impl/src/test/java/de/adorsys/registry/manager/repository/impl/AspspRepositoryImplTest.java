@@ -5,6 +5,7 @@ import de.adorsys.registry.manager.repository.converter.AspspEntityConverter;
 import de.adorsys.registry.manager.repository.converter.AspspEntityConverterImpl;
 import de.adorsys.registry.manager.repository.model.AspspEntity;
 import de.adorsys.registry.manager.repository.model.AspspPO;
+import de.adorsys.registry.manager.repository.model.PagePO;
 import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Test;
@@ -75,7 +76,7 @@ public class AspspRepositoryImplTest {
         when(jpaRepository.findAll(Example.of(entity, matcher), PageRequest.of(PAGE, SIZE))).thenReturn(new PageImpl<>(entities));
         when(converter.toAspspPOList(any())).thenReturn(pos);
 
-        Page<AspspPO> result = repository.findByExample(po, PageRequest.of(PAGE, SIZE));
+        PagePO result = repository.findByExample(po, PAGE, SIZE);
 
         assertNotNull(result);
         assertThat(result.getContent().size(), CoreMatchers.is(1));
@@ -90,7 +91,7 @@ public class AspspRepositoryImplTest {
         when(jpaRepository.findByBankCode(BANK_CODE, PageRequest.of(PAGE, SIZE))).thenReturn(new PageImpl<>(entities));
         when(converter.toAspspPOList(any())).thenReturn(pos);
 
-        Page<AspspPO> result = repository.findByBankCode(BANK_CODE, PageRequest.of(PAGE, SIZE));
+        PagePO result = repository.findByBankCode(BANK_CODE, PAGE, SIZE);
 
         assertNotNull(result);
         assertThat(result.getContent().size(), CoreMatchers.is(1));

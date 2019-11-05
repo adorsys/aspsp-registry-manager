@@ -2,9 +2,11 @@ package de.adorsys.registry.manager.service.impl;
 
 import de.adorsys.registry.manager.repository.AspspRepository;
 import de.adorsys.registry.manager.repository.model.AspspPO;
+import de.adorsys.registry.manager.repository.model.PagePO;
 import de.adorsys.registry.manager.service.converter.AspspBOConverter;
 import de.adorsys.registry.manager.service.exception.IbanException;
 import de.adorsys.registry.manager.service.model.AspspBO;
+import de.adorsys.registry.manager.service.model.PageBO;
 import org.iban4j.Iban;
 import org.junit.Before;
 import org.junit.Test;
@@ -12,7 +14,6 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.springframework.data.domain.*;
 
 import java.util.List;
 import java.util.UUID;
@@ -55,10 +56,10 @@ public class AspspServiceImplTest {
         List<AspspBO> bos = List.of(bo);
 
         when(converter.toAspspPO(bo)).thenReturn(po);
-        when(repository.findByExample(po, PageRequest.of(PAGE, SIZE))).thenReturn(new PageImpl<>(pos));
+        when(repository.findByExample(po, PAGE, SIZE)).thenReturn(new PagePO(pos, anyLong()));
         when(converter.toAspspBOList(pos)).thenReturn(bos);
 
-        Page<AspspBO> result = aspspService.getByAspsp(bo, PageRequest.of(PAGE, SIZE));
+        PageBO result = aspspService.getByAspsp(bo, PAGE, SIZE);
 
         assertNotNull(result);
         assertThat(result.getContent().size(), is(1));
@@ -67,7 +68,7 @@ public class AspspServiceImplTest {
 
     @Test(expected = IbanException.class)
     public void getByIban_failure_wrongIbanFormat() {
-        aspspService.getByIban(WRONG_IBAN, PageRequest.of(PAGE, SIZE));
+        aspspService.getByIban(WRONG_IBAN, PAGE, SIZE);
     }
 
     @Test
@@ -75,10 +76,10 @@ public class AspspServiceImplTest {
         List<AspspPO> pos = List.of(po);
         List<AspspBO> bos = List.of(bo);
 
-        when(repository.findByBankCode(Iban.valueOf(CORRECT_IBAN).getBankCode(), PageRequest.of(PAGE, SIZE))).thenReturn(new PageImpl<>(pos));
+        when(repository.findByBankCode(Iban.valueOf(CORRECT_IBAN).getBankCode(), PAGE, SIZE)).thenReturn(new PagePO(pos, anyLong()));
         when(converter.toAspspBOList(pos)).thenReturn(bos);
 
-        Page<AspspBO> result = aspspService.getByIban(CORRECT_IBAN, PageRequest.of(PAGE, SIZE));
+        PageBO result = aspspService.getByIban(CORRECT_IBAN, PAGE, SIZE);
 
         assertNotNull(result);
         assertThat(result.getContent().size(), is(1));
