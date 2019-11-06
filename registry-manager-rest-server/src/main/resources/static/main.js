@@ -15,6 +15,7 @@ function initGlobals() {
     window.FAILURE = document.querySelector(".alert.failure");
     window.SUCCESS = document.querySelector(".alert.success");
     window.COUNTER = 0;
+    window.BASE_URL = "";
 }
 
 function validateBankName(element) {
@@ -153,8 +154,17 @@ function clearTable() {
     }
 }
 
+function checkMorePart() {
+    let showMore = document.querySelector(".show-more");
+
+    if (!showMore.hidden) {
+        showMore.hidden = true;
+    }
+}
+
 function clearContent() {
     clearTable();
+    checkMorePart();
 
     document.querySelectorAll(".mdl-textfield__input").forEach(element => { element.value = ""; element.parentElement.classList.remove("is-dirty") });
 }
@@ -162,7 +172,7 @@ function clearContent() {
 
 function onEnterPress(event) {
     if (event.keyCode === 13) {
-        search();
+        searchButton();
     }
 }
 
@@ -439,35 +449,27 @@ function upload() {
     })
 }
 
-function search() {
+async function searchButton() {
     clearTable();
 
-    let dataLength;
+    BASE_URL = "/v1/aspsps/?";
+
     let data = document.querySelector(".search-form");
-    let url = "/v1/aspsps/?";
 
     if (data[0].value !== "")
-        url += "name=" + data[0].value.toLowerCase() + "&";
+        BASE_URL += "name=" + data[0].value.toLowerCase() + "&";
 
     if (data[1].value !== "")
-        url += "bic=" + data[1].value + "&";
+        BASE_URL += "bic=" + data[1].value + "&";
 
     if (data[2].value !== "")
-        url += "bankCode=" + data[2].value + "&";
+        BASE_URL += "bankCode=" + data[2].value + "&";
 
-    url += "size=9999";
+    BASE_URL += "size=99999";
 
-    fetch(url).then((response) => {
-        if (!response.ok) {
-            throw Error(response.statusText);
-        }
-        dataLength = response.headers.get("X-Total-Elements");
-        return response;
-    }).then(response => response.text()
-    ).then(response => paginate(JSON.parse(response), dataLength)
-    ).catch(() => {
-        fail("Failed to find any records. Please double check input parameters.");
-    });
+    let response = await search(BASE_URL);
+
+    PAGINATOR.create(response.data, response.headers);
 
     if (HIDDEN_ROW.parentElement.parentElement.parentElement.hidden) {
         showTable();
@@ -475,9 +477,7 @@ function search() {
 }
 
 function importButton() {
-    fetch("/v1/aspsps/adapter/import", {
-        method: 'POST'
-    }).then(response => {
+    fetch("/v1/aspsps/adapter/import").then(response => {
         if (!response.ok) {
             throw Error(response.statusText);
         }
@@ -517,6 +517,20 @@ function mergeButton() {
     }).catch(() => {
         fail("Failed to upload and merge the file.");
     })
+}
+
+function showMore() {
+    PAGINATOR.addRow(PAGINATOR.data);
+}
+
+async function search(URI) {
+    let output = {};
+
+    let response = await fetch(BASE_URL);
+    output.headers = await response.headers.get("X-Total-Elements");
+    output.data = JSON.parse(await response.text());
+
+    return output;
 }
 // End of requests part
 
@@ -588,21 +602,49 @@ function showButton() {
     drawer.classList.toggle("is-hidden");
     icon.classList.toggle("rotate");
 }
-function paginate(data, dataLength) {
-    let step = 10;
-    let current = 0;
-    let button = document.querySelector(".show-more");
-    let total = document.querySelector(".total");
+let PAGINATOR = {
+    data: null,
+    page: 0,
+    showMore: null,
+    button: null,
+    total: null,
+    // used as a current iterator until advanced pagination will be provided
+    left: 0,
+    step: 0
+};
 
-    addPage();
-    total.innerHTML = dataLength;
+    PAGINATOR.setStep = (dataLength) => {
+        PAGINATOR.step = dataLength / 10 <= 10 ? 10 : Math.floor(dataLength / 10) + 1;
+    };
 
-    function addPage() {
-        for (let limit = current + Math.min(step, dataLength); current < limit; current++) {
-            buildRow(data[current]);
+    PAGINATOR.create = (data, dataLength) => {
+
+        PAGINATOR.left = 0;
+        PAGINATOR.page = 0;
+        PAGINATOR.data = data;
+        PAGINATOR.setStep(dataLength);
+        // No need until advanced pagination provided
+        // PAGINATOR.left = dataLength;
+        PAGINATOR.showMore = document.querySelector(".show-more");
+        PAGINATOR.button = document.querySelector(".show-more>.more");
+        PAGINATOR.total = document.querySelector(".total");
+
+        PAGINATOR.total.innerHTML = dataLength;
+        PAGINATOR.button.innerHTML = "show next " + PAGINATOR.step;
+
+        PAGINATOR.addRow(PAGINATOR.data);
+    };
+
+    //TODO alter loop with uncommenting 'limit' and replacing 'step' with 'limit' and set increment to 'iterator++'
+    PAGINATOR.addRow = (input) => {
+        for (/*let iterator = 0, limit = Math.min(PAGINATOR.step, PAGINATOR.left);*/let limit = PAGINATOR.left + Math.min(PAGINATOR.step, (PAGINATOR.data.length - PAGINATOR.left)); PAGINATOR.left < limit /* ! */; PAGINATOR.left++) {
+            // TODO make 'input[iterator]' when appropriate pagination will be done
+            buildRow(input[PAGINATOR.left]);
+            // TODO uncomment this line when appropriate pagination will be done
+            // PAGINATOR.left--;
         }
-        button.hidden = current >= dataLength;
-    }
 
-    button.addEventListener('click', addPage);
-}
+        PAGINATOR.page++;
+        // TODO replace with 'PAGINATOR.showMore.hidden = PAGINATOR.left === 0;' when advanced paginator is provided
+        PAGINATOR.showMore.hidden = PAGINATOR.left >= PAGINATOR.data.length;
+    };
