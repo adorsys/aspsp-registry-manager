@@ -15,7 +15,7 @@ function initGlobals() {
     window.FAILURE = document.querySelector(".alert.failure");
     window.SUCCESS = document.querySelector(".alert.success");
     window.COUNTER = 0;
-    window.BASE_URL = "";
+    window.BASE_URL;
 }
 
 function validateBankName(element) {
@@ -521,10 +521,6 @@ function mergeButton() {
     })
 }
 
-function showMore() {
-    PAGINATOR.addRow(PAGINATOR.data);
-}
-
 async function search(URI) {
     let output = {};
 
@@ -535,6 +531,10 @@ async function search(URI) {
     return output;
 }
 // End of requests part
+
+function showMore() {
+    PAGINATOR.addRow(PAGINATOR.data);
+}
 
 function editButton(e) {
     let editButton = e.parentNode.children[0];
@@ -610,7 +610,6 @@ let PAGINATOR = {
     showMore: null,
     button: null,
     total: null,
-    // used as a current iterator until advanced pagination will be provided
     left: 0,
     step: 0
 };
@@ -621,12 +620,10 @@ let PAGINATOR = {
 
     PAGINATOR.create = (data, dataLength) => {
 
-        PAGINATOR.left = 0;
         PAGINATOR.page = 0;
         PAGINATOR.data = data;
         PAGINATOR.setStep(dataLength);
-        // No need until advanced pagination provided
-        // PAGINATOR.left = dataLength;
+        PAGINATOR.left = dataLength;
         PAGINATOR.showMore = document.querySelector(".show-more");
         PAGINATOR.button = document.querySelector(".show-more>.more");
         PAGINATOR.total = document.querySelector(".total");
@@ -637,16 +634,12 @@ let PAGINATOR = {
         PAGINATOR.addRow(PAGINATOR.data);
     };
 
-    //TODO alter loop with uncommenting 'limit' and replacing 'step' with 'limit' and set increment to 'iterator++'
     PAGINATOR.addRow = (input) => {
-        for (/*let iterator = 0, limit = Math.min(PAGINATOR.step, PAGINATOR.left);*/let limit = PAGINATOR.left + Math.min(PAGINATOR.step, (PAGINATOR.data.length - PAGINATOR.left)); PAGINATOR.left < limit /* ! */; PAGINATOR.left++) {
-            // TODO make 'input[iterator]' when appropriate pagination will be done
-            buildRow(input[PAGINATOR.left]);
-            // TODO uncomment this line when appropriate pagination will be done
-            // PAGINATOR.left--;
+        for (let iterator = 0; PAGINATOR.left < PAGINATOR.step; iterator++) {
+            buildRow(input[iterator]);
+            PAGINATOR.left--;
         }
 
         PAGINATOR.page++;
-        // TODO replace with 'PAGINATOR.showMore.hidden = PAGINATOR.left === 0;' when advanced paginator is provided
-        PAGINATOR.showMore.hidden = PAGINATOR.left >= PAGINATOR.data.length;
+        PAGINATOR.showMore.hidden = PAGINATOR.left === 0;
     };
