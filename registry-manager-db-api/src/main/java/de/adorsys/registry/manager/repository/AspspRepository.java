@@ -1,6 +1,7 @@
 package de.adorsys.registry.manager.repository;
 
 import de.adorsys.registry.manager.repository.model.AspspPO;
+import de.adorsys.registry.manager.repository.model.PagePO;
 
 import java.util.List;
 import java.util.UUID;
@@ -9,9 +10,29 @@ public interface AspspRepository {
 
     List<AspspPO> findAll();
 
-    List<AspspPO> findByExample(AspspPO aspsp, int page, int size);
+    /**
+     * Looks for ASPSPs by {@link AspspPO} entity example starting from the provided
+     * page and returns the output of the provided size
+     *
+     * @param aspsp
+     * @param page
+     * @param size
+     * @return {@link PagePO} object that holds a list of ASPSPs entities
+     * and the total element number of the search results
+     */
+    PagePO findByExample(AspspPO aspsp, int page, int size);
 
-    List<AspspPO> findByBankCode(String bankCode, int page, int size);
+    /**
+     * Looks for ASPSPs by the provided Bank Code starting from the provided
+     * page and returns the output of the provided size
+     *
+     * @param bankCode
+     * @param page
+     * @param size
+     * @return {@link PagePO} object that holds a list of ASPSPs entities
+     * and the total element number of the search results
+     */
+    PagePO findByBankCode(String bankCode, int page, int size);
 
     AspspPO save(AspspPO aspsp);
 
