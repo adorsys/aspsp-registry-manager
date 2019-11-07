@@ -49,7 +49,7 @@ public class PagePO {
     @Override
     public String toString() {
         return "PagePO{" +
-            "aspspPOS=" + content +
+            "content=" + content +
             ", totalElements=" + totalElements +
             '}';
     }

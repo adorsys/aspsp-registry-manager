@@ -31,6 +31,7 @@ import java.util.UUID;
 import static de.adorsys.registry.manager.resource.AspspResource.ASPSP_URI;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
@@ -61,6 +62,8 @@ public class AspspResourceTest {
                                 .param("bic", "00000000"))
                 .andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().exists("X-Total-Elements"))
+                .andExpect(header().longValue("X-Total-Elements", 1L))
                 .andReturn();
         verify(aspspService, times(1)).getByAspsp(any(), anyInt(), anyInt());
     }

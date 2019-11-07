@@ -49,7 +49,7 @@ public class PageBO {
     @Override
     public String toString() {
         return "PageBO{" +
-            "bos=" + content +
+            "content=" + content +
             ", pages=" + totalElements +
             '}';
     }
