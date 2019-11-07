@@ -10,8 +10,28 @@ public interface AspspRepository {
 
     List<AspspPO> findAll();
 
+    /**
+     * Looks for ASPSPs by {@link AspspPO} entity example starting from the provided
+     * page and returns the output of the provided size
+     *
+     * @param aspsp
+     * @param page
+     * @param size
+     * @return {@link PagePO} object that holds a list of ASPSPs entities
+     * and the total element number of the search results
+     */
     PagePO findByExample(AspspPO aspsp, int page, int size);
 
+    /**
+     * Looks for ASPSPs by the provided Bank Code starting from the provided
+     * page and returns the output of the provided size
+     *
+     * @param bankCode
+     * @param page
+     * @param size
+     * @return {@link PagePO} object that holds a list of ASPSPs entities
+     * and the total element number of the search results
+     */
     PagePO findByBankCode(String bankCode, int page, int size);
 
     AspspPO save(AspspPO aspsp);
