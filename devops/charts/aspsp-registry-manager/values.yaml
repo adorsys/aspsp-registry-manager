@@ -1,7 +1,3 @@
-image:
-  name: openshift-registry.adorsys.de/aspsp-registry-manager-dev/aspsp-registry-manager
-  tag: latest
-
 route:
   host: aspsp-registry-manager-dev.cloud.adorsys.de
 

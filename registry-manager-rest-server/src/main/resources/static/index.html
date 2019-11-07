@@ -113,7 +113,7 @@
                     <input class="mdl-textfield__input" type="text" name="bank-code">
                 </div>
                 <input class="mdl-button mdl-js-button button__padding-top" type="button" value="SEARCH"
-                    id="search_button" onclick="search();">
+                    id="search_button" onclick="searchButton();">
                 <input class="mdl-button mdl-js-button button__padding-top" type="button" value="CLEAR"
                     id="clear_button" onclick="clearContent();">
             </form>
@@ -194,7 +194,7 @@
     </div>
 </main>
 <div class="show-more" hidden>
-    <button class="more mdl-button mdl-js-button mdl-js-ripple-effect">Show 10 more</button>
+    <button class="more mdl-button mdl-js-button mdl-js-ripple-effect" onclick="showMore();">Show more</button>
     <div>
         Total: <span class="total"></span>
     </div>

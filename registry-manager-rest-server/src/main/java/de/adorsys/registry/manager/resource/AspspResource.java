@@ -4,6 +4,7 @@ import de.adorsys.registry.manager.converter.AspspTOConverter;
 import de.adorsys.registry.manager.model.AspspTO;
 import de.adorsys.registry.manager.service.AspspService;
 import de.adorsys.registry.manager.service.model.AspspBO;
+import de.adorsys.registry.manager.service.model.PageBO;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,17 +43,18 @@ public class AspspResource {
                                             @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
         logger.info("Get all ASPSPs");
 
-        List<AspspBO> aspspBOs;
+        PageBO bos;
 
         if (iban != null && !iban.isEmpty()) {
-            aspspBOs = aspspService.getByIban(iban, page, size);
+            bos = aspspService.getByIban(iban, page, size);
         } else {
-            aspspBOs = aspspService.getByAspsp(buildAspspBO(name, bic, bankCode), page, size);
+            bos = aspspService.getByAspsp(buildAspspBO(name, bic, bankCode), page, size);
         }
 
         return ResponseEntity
                        .status(HttpStatus.OK)
-                       .body(converter.toAspspTOList(aspspBOs));
+                       .header("X-Total-Elements", String.valueOf(bos.getTotalElements()))
+                       .body(converter.toAspspTOList(bos.getContent()));
     }
 
     private AspspBO buildAspspBO(String name, String bic, String bankCode) {

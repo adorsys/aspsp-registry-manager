@@ -2,10 +2,12 @@ package de.adorsys.registry.manager.service.impl;
 
 import de.adorsys.registry.manager.repository.AspspRepository;
 import de.adorsys.registry.manager.repository.model.AspspPO;
+import de.adorsys.registry.manager.repository.model.PagePO;
 import de.adorsys.registry.manager.service.AspspService;
 import de.adorsys.registry.manager.service.converter.AspspBOConverter;
 import de.adorsys.registry.manager.service.exception.IbanException;
 import de.adorsys.registry.manager.service.model.AspspBO;
+import de.adorsys.registry.manager.service.model.PageBO;
 import org.iban4j.Iban;
 import org.iban4j.Iban4jException;
 import org.slf4j.Logger;
@@ -30,18 +32,18 @@ public class AspspServiceImpl implements AspspService {
     }
 
     @Override
-    public List<AspspBO> getByAspsp(AspspBO aspsp, int page, int size) {
+    public PageBO getByAspsp(AspspBO aspsp, int page, int size) {
         logger.info("Trying to get ASPSPs by name [{}], bic [{}] and bankCode [{}]",
                 aspsp.getName(), aspsp.getBic(), aspsp.getBankCode());
 
         AspspPO po = converter.toAspspPO(aspsp);
-        List<AspspPO> pos = repository.findByExample(po, page, size);
+        PagePO pagePO = repository.findByExample(po, page, size);
 
-        return converter.toAspspBOList(pos);
+        return new PageBO(converter.toAspspBOList(pagePO.getContent()), pagePO.getTotalElements());
     }
 
     @Override
-    public List<AspspBO> getByIban(String iban, int page, int size) {
+    public PageBO getByIban(String iban, int page, int size) {
         logger.info("Trying to get ASPSPs by IBAN {}", iban);
 
         String bankCode;
@@ -56,7 +58,9 @@ public class AspspServiceImpl implements AspspService {
             throw new IbanException("Failed to extract the bank code from the IBAN");
         }
 
-        return converter.toAspspBOList(repository.findByBankCode(bankCode, page, size));
+        PagePO pagePO = repository.findByBankCode(bankCode, page, size);
+
+        return new PageBO(converter.toAspspBOList(pagePO.getContent()), pagePO.getTotalElements());
     }
 
     @Override
