@@ -465,8 +465,6 @@ async function searchButton() {
     if (data[2].value !== "")
         BASE_URL += "bankCode=" + data[2].value + "&";
 
-    BASE_URL += "size=99999";
-
     let response = await search(BASE_URL);
 
     PAGINATOR.create(response.data, response.headers);
@@ -532,8 +530,15 @@ async function search(URI) {
 }
 // End of requests part
 
-function showMore() {
-    PAGINATOR.addRow(PAGINATOR.data);
+async function showMore() {
+
+    let pagination = "&page=" + PAGINATOR.page + "&size=" + PAGINATOR.size;
+
+    let nextPageUrl = BASE_URL + pagination;
+
+    let output = await search(nextPageUrl);
+
+    PAGINATOR.addRow(output.data);
 }
 
 function editButton(e) {
@@ -611,31 +616,34 @@ let PAGINATOR = {
     button: null,
     total: null,
     left: 0,
-    step: 0
+    size: 0
 };
 
-    PAGINATOR.setStep = (dataLength) => {
-        PAGINATOR.step = dataLength / 10 <= 10 ? 10 : Math.floor(dataLength / 10) + 1;
+    // size is calculated with the consideration to have a user clicking on SHOW NEXT button
+    // at most 10 times. E.g. if the total element quantity in the result set is 300, the size for
+    // the next page request will be 30 and there can be only 10 requests ( 30 * 10 = 300 )
+    PAGINATOR.setSize = (dataLength) => {
+        PAGINATOR.size = (dataLength - 10) / 10 <= 10 ? Math.min(10, dataLength) : Math.floor((dataLength - 10) / 10) + 1;
     };
 
     PAGINATOR.create = (data, dataLength) => {
 
         PAGINATOR.page = 0;
         PAGINATOR.data = data;
-        PAGINATOR.setStep(dataLength);
+        PAGINATOR.setSize(dataLength);
         PAGINATOR.left = dataLength;
         PAGINATOR.showMore = document.querySelector(".show-more");
         PAGINATOR.button = document.querySelector(".show-more>.more");
         PAGINATOR.total = document.querySelector(".total");
 
         PAGINATOR.total.innerHTML = dataLength;
-        PAGINATOR.button.innerHTML = "show next " + PAGINATOR.step;
+        PAGINATOR.button.innerHTML = "show next " + PAGINATOR.size;
 
         PAGINATOR.addRow(PAGINATOR.data);
     };
 
     PAGINATOR.addRow = (input) => {
-        for (let iterator = 0; PAGINATOR.left < PAGINATOR.step; iterator++) {
+        for (let iterator = 0, limit = Math.min(PAGINATOR.size, PAGINATOR.left); iterator < limit; iterator++) {
             buildRow(input[iterator]);
             PAGINATOR.left--;
         }
