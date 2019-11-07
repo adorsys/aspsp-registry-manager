@@ -9,8 +9,30 @@ import java.util.UUID;
 
 public interface AspspService {
 
+    /**
+     * Calls for {@link AspspRepository} findByExample(...) and returns results
+     * from that request converted into appropriate entity.
+     *
+     * @param aspsp
+     * @param page
+     * @param size
+     * @return {@link PageBO} object that holds a list of ASPSPs entities
+     * and the total element number of the search results
+     */
     PageBO getByAspsp(AspspBO aspsp, int page, int size);
 
+    /**
+     * Extracts Bank Code from Iban and calls for {@link AspspRepository} findByBankCode(...)
+     * and returns results from that request converted into appropriate entity.
+     *
+     * @param iban
+     * @param page
+     * @param size
+     * @return {@link PageBO} object that holds a list of ASPSPs entities
+     * and the total element number of the search results
+     * @throws {@link de.adorsys.registry.manager.service.exception.IbanException} if
+     * extracting Bank Code fails or extracted Bank Code is NULL
+     */
     PageBO getByIban(String iban, int page, int size);
 
     AspspBO save(AspspBO aspsp);

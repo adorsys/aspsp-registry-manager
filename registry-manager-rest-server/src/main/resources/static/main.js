@@ -452,6 +452,8 @@ function upload() {
 async function searchButton() {
     clearTable();
 
+    let response;
+
     BASE_URL = "/v1/aspsps/?";
 
     let data = document.querySelector(".search-form");
@@ -465,7 +467,11 @@ async function searchButton() {
     if (data[2].value !== "")
         BASE_URL += "bankCode=" + data[2].value + "&";
 
-    let response = await search(BASE_URL);
+    try {
+        response = await search(BASE_URL);
+    } catch (error) {
+        fail("Failed to find any records. Please double check the search conditions");
+    }
 
     PAGINATOR.create(response.data, response.headers);
 
@@ -522,7 +528,7 @@ function mergeButton() {
 async function search(URI) {
     let output = {};
 
-    let response = await fetch(BASE_URL);
+    let response = await fetch(URI);
     output.headers = await response.headers.get("X-Total-Elements");
     output.data = JSON.parse(await response.text());
 
