@@ -473,8 +473,12 @@ async function searchButton() {
         if (response.data.length === 0) {
             throw Error("no data");
         }
-
+        
         PAGINATOR.create(response.data, response.headers);
+    } catch (error) {
+        fail("Failed to find any records. Please double check the search conditions");
+    }
+
     } catch (error) {
         fail("Failed to find any records. Please double check the search conditions");
     }
