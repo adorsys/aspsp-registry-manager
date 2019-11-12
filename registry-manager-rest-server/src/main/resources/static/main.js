@@ -469,11 +469,15 @@ async function searchButton() {
 
     try {
         response = await search(BASE_URL);
+
+        if (response.data.length === 0) {
+            throw Error("no data");
+        }
+        
+        PAGINATOR.create(response.data, response.headers);
     } catch (error) {
         fail("Failed to find any records. Please double check the search conditions");
     }
-
-    PAGINATOR.create(response.data, response.headers);
 
     if (HIDDEN_ROW.parentElement.parentElement.parentElement.hidden) {
         showTable();
@@ -615,6 +619,7 @@ function showButton() {
     drawer.classList.toggle("is-hidden");
     icon.classList.toggle("rotate");
 }
+
 let PAGINATOR = {
     data: null,
     page: 0,
@@ -649,7 +654,7 @@ let PAGINATOR = {
     };
 
     PAGINATOR.addRow = (input) => {
-        for (let iterator = 0, limit = Math.min(PAGINATOR.size, PAGINATOR.left); iterator < limit; iterator++) {
+        for (let iterator = 0, limit = Math.min(PAGINATOR.size, PAGINATOR.left, input.length); iterator < limit; iterator++) {
             buildRow(input[iterator]);
             PAGINATOR.left--;
         }

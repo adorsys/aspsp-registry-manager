@@ -10,6 +10,6 @@ public class AspspManagerController {
 
     @GetMapping(ASPSP_MANAGER_URL)
     public String manage() {
-        return "index.html";
+        return "index";
     }
 }
