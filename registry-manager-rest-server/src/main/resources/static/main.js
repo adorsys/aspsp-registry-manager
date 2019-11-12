@@ -479,10 +479,6 @@ async function searchButton() {
         fail("Failed to find any records. Please double check the search conditions");
     }
 
-    } catch (error) {
-        fail("Failed to find any records. Please double check the search conditions");
-    }
-
     if (HIDDEN_ROW.parentElement.parentElement.parentElement.hidden) {
         showTable();
     }
