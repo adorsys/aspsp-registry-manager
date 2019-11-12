@@ -76,7 +76,7 @@ public class AspspRepositoryImplTest {
 
     @Test
     public void findByExample() {
-        ExampleMatcher matcher = ExampleMatcher.matchingAll()
+        ExampleMatcher matcher = ExampleMatcher.matchingAny()
                                          .withStringMatcher(ExampleMatcher.StringMatcher.STARTING)
                                          .withIgnoreCase()
                                          .withIgnoreNullValues();
