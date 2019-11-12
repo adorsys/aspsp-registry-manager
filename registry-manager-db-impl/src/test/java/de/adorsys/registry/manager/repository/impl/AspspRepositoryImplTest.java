@@ -14,7 +14,10 @@ import org.mockito.*;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.data.domain.*;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
@@ -26,6 +29,15 @@ public class AspspRepositoryImplTest {
     private static final int PAGE = 0;
     private static final int SIZE = 10;
     private static final String BANK_CODE = "111111";
+    private static final String BIC_FIELD_NAME = "bic";
+    private static final String BANK_CODE_FIELD_NAME = "bankCode";
+    private static final String NAME_FIELD_NAME = "name";
+
+    private static final Sort SORT_BY_BIC_BANKCODE_NAME = Sort.by(
+            Sort.Order.by(BIC_FIELD_NAME).nullsLast(),
+            Sort.Order.by(BANK_CODE_FIELD_NAME).nullsLast(),
+            Sort.Order.by(NAME_FIELD_NAME).nullsLast()
+    );
 
     @InjectMocks
     private AspspRepositoryImpl repository;
@@ -73,7 +85,8 @@ public class AspspRepositoryImplTest {
         List<AspspPO> pos = List.of(po);
 
         when(converter.toAspspEntity(any())).thenReturn(entity);
-        when(jpaRepository.findAll(Example.of(entity, matcher), PageRequest.of(PAGE, SIZE))).thenReturn(new PageImpl<>(entities));
+        when(jpaRepository.findAll(Example.of(entity, matcher), PageRequest.of(PAGE, SIZE, SORT_BY_BIC_BANKCODE_NAME)))
+                .thenReturn(new PageImpl<>(entities));
         when(converter.toAspspPOList(any())).thenReturn(pos);
 
         PagePO result = repository.findByExample(po, PAGE, SIZE);
