@@ -128,7 +128,6 @@ function editableCells(e) {
 
     for (let i = 1, till = (rowCells.length - 2); i < till; i++) {
         rowCells[i].setAttribute("contenteditable", true);
-
     }
 
     approach.forEach(element => {
@@ -473,7 +472,7 @@ async function searchButton() {
         if (response.data.length === 0) {
             throw Error("no data");
         }
-        
+
         PAGINATOR.create(response.data, response.headers);
     } catch (error) {
         fail("Failed to find any records. Please double check the search conditions");
@@ -482,32 +481,6 @@ async function searchButton() {
     if (HIDDEN_ROW.parentElement.parentElement.parentElement.hidden) {
         showTable();
     }
-}
-
-function importButton() {
-    fetch("/v1/aspsps/adapter/import", {
-        method: 'POST'
-    }).then(response => {
-        if (!response.ok) {
-            throw Error(response.statusText);
-        }
-        success();
-    }).catch(() => {
-        fail("Failed to import data from Adapter");
-    })
-}
-
-function exportButton() {
-    fetch("/v1/aspsps/adapter/export", {
-        method: 'POST'
-    }).then(response => {
-        if (!response.ok) {
-            throw Error(response.statusText);
-        }
-        success();
-    }).catch(() => {
-        fail("Failed to export data into Adapter");
-    })
 }
 
 function mergeButton() {
@@ -648,17 +621,17 @@ let PAGINATOR = {
         PAGINATOR.total = document.querySelector(".total");
 
         PAGINATOR.total.innerHTML = dataLength;
-        PAGINATOR.button.innerHTML = "show next " + PAGINATOR.size;
 
         PAGINATOR.addRow(PAGINATOR.data);
     };
 
     PAGINATOR.addRow = (input) => {
-        for (let iterator = 0, limit = Math.min(PAGINATOR.size, PAGINATOR.left, input.length); iterator < limit; iterator++) {
+        for (let iterator = 0, limit = input.length; iterator < limit; iterator++) {
             buildRow(input[iterator]);
             PAGINATOR.left--;
         }
 
+        PAGINATOR.button.innerHTML = "show next " + Math.min(PAGINATOR.size, PAGINATOR.left);
         PAGINATOR.page++;
         PAGINATOR.showMore.hidden = PAGINATOR.left === 0;
     };
