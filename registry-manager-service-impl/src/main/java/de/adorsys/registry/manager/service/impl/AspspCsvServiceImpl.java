@@ -132,21 +132,8 @@ public class AspspCsvServiceImpl implements AspspCsvService {
     }
 
     private String toCsvString(AspspCsvRecord aspsp) {
-        CsvMapper mapper = new CsvMapper();
-        CsvSchema schema = mapper.schemaFor(AspspCsvRecord.class).withoutQuoteChar();
-
-        if (aspsp.getAspspName() == null) {
-            aspsp.setAspspName("");
-        }
-
-        if (aspsp.getAspspName().contains(",")) {
-            int nameColumnIndex = schema.column(ASPSP_NAME_COLUMN_NAME).getIndex();
-            schema = mapper.configure(CsvGenerator.Feature.STRICT_CHECK_FOR_QUOTING, true)
-                             .schemaFor(AspspCsvRecord.class)
-                             .rebuild()
-                             .replaceColumn(nameColumnIndex, new CsvSchema.Column(nameColumnIndex, ASPSP_NAME_COLUMN_NAME))
-                             .build();
-        }
+        CsvMapper mapper = new CsvMapper().configure(CsvGenerator.Feature.STRICT_CHECK_FOR_QUOTING, true);
+        CsvSchema schema = mapper.schemaFor(AspspCsvRecord.class);
 
         try {
             return mapper.writer(schema).writeValueAsString(aspsp);

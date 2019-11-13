@@ -14,6 +14,9 @@ import java.util.UUID;
 
 @Component
 public class AspspRepositoryImpl implements AspspRepository {
+    private static final String BIC_FIELD_NAME = "bic";
+    private static final String BANK_CODE_FIELD_NAME = "bankCode";
+    private static final String NAME_FIELD_NAME = "name";
 
     private final AspspJpaRepository repository;
     private final AspspEntityConverter converter;
@@ -32,12 +35,19 @@ public class AspspRepositoryImpl implements AspspRepository {
     public PagePO findByExample(AspspPO aspsp, int page, int size) {
         AspspEntity entity = converter.toAspspEntity(aspsp);
 
-        ExampleMatcher matcher = ExampleMatcher.matchingAll()
+        ExampleMatcher matcher = ExampleMatcher.matchingAny()
                                          .withStringMatcher(ExampleMatcher.StringMatcher.STARTING)
                                          .withIgnoreCase()
                                          .withIgnoreNullValues();
 
-        Page<AspspEntity> entities = repository.findAll(Example.of(entity, matcher), PageRequest.of(page, size));
+        Page<AspspEntity> entities = repository.findAll(
+                Example.of(entity, matcher),
+                PageRequest.of(page, size, Sort.by(
+                        Sort.Order.by(BIC_FIELD_NAME).nullsLast(),
+                        Sort.Order.by(BANK_CODE_FIELD_NAME).nullsLast(),
+                        Sort.Order.by(NAME_FIELD_NAME).nullsLast())
+                )
+        );
 
         return new PagePO(converter.toAspspPOList(entities.getContent()), entities.getTotalElements());
     }
