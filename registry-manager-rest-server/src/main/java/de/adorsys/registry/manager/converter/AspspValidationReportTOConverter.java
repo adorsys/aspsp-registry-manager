@@ -4,7 +4,7 @@ import de.adorsys.registry.manager.model.AspspValidationReportTO;
 import de.adorsys.registry.manager.service.model.AspspValidationReportBO;
 import org.mapstruct.Mapper;
 
-@Mapper(uses = AspspTOConverter.class)
+@Mapper(componentModel = "spring")
 public interface AspspValidationReportTOConverter {
 
     AspspValidationReportTO toAspspValidationReportTO(AspspValidationReportBO bo);

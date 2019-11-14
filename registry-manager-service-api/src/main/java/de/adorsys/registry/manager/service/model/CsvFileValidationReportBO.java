@@ -2,6 +2,7 @@ package de.adorsys.registry.manager.service.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class CsvFileValidationReportBO {
     private List<AspspValidationReportBO> aspspValidationErrorReports;
@@ -43,6 +44,30 @@ public class CsvFileValidationReportBO {
 
     public boolean isNotValid() {
         return this.validationResult == ValidationResultBO.NOT_VALID;
+    }
+
+    @Override
+    public String toString() {
+        return "CsvFileValidationReportBO{" +
+                       "aspspValidationErrorReports=" + aspspValidationErrorReports +
+                       ", totalNotValidRecords=" + totalNotValidRecords +
+                       ", validationResult=" + validationResult +
+                       '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CsvFileValidationReportBO that = (CsvFileValidationReportBO) o;
+        return Objects.equals(aspspValidationErrorReports, that.aspspValidationErrorReports) &&
+                       Objects.equals(totalNotValidRecords, that.totalNotValidRecords) &&
+                       validationResult == that.validationResult;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(aspspValidationErrorReports, totalNotValidRecords, validationResult);
     }
 
     public enum ValidationResultBO {
