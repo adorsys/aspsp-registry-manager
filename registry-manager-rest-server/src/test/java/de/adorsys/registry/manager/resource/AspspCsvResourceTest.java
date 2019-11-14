@@ -1,7 +1,11 @@
 package de.adorsys.registry.manager.resource;
 
 import de.adorsys.registry.manager.config.SecurityConfig;
+import de.adorsys.registry.manager.converter.CsvFileValidationReportTOConverter;
+import de.adorsys.registry.manager.model.CsvFileValidationReportTO;
+import de.adorsys.registry.manager.model.CsvFileValidationReportTO.ValidationResultTO;
 import de.adorsys.registry.manager.service.AspspCsvService;
+import de.adorsys.registry.manager.service.model.CsvFileValidationReportBO;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +43,8 @@ public class AspspCsvResourceTest {
 
     @MockBean
     private AspspCsvService service;
+    @MockBean
+    private CsvFileValidationReportTOConverter converter;
 
     @WithMockUser(roles = {"MANAGER", "DEPLOYER", "READER"})
     @Test
@@ -115,5 +121,60 @@ public class AspspCsvResourceTest {
         mockMvc.perform(multipart(BASE_URI + "/merge")
                                 .file("file", "content".getBytes()))
                 .andExpect(status().is(HttpStatus.FORBIDDEN.value()));
+    }
+
+    @WithMockUser(roles = {"MANAGER", "DEPLOYER"})
+    @Test
+    public void validateCsv_Success() throws Exception {
+        CsvFileValidationReportBO validationReportBO = new CsvFileValidationReportBO();
+        validationReportBO.valid();
+
+        CsvFileValidationReportTO validationReportTO = new CsvFileValidationReportTO();
+        validationReportTO.setValidationResult(ValidationResultTO.VALID);
+
+        when(service.validateCsv(any())).thenReturn(validationReportBO);
+        when(converter.toCsvFileValidationReportTO(validationReportBO)).thenReturn(validationReportTO);
+
+        mockMvc.perform(multipart(BASE_URI + "/validate")
+                                .file("file", "content".getBytes()))
+                .andExpect(status().is(HttpStatus.OK.value()));
+
+        verify(service, times(1)).validateCsv(any());
+        verify(converter, times(1)).toCsvFileValidationReportTO(validationReportBO);
+    }
+
+    @WithMockUser(roles = {"MANAGER", "DEPLOYER"})
+    @Test
+    public void validateCsv_Failure() throws Exception {
+        CsvFileValidationReportBO validationReportBO = new CsvFileValidationReportBO();
+        validationReportBO.notValid();
+
+        CsvFileValidationReportTO validationReportTO = new CsvFileValidationReportTO();
+        validationReportTO.setValidationResult(ValidationResultTO.NOT_VALID);
+
+        when(service.validateCsv(any())).thenReturn(validationReportBO);
+        when(converter.toCsvFileValidationReportTO(validationReportBO)).thenReturn(validationReportTO);
+
+        mockMvc.perform(multipart(BASE_URI + "/validate")
+                                .file("file", "content".getBytes()))
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()));
+
+        verify(service, times(1)).validateCsv(any());
+        verify(converter, times(1)).toCsvFileValidationReportTO(validationReportBO);
+    }
+
+    @WithMockUser(roles = "READER")
+    @Test
+    public void validateCsvForbidden() throws Exception {
+        mockMvc.perform(multipart(BASE_URI + "/validate")
+                                .file("file", "content".getBytes()))
+                .andExpect(status().is(HttpStatus.FORBIDDEN.value()));
+    }
+
+    @Test
+    public void validateCsvRedirectToLoginPage() throws Exception {
+        mockMvc.perform(multipart(BASE_URI + "/validate")
+                                .file("file", "content".getBytes()))
+                .andExpect(status().is(HttpStatus.FOUND.value()));
     }
 }
