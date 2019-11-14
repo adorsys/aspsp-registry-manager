@@ -22,6 +22,7 @@ public class BankNameValidatorTest {
         AspspValidationReportBO actual = validator.validate(validationReport, aspspValid);
 
         assertThat(actual.isNotValid(), is(false));
+        assertThat(actual.getValidationErrors().isEmpty(), is(true));
     }
 
     @Test
