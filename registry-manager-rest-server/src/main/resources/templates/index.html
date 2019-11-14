@@ -78,18 +78,20 @@
         </div>
     </div>
     <div class="manager-layout--fixed-drawer margin-top__zero">
-        <div class="username">
-            <span class="user" sec:authentication="name"></span>
-        </div>
-        <div class="logout-drawer margin-top__zero">
-            <div class="logout">
-                <a href="/logout" class="logout-link">
-                    <button class="mdl-button mdl-js-button mdl-button--fab" id="logout-button">
-                        <i class="material-icons">
-                            power_settings_new
-                        </i>
-                    </button>
-                </a>
+        <div class="manager-layout__drawer">
+            <div class="username">
+                <span class="user" sec:authentication="name"></span>
+            </div>
+            <div class="logout-drawer margin-top__zero">
+                <div class="logout">
+                    <a href="/logout" class="logout-link">
+                        <button class="mdl-button mdl-js-button mdl-button--fab" id="logout-button">
+                            <i class="material-icons">
+                                power_settings_new
+                            </i>
+                        </button>
+                    </a>
+                </div>
             </div>
         </div>
         <div class="tooltips margin-top__zero">
