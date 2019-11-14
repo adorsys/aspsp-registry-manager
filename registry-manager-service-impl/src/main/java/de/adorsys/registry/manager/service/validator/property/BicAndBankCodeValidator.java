@@ -24,6 +24,8 @@ public class BicAndBankCodeValidator implements PropertyValidator {
                     && (bankCode == null || bankCode.isEmpty())) {
             validationReport.addValidationError(String.format(EMPTY_PROPERTY_VALIDATION_ERROR_MESSAGE, BIC_PROPERTY));
             validationReport.addValidationError(String.format(EMPTY_PROPERTY_VALIDATION_ERROR_MESSAGE, BANK_CODE_PROPERTY));
+
+            return validationReport;
         }
 
         validationReport = validatePropertyValuePatternConstraint(bic, BIC_PATTERN, validationReport,
