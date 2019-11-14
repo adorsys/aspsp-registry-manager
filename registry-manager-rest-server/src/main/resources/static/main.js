@@ -179,33 +179,33 @@ function addTooltips(e) {
     let editId = "edit-";
     let updateId = "update-";
     let deleteId = "delete-";
-
+    
     if (e.className.indexOf("edit") > -1) {
         let helper = e.parentNode.childNodes[7];
-
+        
         e.addEventListener("click", () => { editButton(e) });
         e.setAttribute("id", editId + COUNTER);
-
+        
         helper.setAttribute("data-mdl-for", editId + COUNTER);
         helper.setAttribute("class", "mdl-tooltip mdl-tooltip--top");
     }
-
+    
     if (e.className.indexOf("update") > -1) {
         let helper = e.parentNode.childNodes[9];
-
+        
         e.addEventListener("click", () => { greenButton(e) });
         e.setAttribute("id", updateId + COUNTER);
-
+        
         helper.setAttribute("data-mdl-for", updateId + COUNTER);
         helper.setAttribute("class", "mdl-tooltip mdl-tooltip--top");
     }
-
+    
     if (e.className.indexOf("delete") > -1) {
         let helper = e.parentNode.childNodes[11];
-
+        
         e.addEventListener("click", () => { redButton(e) });
         e.setAttribute("id", deleteId + COUNTER);
-
+        
         helper.setAttribute("data-mdl-for", deleteId + COUNTER);
         helper.setAttribute("class", "mdl-tooltip mdl-tooltip--top");
     }
@@ -302,7 +302,7 @@ function buildRow(data) {
 function fail(message) {
     let messageBlock = FAILURE.querySelector(".message");
     messageBlock.textContent = message;
-
+    
     setTimeout(() => { FAILURE.style.opacity = 1 }, 500);
 
     setTimeout(() => { FAILURE.style.opacity = 0 }, 8000);
@@ -468,14 +468,16 @@ async function searchButton() {
 
     try {
         response = await search(BASE_URL);
-
+        
         if (response.data.length === 0) {
-            throw Error("no data");
+            warning("Failed to find any records. Please double check the search conditions");
+            return;
         }
 
         PAGINATOR.create(response.data, response.headers);
     } catch (error) {
-        fail("Failed to find any records. Please double check the search conditions");
+        fail("Oops... Something went wrong");
+        return;
     }
 
     if (HIDDEN_ROW.parentElement.parentElement.parentElement.hidden) {
