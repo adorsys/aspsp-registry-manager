@@ -3,16 +3,23 @@ package de.adorsys.registry.manager.service.impl;
 import de.adorsys.registry.manager.repository.AspspRepository;
 import de.adorsys.registry.manager.repository.model.AspspPO;
 import de.adorsys.registry.manager.repository.model.AspspScaApproachPO;
+import de.adorsys.registry.manager.service.converter.AspspBOConverter;
 import de.adorsys.registry.manager.service.converter.AspspCsvRecordConverter;
 import de.adorsys.registry.manager.service.converter.AspspCsvRecordConverterImpl;
+import de.adorsys.registry.manager.service.model.AspspBO;
 import de.adorsys.registry.manager.service.model.AspspCsvRecord;
 import de.adorsys.registry.manager.service.model.AspspScaApproachBO;
+import de.adorsys.registry.manager.service.model.CsvFileValidationReportBO;
+import de.adorsys.registry.manager.service.validator.AspspValidationService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.*;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.UUID;
 
 import static de.adorsys.registry.manager.repository.model.AspspScaApproachPO.EMBEDDED;
 import static de.adorsys.registry.manager.repository.model.AspspScaApproachPO.REDIRECT;
@@ -33,8 +40,10 @@ public class AspspCsvServiceImplTest {
     private static final List<AspspScaApproachBO> SCA_APPROACHES_BO = Arrays.asList(AspspScaApproachBO.EMBEDDED, AspspScaApproachBO.REDIRECT);
 
     private static final AspspPO PO = buildAspspPO();
+    private static final AspspBO BO = buildAspspBO();
     private static final AspspCsvRecord CSV_RECORD = buildAspspCsvRecord();
     private static final List<AspspPO> POS = List.of(PO);
+    private static final List<AspspBO> BOS = List.of(BO);
     private static final List<AspspCsvRecord> CSV_RECORDS = List.of(CSV_RECORD);
 
     private static final byte[] STORED_BYTES_TEMPLATE
@@ -46,10 +55,14 @@ public class AspspCsvServiceImplTest {
 
     @Mock
     private AspspRepository repository;
+    @Mock
+    AspspBOConverter aspspBOConverter;
     @Spy
     private AspspCsvRecordConverter converter = new AspspCsvRecordConverterImpl();
     @Spy
     private UUIDGeneratorService uuidGeneratorService;
+    @Mock
+    private AspspValidationService aspspValidationService;
 
     @Captor
     private ArgumentCaptor<List<AspspPO>> captor;
@@ -161,6 +174,32 @@ public class AspspCsvServiceImplTest {
         assertThat(POS_updated, is(captor.getAllValues().get(0).get(0)));
     }
 
+    @Test
+    public void validateCsv_Success() {
+        CsvFileValidationReportBO validationReport = new CsvFileValidationReportBO();
+        validationReport.valid();
+
+        when(aspspBOConverter.csvRecordListToAspspBOList(List.of(CSV_RECORD))).thenReturn(BOS);
+        when(aspspValidationService.validate(BOS)).thenReturn(validationReport);
+
+        CsvFileValidationReportBO actual = service.validateCsv(STORED_BYTES_TEMPLATE);
+
+        assertEquals(validationReport, actual);
+    }
+
+    @Test
+    public void validateCsv_Failure() {
+        CsvFileValidationReportBO validationReport = new CsvFileValidationReportBO();
+        validationReport.notValid();
+
+        when(aspspBOConverter.csvRecordListToAspspBOList(List.of(CSV_RECORD))).thenReturn(BOS);
+        when(aspspValidationService.validate(BOS)).thenReturn(validationReport);
+
+        CsvFileValidationReportBO actual = service.validateCsv(STORED_BYTES_TEMPLATE);
+
+        assertEquals(validationReport, actual);
+    }
+
     private static AspspPO buildAspspPO() {
         AspspPO aspsp = new AspspPO();
 
@@ -172,6 +211,21 @@ public class AspspCsvServiceImplTest {
         aspsp.setBankCode(BANK_CODE);
         aspsp.setIdpUrl(IDP_URL);
         aspsp.setScaApproaches(SCA_APPROACHES_PO);
+
+        return aspsp;
+    }
+
+    private static AspspBO buildAspspBO() {
+        AspspBO aspsp = new AspspBO();
+
+        aspsp.setId(ID);
+        aspsp.setName(ASPSP_NAME);
+        aspsp.setBic(BIC);
+        aspsp.setUrl(URL);
+        aspsp.setAdapterId(ADAPTER_ID);
+        aspsp.setBankCode(BANK_CODE);
+        aspsp.setIdpUrl(IDP_URL);
+        aspsp.setScaApproaches(SCA_APPROACHES_BO);
 
         return aspsp;
     }
