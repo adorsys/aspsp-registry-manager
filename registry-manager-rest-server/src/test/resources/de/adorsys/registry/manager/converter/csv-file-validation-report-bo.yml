@@ -1,0 +1,35 @@
+validationResult: NOT_VALID
+totalNotValidRecords: 2
+aspspValidationErrorReports:
+  - lineNumberInCsv: 3
+    aspsp:
+      id: 054fc7ab-60b8-4bcf-9b76-1890b255d671
+      name: TestBank
+      bic: BANKABICXXX
+      bankCode: 11111111
+      url: https://example.com
+      adapterId: test-bank-adapter
+      idpUrl: https://example.com/idp
+      scaApproaches:
+        - REDIRECT
+        - EMBEDDED
+      paginationId: PAGINATION_ID
+    validationErrors:
+      - Bank name is empty
+      - URL is empty
+  - lineNumberInCsv: 5
+    aspsp:
+      id: fedf72b1-982f-4b52-bc5d-cdb8c4f60e4a
+      name: TestBank1
+      bic: BANKBBICXXX
+      bankCode: 111111
+      url: https://example.com/1
+      adapterId: test-bank1-adapter
+      idpUrl: https://example.com/1/idp
+      scaApproaches:
+        - DECOUPLED
+        - OAUTH
+      paginationId: PAGINATION_ID_1
+    validationErrors:
+      - Adapter ID is empty
+      - Bank code is empty

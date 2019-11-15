@@ -46,6 +46,13 @@ spring:
         jdbc:
           lob:
             non_contextual_creation: true
+  jackson:
+    default-property-inclusion: non_null
+    serialization:
+      indent-output: true
+      write-dates-as-timestamps: false
+    deserialization:
+      FAIL_ON_UNKNOWN_PROPERTIES: false
 
 logging.level.de.adorsys.registry.manager.client.AspspOutboundClient: DEBUG
 

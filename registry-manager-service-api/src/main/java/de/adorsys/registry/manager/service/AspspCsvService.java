@@ -1,5 +1,7 @@
 package de.adorsys.registry.manager.service;
 
+import de.adorsys.registry.manager.service.model.CsvFileValidationReportBO;
+
 public interface AspspCsvService {
 
     byte[] exportCsv();
@@ -23,4 +25,12 @@ public interface AspspCsvService {
      * @param file as an array of bytes
      */
     void merge(byte[] file);
+
+    /**
+     * Validates the import CSV file.
+     *
+     * @param file as an array of bytes
+     * @return CsvFileValidationReportBO as a result of validation {@link CsvFileValidationReportBO}
+     */
+    CsvFileValidationReportBO validateCsv(byte[] file);
 }
