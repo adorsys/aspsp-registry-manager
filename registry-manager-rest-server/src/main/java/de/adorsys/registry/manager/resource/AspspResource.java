@@ -107,4 +107,13 @@ public class AspspResource {
                        .noContent()
                        .build();
     }
+
+    @PreAuthorize("isAuthenticated()")
+    @ApiOperation("Count all ASPSPs")
+    @GetMapping("/count")
+    public ResponseEntity<Long> count() {
+        logger.info("Count all records in the database");
+
+        return ResponseEntity.status(HttpStatus.OK).body(aspspService.count());
+    }
 }

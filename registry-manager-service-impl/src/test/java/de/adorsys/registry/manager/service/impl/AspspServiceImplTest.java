@@ -27,6 +27,7 @@ public class AspspServiceImplTest {
     private static final UUID ID = UUID.randomUUID();
     private static final int PAGE = 0;
     private static final int SIZE = 10;
+    private static final long TOTAL = 10L;
     private static final String WRONG_IBAN = "wrong iban";
     private static final String CORRECT_IBAN = "DE89370400440532013000";
 
@@ -126,5 +127,14 @@ public class AspspServiceImplTest {
         aspspService.deleteById(ID);
 
         verify(repository, times(1)).deleteById(ID);
+    }
+
+    @Test
+    public void count() {
+        when(repository.count()).thenReturn(TOTAL);
+
+        long result = aspspService.count();
+
+        assertEquals(result, TOTAL);
     }
 }

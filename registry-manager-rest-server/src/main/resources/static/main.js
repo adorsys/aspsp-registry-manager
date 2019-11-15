@@ -15,19 +15,18 @@ function initGlobals() {
     window.FAILURE = document.querySelector(".alert.failure");
     window.SUCCESS = document.querySelector(".alert.success");
     window.COUNTER = 0;
-    window.BASE_URL;
+    window.BASE = "/v1/aspsps";
+    window.BASE_URL = "";
 }
 
 function validateBankName(element) {
     let target = element.textContent;
     let regex = /^[a-zA-Z0-9äöüÄÖÜß-\s]*$/;
 
-    if (!(regex.test(target) || target === "")) {
-        element.style.background = "rgba(255, 152, 0, 0.2)";
+    if (!(regex.test(target) || target !== "")) {
         element.classList.add("invalid");
         warning("Bank name should be a plain text, e.g. there shouldn't be symbols like #, @, *, %, etc.");
     } else {
-        element.style.background = "none";
         element.classList.remove("invalid");
     }
 }
@@ -37,12 +36,10 @@ function validateBic(element) {
     let target = element.textContent;
     let regex = /^[A-Z0-9]*$/;
 
-    if (!(((target.length === 6 || target.length === 8 || target.length === 11) && regex.test(target)) || target === "")) {
-        element.style.background = "rgba(255, 152, 0, 0.2)";
+    if (!(((target.length === 6 || target.length === 8 || target.length === 11) && regex.test(target)) || target !== "")) {
         element.classList.add("invalid");
         warning("BIC should be 6, 8, 11 characters long and consist of word characters and numbers only");
     } else {
-        element.style.background = "none";
         element.classList.remove("invalid");
     }
 }
@@ -51,12 +48,10 @@ function validateUrl(element) {
     let target = element.textContent;
     let regex = /^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/;
 
-    if (!(regex.test(target) || target === "")) {
-        element.style.background = "rgba(255, 152, 0, 0.2)";
+    if (!(regex.test(target) || target !== "")) {
         element.classList.add("invalid");
         warning("URL format is wrong, e.g. right format is https://example.test");
     } else {
-        element.style.background = "none";
         element.classList.remove("invalid");
     }
 }
@@ -65,12 +60,10 @@ function validateAdapterId(element) {
     let target = element.textContent;
     let regex = /^[a-zA-Z0-9-äöüÄÖÜß]*$/;
 
-    if (!(regex.test(target) || target === "")) {
-        element.style.background = "rgba(255, 152, 0, 0.2)";
+    if (!(regex.test(target) || target !== "")) {
         element.classList.add("invalid");
         warning("Adapter Id should consist of aA-zZ, 0-9 and a hyphen(-) only, e.g. 'Adapter-12345'");
     } else {
-        element.style.background = "none";
         element.classList.remove("invalid");
     }
 }
@@ -80,12 +73,10 @@ function validateBankCode(element) {
     let regex = /^[0-9]*$/;
     let length = 8;
 
-    if (!((target.length === length && regex.test(target)) || target === "")) {
-        element.style.background = "rgba(255, 152, 0, 0.2)";
+    if (!((target.length === length && regex.test(target)) || target !== "")) {
         element.classList.add("invalid");
         warning("Bank Code should be 8 digits long and consist of numbers only");
     } else {
-        element.style.background = "none";
         element.classList.remove("invalid");
     }
 }
@@ -101,7 +92,6 @@ function forceValidation() {
         for (let cell of row.cells) {
             if (cell.classList.contains("invalid")) {
                 cell.classList.remove("invalid");
-                cell.style.background = "none";
                 console.log("Cell with content '" + cell.textContent + "' is made valid");
             }
         }
@@ -343,6 +333,8 @@ function addRow() {
     if (HIDDEN_ROW.parentElement.parentElement.parentElement.hidden) {
         showTable();
     }
+
+    warning("Bank Name, URL, Adapter Id, Bank Code or BIC must not be empty");
     // updating MDL library for making Tooltip working
     componentHandler.upgradeAllRegistered();
 }
@@ -358,7 +350,7 @@ function saveButton(e) {
         }
     }
 
-    fetch("/v1/aspsps/", {
+    fetch(BASE, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -376,6 +368,7 @@ function saveButton(e) {
         return response.text();
     }).then(response => {
         if (!response) { return; }
+        (async () => { COUNTUP.update(await getTotal()); })()
         let output = JSON.parse(response);
         row.cells[0].textContent = output.id;
     }).catch(() => {
@@ -393,7 +386,7 @@ function updateButton(e) {
         }
     }
 
-    fetch("/v1/aspsps/", {
+    fetch(BASE, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
@@ -416,7 +409,7 @@ function updateButton(e) {
 
 function deleteButton(e) {
     let uuidCell = e.parentElement.parentElement.cells[0].innerText;
-    let url = "/v1/aspsps/" + uuidCell;
+    let url = BASE + "/" + uuidCell;
 
     fetch(url, {
         method: 'DELETE',
@@ -432,6 +425,7 @@ function deleteButton(e) {
             throw Error(response.statusText);
         }
         purgeRow(e);
+        (async () => { COUNTUP.update(await getTotal()); })()
     }).catch(() => {
         fail("Deleting process has failed");
     });
@@ -443,7 +437,7 @@ function upload() {
 
     data.append("file", file);
 
-    fetch("/v1/aspsps/csv/upload", {
+    fetch(BASE + "/csv/upload", {
         method: 'POST',
         body: data
     }).then(response => {
@@ -454,6 +448,7 @@ function upload() {
             throw Error(response.statusText);
         }
         success();
+        (async () => { COUNTUP.update(await getTotal()); })()
     }).catch(() => {
         fail("Failed to upload the file. It looks like the file has an inappropriate format.");
     })
@@ -464,7 +459,7 @@ async function searchButton() {
 
     let response;
 
-    BASE_URL = "/v1/aspsps/?";
+    BASE_URL = BASE + "/?";
 
     let data = document.querySelector(".search-form");
 
@@ -502,7 +497,7 @@ function mergeButton() {
 
     data.append("file", file);
 
-    fetch("/v1/aspsps/csv/merge", {
+    fetch(BASE + "/csv/merge", {
         method: 'POST',
         body: data
     }).then(response => {
@@ -513,6 +508,7 @@ function mergeButton() {
             throw Error(response.statusText);
         }
         success();
+        (async () => { COUNTUP.update(await getTotal()); })()
     }).catch(() => {
         fail("Failed to upload and merge the file.");
     })
@@ -651,3 +647,19 @@ let PAGINATOR = {
         PAGINATOR.page++;
         PAGINATOR.showMore.hidden = PAGINATOR.left === 0;
     };
+
+window.onload = async () => {
+    window.COUNTUP = new CountUp("total", await getTotal());
+    
+    COUNTUP.start();
+}
+
+let getTotal = async () => {
+
+    let result = await fetch(BASE + "/count");
+    result = await result.text();
+    return result;
+}
+// this counter is made by inorgaik https://inorganik.github.io/countUp.js/
+
+var __assign=this&&this.__assign||function(){return(__assign=Object.assign||function(t){for(var i,a=1,s=arguments.length;a<s;a++)for(var n in i=arguments[a])Object.prototype.hasOwnProperty.call(i,n)&&(t[n]=i[n]);return t}).apply(this,arguments)},CountUp=function(){function t(t,i,a){var s=this;this.target=t,this.endVal=i,this.options=a,this.version="2.0.4",this.defaults={startVal:0,decimalPlaces:0,duration:2,useEasing:!0,useGrouping:!0,smartEasingThreshold:999,smartEasingAmount:333,separator:",",decimal:".",prefix:"",suffix:""},this.finalEndVal=null,this.useEasing=!0,this.countDown=!1,this.error="",this.startVal=0,this.paused=!0,this.count=function(t){s.startTime||(s.startTime=t);var i=t-s.startTime;s.remaining=s.duration-i,s.useEasing?s.countDown?s.frameVal=s.startVal-s.easingFn(i,0,s.startVal-s.endVal,s.duration):s.frameVal=s.easingFn(i,s.startVal,s.endVal-s.startVal,s.duration):s.countDown?s.frameVal=s.startVal-(s.startVal-s.endVal)*(i/s.duration):s.frameVal=s.startVal+(s.endVal-s.startVal)*(i/s.duration),s.countDown?s.frameVal=s.frameVal<s.endVal?s.endVal:s.frameVal:s.frameVal=s.frameVal>s.endVal?s.endVal:s.frameVal,s.frameVal=Math.round(s.frameVal*s.decimalMult)/s.decimalMult,s.printValue(s.frameVal),i<s.duration?s.rAF=requestAnimationFrame(s.count):null!==s.finalEndVal?s.update(s.finalEndVal):s.callback&&s.callback()},this.formatNumber=function(t){var i,a,n,e,r,o=t<0?"-":"";if(i=Math.abs(t).toFixed(s.options.decimalPlaces),n=(a=(i+="").split("."))[0],e=a.length>1?s.options.decimal+a[1]:"",s.options.useGrouping){r="";for(var l=0,h=n.length;l<h;++l)0!==l&&l%3==0&&(r=s.options.separator+r),r=n[h-l-1]+r;n=r}return s.options.numerals&&s.options.numerals.length&&(n=n.replace(/[0-9]/g,function(t){return s.options.numerals[+t]}),e=e.replace(/[0-9]/g,function(t){return s.options.numerals[+t]})),o+s.options.prefix+n+e+s.options.suffix},this.easeOutExpo=function(t,i,a,s){return a*(1-Math.pow(2,-10*t/s))*1024/1023+i},this.options=__assign({},this.defaults,a),this.formattingFn=this.options.formattingFn?this.options.formattingFn:this.formatNumber,this.easingFn=this.options.easingFn?this.options.easingFn:this.easeOutExpo,this.startVal=this.validateValue(this.options.startVal),this.frameVal=this.startVal,this.endVal=this.validateValue(i),this.options.decimalPlaces=Math.max(this.options.decimalPlaces),this.decimalMult=Math.pow(10,this.options.decimalPlaces),this.resetDuration(),this.options.separator=String(this.options.separator),this.useEasing=this.options.useEasing,""===this.options.separator&&(this.options.useGrouping=!1),this.el="string"==typeof t?document.getElementById(t):t,this.el?this.printValue(this.startVal):this.error="[CountUp] target is null or undefined"}return t.prototype.determineDirectionAndSmartEasing=function(){var t=this.finalEndVal?this.finalEndVal:this.endVal;this.countDown=this.startVal>t;var i=t-this.startVal;if(Math.abs(i)>this.options.smartEasingThreshold){this.finalEndVal=t;var a=this.countDown?1:-1;this.endVal=t+a*this.options.smartEasingAmount,this.duration=this.duration/2}else this.endVal=t,this.finalEndVal=null;this.finalEndVal?this.useEasing=!1:this.useEasing=this.options.useEasing},t.prototype.start=function(t){this.error||(this.callback=t,this.duration>0?(this.determineDirectionAndSmartEasing(),this.paused=!1,this.rAF=requestAnimationFrame(this.count)):this.printValue(this.endVal))},t.prototype.pauseResume=function(){this.paused?(this.startTime=null,this.duration=this.remaining,this.startVal=this.frameVal,this.determineDirectionAndSmartEasing(),this.rAF=requestAnimationFrame(this.count)):cancelAnimationFrame(this.rAF),this.paused=!this.paused},t.prototype.reset=function(){cancelAnimationFrame(this.rAF),this.paused=!0,this.resetDuration(),this.startVal=this.validateValue(this.options.startVal),this.frameVal=this.startVal,this.printValue(this.startVal)},t.prototype.update=function(t){cancelAnimationFrame(this.rAF),this.startTime=null,this.endVal=this.validateValue(t),this.endVal!==this.frameVal&&(this.startVal=this.frameVal,this.finalEndVal||this.resetDuration(),this.determineDirectionAndSmartEasing(),this.rAF=requestAnimationFrame(this.count))},t.prototype.printValue=function(t){var i=this.formattingFn(t);"INPUT"===this.el.tagName?this.el.value=i:"text"===this.el.tagName||"tspan"===this.el.tagName?this.el.textContent=i:this.el.innerHTML=i},t.prototype.ensureNumber=function(t){return"number"==typeof t&&!isNaN(t)},t.prototype.validateValue=function(t){var i=Number(t);return this.ensureNumber(i)?i:(this.error="[CountUp] invalid start or end value: "+t,null)},t.prototype.resetDuration=function(){this.startTime=null,this.duration=1e3*Number(this.options.duration),this.remaining=this.duration},t}();

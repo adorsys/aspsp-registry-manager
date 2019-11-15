@@ -61,4 +61,11 @@ public interface AspspRepository {
      * @param aspsps, a list of objects
      */
     void delete(List<AspspPO> aspsps);
+
+    /**
+     * Counts total number of ASPSPs entities persisting in the database
+     *
+     * @return total number of elements in the repository
+     */
+    Long count();
 }
