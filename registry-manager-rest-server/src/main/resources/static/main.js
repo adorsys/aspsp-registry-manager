@@ -60,7 +60,7 @@ function validateAdapterId(element) {
     let target = element.textContent;
     let regex = /^\w+-adapter$/;
 
-    if (!regex.test(target) || target === "") {
+    if (!regex.test(target)) {
         element.classList.add("invalid");
         warning("Adapter Id should consist of aA-zZ, 0-9 and a hyphen(-) only, e.g. 'Adapter-12345'");
     } else {
