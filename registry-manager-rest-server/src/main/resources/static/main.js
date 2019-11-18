@@ -21,9 +21,9 @@ function initGlobals() {
 
 function validateBankName(element) {
     let target = element.textContent;
-    let regex = /^[a-zA-Z0-9äöüÄÖÜß-\s]*$/;
+    let regex = /^[\w\-\s\WäöüÄÖÜß]+$/;
 
-    if (!(regex.test(target) || target !== "")) {
+    if (!regex.test(target)) {
         element.classList.add("invalid");
         warning("Bank name should be a plain text, e.g. there shouldn't be symbols like #, @, *, %, etc.");
     } else {
@@ -34,11 +34,11 @@ function validateBankName(element) {
 function validateBic(element) {
     toUpper(element);
     let target = element.textContent;
-    let regex = /^[A-Z0-9]*$/;
+    let regex = /^[A-Z]{6}([A-Z0-9]{2})?([A-Z0-9]{5})?$/;
 
-    if (!(((target.length === 6 || target.length === 8 || target.length === 11) && regex.test(target)) || target !== "")) {
+    if (!regex.test(target)) {
         element.classList.add("invalid");
-        warning("BIC should be 6, 8, 11 characters long and consist of word characters and numbers only");
+        warning("BIC should be 6, 8 or 11 characters long and consist of word characters and numbers only");
     } else {
         element.classList.remove("invalid");
     }
@@ -46,9 +46,9 @@ function validateBic(element) {
 
 function validateUrl(element) {
     let target = element.textContent;
-    let regex = /^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/;
+    let regex = /(https|http):\/\/[\w\-]+\.[^\n\r]+$/;
 
-    if (!(regex.test(target) || target !== "")) {
+    if (!regex.test(target) && !(target === "" && element.classList.contains("idp-url"))) {
         element.classList.add("invalid");
         warning("URL format is wrong, e.g. right format is https://example.test");
     } else {
@@ -58,9 +58,9 @@ function validateUrl(element) {
 
 function validateAdapterId(element) {
     let target = element.textContent;
-    let regex = /^[a-zA-Z0-9-äöüÄÖÜß]*$/;
+    let regex = /^\w+-adapter$/;
 
-    if (!(regex.test(target) || target !== "")) {
+    if (!regex.test(target) || target === "") {
         element.classList.add("invalid");
         warning("Adapter Id should consist of aA-zZ, 0-9 and a hyphen(-) only, e.g. 'Adapter-12345'");
     } else {
@@ -70,10 +70,9 @@ function validateAdapterId(element) {
 
 function validateBankCode(element) {
     let target = element.textContent;
-    let regex = /^[0-9]*$/;
-    let length = 8;
+    let regex = /^\d{8}$/;
 
-    if (!((target.length === length && regex.test(target)) || target !== "")) {
+    if (!regex.test(target)) {
         element.classList.add("invalid");
         warning("Bank Code should be 8 digits long and consist of numbers only");
     } else {
@@ -368,9 +367,9 @@ function saveButton(e) {
         return response.text();
     }).then(response => {
         if (!response) { return; }
-        (async () => { COUNTUP.update(await getTotal()); })()
         let output = JSON.parse(response);
         row.cells[0].textContent = output.id;
+        COUNTUP.update(COUNTUP.endVal + 1);
     }).catch(() => {
         fail("Saving process has failed");
     });
@@ -425,7 +424,7 @@ function deleteButton(e) {
             throw Error(response.statusText);
         }
         purgeRow(e);
-        (async () => { COUNTUP.update(await getTotal()); })()
+        COUNTUP.update(COUNTUP.endVal - 1);
     }).catch(() => {
         fail("Deleting process has failed");
     });
