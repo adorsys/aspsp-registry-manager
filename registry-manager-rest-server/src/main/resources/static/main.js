@@ -38,8 +38,10 @@ function validateBic(element) {
 
     if (!regex.test(target)) {
         element.classList.add("invalid");
+        element.parentElement.cells[5].classList.add("invalid");
         warning("BIC should be 6, 8 or 11 characters long and consist of word characters and numbers only");
     } else {
+        element.parentElement.cells[5].classList.remove("invalid");
         element.classList.remove("invalid");
     }
 }
@@ -74,8 +76,10 @@ function validateBankCode(element) {
 
     if (!regex.test(target)) {
         element.classList.add("invalid");
+        element.parentElement.cells[2].classList.add("invalid");
         warning("Bank Code should be 8 digits long and consist of numbers only");
     } else {
+        element.parentElement.cells[2].classList.remove("invalid");
         element.classList.remove("invalid");
     }
 }
@@ -84,17 +88,26 @@ function toUpper(element) {
     element.innerText = element.innerText.toUpperCase();
 }
 
-function forceValidation() {
+function forceValidation(disable) {
     let rows = document.querySelectorAll("tr");
+    const makeValid = (element) => {
+        if (element.classList.contains("invalid")) {
+            element.classList.remove("invalid");
+        }
+    }
 
     rows.forEach((row) => {
-        for (let cell of row.cells) {
-            if (cell.classList.contains("invalid")) {
-                cell.classList.remove("invalid");
-                console.log("Cell with content '" + cell.textContent + "' is made valid");
+        if (row.classList.contains("hidden") && disable) {
+            for (let cell of row.cells) {
+                makeValid(cell);
+            }
+        } else  if (!row.classList.contains("hidden")) {
+            for (let cell of row.cells) {
+                makeValid(cell);
             }
         }
     })
+
 }
 
 // Manipulating cells
@@ -488,6 +501,8 @@ async function searchButton() {
     if (HIDDEN_ROW.parentElement.parentElement.parentElement.hidden) {
         showTable();
     }
+
+    forceValidation();
 }
 
 function mergeButton() {
@@ -533,6 +548,8 @@ async function showMore() {
     let output = await search(nextPageUrl);
 
     PAGINATOR.addRow(output.data);
+
+    forceValidation();
 }
 
 function editButton(e) {
