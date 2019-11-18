@@ -14,8 +14,8 @@ import static org.junit.Assert.assertThat;
 public class FileValidationReportTOConverterTest {
 
     private FileValidationReportTOConverter converter = Mappers.getMapper(FileValidationReportTOConverter.class);
-    private FileValidationReportTO to = readYml(FileValidationReportTO.class, "csv-file-validation-report-to.yml");
-    private FileValidationReportBO bo = readYml(FileValidationReportBO.class, "csv-file-validation-report-bo.yml");
+    private FileValidationReportTO to = readYml(FileValidationReportTO.class, "file-validation-report-to.yml");
+    private FileValidationReportBO bo = readYml(FileValidationReportBO.class, "file-validation-report-bo.yml");
 
     @Test
     public void toCsvFileValidationReportTO() {
