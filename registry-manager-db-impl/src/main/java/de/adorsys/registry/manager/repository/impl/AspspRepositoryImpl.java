@@ -83,4 +83,9 @@ public class AspspRepositoryImpl implements AspspRepository {
     public void delete(List<AspspPO> aspsps) {
         repository.deleteAll(converter.toAspspEntityList(aspsps));
     }
+
+    @Override
+    public long countNumberOfAspsps() {
+        return repository.count();
+    }
 }

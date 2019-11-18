@@ -14,7 +14,8 @@ import de.adorsys.registry.manager.service.converter.AspspBOConverter;
 import de.adorsys.registry.manager.service.converter.AspspCsvRecordConverter;
 import de.adorsys.registry.manager.service.model.AspspBO;
 import de.adorsys.registry.manager.service.model.AspspCsvRecord;
-import de.adorsys.registry.manager.service.model.CsvFileValidationReportBO;
+import de.adorsys.registry.manager.service.model.CsvFileImportValidationReportBO;
+import de.adorsys.registry.manager.service.model.FileValidationReportBO;
 import de.adorsys.registry.manager.service.validator.AspspValidationService;
 import org.springframework.stereotype.Service;
 
@@ -29,7 +30,6 @@ import java.util.stream.Collectors;
 
 @Service
 public class AspspCsvServiceImpl implements AspspCsvService {
-    private static final String ASPSP_NAME_COLUMN_NAME = "aspspName";
     private static final ObjectReader CSV_OBJECT_READER;
 
     private final AspspRepository aspspRepository;
@@ -75,9 +75,14 @@ public class AspspCsvServiceImpl implements AspspCsvService {
     }
 
     @Override
-    public CsvFileValidationReportBO validateCsv(byte[] file) {
+    public CsvFileImportValidationReportBO validateImportCsv(byte[] file) {
         List<AspspBO> aspsps = readAllRecords(file, aspspBOConverter::csvRecordListToAspspBOList);
-        return aspspValidationService.validate(aspsps);
+
+        long csvFileRecordsNumber = aspsps.size();
+        long dbRecordsNumber = aspspRepository.countNumberOfAspsps();
+        FileValidationReportBO fileValidationReport = aspspValidationService.validate(aspsps);
+
+        return new CsvFileImportValidationReportBO(csvFileRecordsNumber, dbRecordsNumber, fileValidationReport);
     }
 
     @Override

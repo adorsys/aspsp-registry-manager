@@ -1,7 +1,7 @@
 package de.adorsys.registry.manager.converter;
 
-import de.adorsys.registry.manager.model.CsvFileValidationReportTO;
-import de.adorsys.registry.manager.service.model.CsvFileValidationReportBO;
+import de.adorsys.registry.manager.model.FileValidationReportTO;
+import de.adorsys.registry.manager.service.model.FileValidationReportBO;
 import org.junit.Test;
 import org.mapstruct.factory.Mappers;
 import pro.javatar.commons.reader.YamlReader;
@@ -11,15 +11,15 @@ import java.io.IOException;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
-public class CsvFileValidationReportTOConverterTest {
+public class FileValidationReportTOConverterTest {
 
-    private CsvFileValidationReportTOConverter converter = Mappers.getMapper(CsvFileValidationReportTOConverter.class);
-    private CsvFileValidationReportTO to = readYml(CsvFileValidationReportTO.class, "csv-file-validation-report-to.yml");
-    private CsvFileValidationReportBO bo = readYml(CsvFileValidationReportBO.class, "csv-file-validation-report-bo.yml");
+    private FileValidationReportTOConverter converter = Mappers.getMapper(FileValidationReportTOConverter.class);
+    private FileValidationReportTO to = readYml(FileValidationReportTO.class, "csv-file-validation-report-to.yml");
+    private FileValidationReportBO bo = readYml(FileValidationReportBO.class, "csv-file-validation-report-bo.yml");
 
     @Test
     public void toCsvFileValidationReportTO() {
-        CsvFileValidationReportTO actual = converter.toCsvFileValidationReportTO(bo);
+        FileValidationReportTO actual = converter.toFileValidationReportTO(bo);
         assertThat(actual, is(to));
     }
 

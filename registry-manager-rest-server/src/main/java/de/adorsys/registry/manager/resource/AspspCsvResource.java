@@ -1,9 +1,9 @@
 package de.adorsys.registry.manager.resource;
 
-import de.adorsys.registry.manager.converter.CsvFileValidationReportTOConverter;
-import de.adorsys.registry.manager.model.CsvFileValidationReportTO;
+import de.adorsys.registry.manager.converter.CsvFileImportValidationReportTOConverter;
+import de.adorsys.registry.manager.model.CsvFileImportValidationReportTO;
 import de.adorsys.registry.manager.service.AspspCsvService;
-import de.adorsys.registry.manager.service.model.CsvFileValidationReportBO;
+import de.adorsys.registry.manager.service.model.CsvFileImportValidationReportBO;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,9 +24,9 @@ public class AspspCsvResource {
     private static final Logger logger = LoggerFactory.getLogger(AspspCsvResource.class);
 
     private final AspspCsvService aspspCsvService;
-    private final CsvFileValidationReportTOConverter validationReportConverter;
+    private final CsvFileImportValidationReportTOConverter validationReportConverter;
 
-    public AspspCsvResource(AspspCsvService aspspCsvService, CsvFileValidationReportTOConverter validationReportConverter) {
+    public AspspCsvResource(AspspCsvService aspspCsvService, CsvFileImportValidationReportTOConverter validationReportConverter) {
         this.aspspCsvService = aspspCsvService;
         this.validationReportConverter = validationReportConverter;
     }
@@ -50,13 +50,14 @@ public class AspspCsvResource {
 
     @PreAuthorize("hasAnyRole('MANAGER','DEPLOYER')")
     @ApiOperation("Validate CSV file with ASPSPs")
-    @PostMapping(value = "/validate", consumes = {"multipart/form-data"})
-    public ResponseEntity<CsvFileValidationReportTO> validateCsv(@RequestParam MultipartFile file) {
+    @PostMapping(value = "/validate/upload", consumes = {"multipart/form-data"})
+    public ResponseEntity<CsvFileImportValidationReportTO> validateImportCsv(@RequestParam MultipartFile file) {
         logger.info("Validate the CSV file with ASPSPs");
 
         try {
-            CsvFileValidationReportBO validationReportBO = aspspCsvService.validateCsv(file.getBytes());
-            CsvFileValidationReportTO validationReportTO = validationReportConverter.toCsvFileValidationReportTO(validationReportBO);
+            CsvFileImportValidationReportBO validationReportBO = aspspCsvService.validateImportCsv(file.getBytes());
+            CsvFileImportValidationReportTO validationReportTO
+                    = validationReportConverter.toCsvFileImportValidationReportTO(validationReportBO);
 
             if (validationReportBO.isNotValid()) {
                 return ResponseEntity.badRequest()

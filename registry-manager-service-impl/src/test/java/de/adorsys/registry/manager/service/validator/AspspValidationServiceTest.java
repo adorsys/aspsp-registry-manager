@@ -1,7 +1,7 @@
 package de.adorsys.registry.manager.service.validator;
 
 import de.adorsys.registry.manager.service.model.AspspBO;
-import de.adorsys.registry.manager.service.model.CsvFileValidationReportBO;
+import de.adorsys.registry.manager.service.model.FileValidationReportBO;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -30,7 +30,7 @@ public class AspspValidationServiceTest {
 
     @Test
     public void validate_Success() {
-        CsvFileValidationReportBO actual = service.validate(validAspsps);
+        FileValidationReportBO actual = service.validate(validAspsps);
 
         assertThat(actual.isNotValid(), is(false));
         assertThat(actual.containsErrors(), is(false));
@@ -40,7 +40,7 @@ public class AspspValidationServiceTest {
 
     @Test
     public void validate_Failure() {
-        CsvFileValidationReportBO actual = service.validate(notValidAspsps);
+        FileValidationReportBO actual = service.validate(notValidAspsps);
 
         assertThat(actual.isNotValid(), is(true));
         assertThat(actual.containsErrors(), is(true));

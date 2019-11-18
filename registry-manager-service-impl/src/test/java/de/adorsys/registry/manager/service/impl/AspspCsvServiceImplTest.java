@@ -6,10 +6,7 @@ import de.adorsys.registry.manager.repository.model.AspspScaApproachPO;
 import de.adorsys.registry.manager.service.converter.AspspBOConverter;
 import de.adorsys.registry.manager.service.converter.AspspCsvRecordConverter;
 import de.adorsys.registry.manager.service.converter.AspspCsvRecordConverterImpl;
-import de.adorsys.registry.manager.service.model.AspspBO;
-import de.adorsys.registry.manager.service.model.AspspCsvRecord;
-import de.adorsys.registry.manager.service.model.AspspScaApproachBO;
-import de.adorsys.registry.manager.service.model.CsvFileValidationReportBO;
+import de.adorsys.registry.manager.service.model.*;
 import de.adorsys.registry.manager.service.validator.AspspValidationService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -176,26 +173,32 @@ public class AspspCsvServiceImplTest {
 
     @Test
     public void validateCsv_Success() {
-        CsvFileValidationReportBO validationReport = new CsvFileValidationReportBO();
-        validationReport.valid();
+        FileValidationReportBO fileValidationReport = new FileValidationReportBO();
+        fileValidationReport.valid();
 
+        CsvFileImportValidationReportBO validationReport = new CsvFileImportValidationReportBO(1, 1, fileValidationReport);
+
+        when(repository.countNumberOfAspsps()).thenReturn(1L);
         when(aspspBOConverter.csvRecordListToAspspBOList(List.of(CSV_RECORD))).thenReturn(BOS);
-        when(aspspValidationService.validate(BOS)).thenReturn(validationReport);
+        when(aspspValidationService.validate(BOS)).thenReturn(fileValidationReport);
 
-        CsvFileValidationReportBO actual = service.validateCsv(STORED_BYTES_TEMPLATE);
+        CsvFileImportValidationReportBO actual = service.validateImportCsv(STORED_BYTES_TEMPLATE);
 
         assertEquals(validationReport, actual);
     }
 
     @Test
     public void validateCsv_Failure() {
-        CsvFileValidationReportBO validationReport = new CsvFileValidationReportBO();
-        validationReport.notValid();
+        FileValidationReportBO fileValidationReport = new FileValidationReportBO();
+        fileValidationReport.valid();
 
+        CsvFileImportValidationReportBO validationReport = new CsvFileImportValidationReportBO(1, 1, fileValidationReport);
+
+        when(repository.countNumberOfAspsps()).thenReturn(1L);
         when(aspspBOConverter.csvRecordListToAspspBOList(List.of(CSV_RECORD))).thenReturn(BOS);
-        when(aspspValidationService.validate(BOS)).thenReturn(validationReport);
+        when(aspspValidationService.validate(BOS)).thenReturn(fileValidationReport);
 
-        CsvFileValidationReportBO actual = service.validateCsv(STORED_BYTES_TEMPLATE);
+        CsvFileImportValidationReportBO actual = service.validateImportCsv(STORED_BYTES_TEMPLATE);
 
         assertEquals(validationReport, actual);
     }

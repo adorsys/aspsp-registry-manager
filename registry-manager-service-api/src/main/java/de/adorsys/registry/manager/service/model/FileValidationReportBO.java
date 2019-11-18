@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class CsvFileValidationReportBO {
+public class FileValidationReportBO {
     private List<AspspValidationReportBO> aspspValidationErrorReports;
     private Integer totalNotValidRecords;
     private ValidationResultBO validationResult;
 
-    public CsvFileValidationReportBO() {
+    public FileValidationReportBO() {
         this.aspspValidationErrorReports = new ArrayList<>();
     }
 
@@ -48,7 +48,7 @@ public class CsvFileValidationReportBO {
 
     @Override
     public String toString() {
-        return "CsvFileValidationReportBO{" +
+        return "FileValidationReportBO{" +
                        "aspspValidationErrorReports=" + aspspValidationErrorReports +
                        ", totalNotValidRecords=" + totalNotValidRecords +
                        ", validationResult=" + validationResult +
@@ -59,7 +59,7 @@ public class CsvFileValidationReportBO {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        CsvFileValidationReportBO that = (CsvFileValidationReportBO) o;
+        FileValidationReportBO that = (FileValidationReportBO) o;
         return Objects.equals(aspspValidationErrorReports, that.aspspValidationErrorReports) &&
                        Objects.equals(totalNotValidRecords, that.totalNotValidRecords) &&
                        validationResult == that.validationResult;

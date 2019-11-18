@@ -2,7 +2,7 @@ package de.adorsys.registry.manager.service.validator;
 
 import de.adorsys.registry.manager.service.model.AspspBO;
 import de.adorsys.registry.manager.service.model.AspspValidationReportBO;
-import de.adorsys.registry.manager.service.model.CsvFileValidationReportBO;
+import de.adorsys.registry.manager.service.model.FileValidationReportBO;
 import de.adorsys.registry.manager.service.validator.property.*;
 import org.springframework.stereotype.Service;
 
@@ -19,8 +19,8 @@ public class AspspValidationService {
                                  .andThen(new BicAndBankCodeValidator());
     }
 
-    public CsvFileValidationReportBO validate(List<AspspBO> aspsps) {
-        CsvFileValidationReportBO fileValidationReport = new CsvFileValidationReportBO();
+    public FileValidationReportBO validate(List<AspspBO> aspsps) {
+        FileValidationReportBO fileValidationReport = new FileValidationReportBO();
 
         for (int i = 0; i < aspsps.size(); i++) {
             AspspBO aspsp = aspsps.get(i);
