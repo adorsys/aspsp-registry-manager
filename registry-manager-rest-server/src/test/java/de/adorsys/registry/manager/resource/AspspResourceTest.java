@@ -30,8 +30,7 @@ import java.util.UUID;
 import static de.adorsys.registry.manager.resource.AspspResource.ASPSP_URI;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(AspspResource.class)
@@ -195,6 +194,40 @@ public class AspspResourceTest {
                 .andDo(print())
                 .andExpect(status().is(HttpStatus.FORBIDDEN.value()))
                 .andReturn();
+    }
+
+    @WithMockUser
+    @Test
+    public void count() throws Exception {
+        long total = 10L;
+
+        when(aspspService.count()).thenReturn(total);
+
+        mockMvc.perform(MockMvcRequestBuilders.get(ASPSP_URI + "/count"))
+            .andExpect(status().is(HttpStatus.OK.value()))
+            .andExpect(content().string(String.valueOf(total)))
+            .andReturn();
+    }
+
+    @WithMockUser
+    @Test
+    public void countEmptyBase() throws Exception {
+        long total = 0;
+
+        when(aspspService.count()).thenReturn(total);
+
+        mockMvc.perform(MockMvcRequestBuilders.get(ASPSP_URI + "/count"))
+            .andExpect(status().is(HttpStatus.OK.value()))
+            .andExpect(content().string(String.valueOf(total)))
+            .andReturn();
+    }
+
+    @Test
+    public void countRedirectToLoginPage() throws Exception {
+
+        mockMvc.perform(MockMvcRequestBuilders.get(ASPSP_URI + "/count"))
+            .andExpect(status().is(HttpStatus.FOUND.value()))
+            .andReturn();
     }
 
     private <T> T readYml(Class<T> aClass, String fileName) {

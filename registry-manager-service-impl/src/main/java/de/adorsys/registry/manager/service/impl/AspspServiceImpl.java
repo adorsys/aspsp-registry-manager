@@ -95,4 +95,11 @@ public class AspspServiceImpl implements AspspService {
 
         repository.delete();
     }
+
+    @Override
+    public long count() {
+        logger.info("Counting all available ASPSPs");
+
+        return repository.count();
+    }
 }

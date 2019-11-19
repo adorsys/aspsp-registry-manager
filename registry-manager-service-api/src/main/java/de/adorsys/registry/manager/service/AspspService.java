@@ -42,4 +42,11 @@ public interface AspspService {
     void deleteById(UUID aspspId);
 
     void deleteAll();
+
+    /**
+     * Return the total number of ASPSPs currently recorded in the database
+     *
+     * @return integer, representing total elements in the database
+     */
+    long count();
 }
