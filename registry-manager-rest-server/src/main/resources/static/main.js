@@ -88,7 +88,7 @@ function toUpper(element) {
     element.innerText = element.innerText.toUpperCase();
 }
 
-function forceValidation(disable) {
+function forceValidation() {
     let rows = document.querySelectorAll("tr");
     const makeValid = (element) => {
         if (element.classList.contains("invalid")) {
@@ -97,11 +97,7 @@ function forceValidation(disable) {
     }
 
     rows.forEach((row) => {
-        if (row.classList.contains("hidden") && disable) {
-            for (let cell of row.cells) {
-                makeValid(cell);
-            }
-        } else  if (!row.classList.contains("hidden")) {
+        if (!row.classList.contains("hidden")) {
             for (let cell of row.cells) {
                 makeValid(cell);
             }
