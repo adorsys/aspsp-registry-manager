@@ -199,7 +199,20 @@ public class AspspResourceTest {
     @WithMockUser
     @Test
     public void count() throws Exception {
-        long total = 1L;
+        long total = 10L;
+
+        when(aspspService.count()).thenReturn(total);
+
+        mockMvc.perform(MockMvcRequestBuilders.get(ASPSP_URI + "/count"))
+            .andExpect(status().is(HttpStatus.OK.value()))
+            .andExpect(content().string(String.valueOf(total)))
+            .andReturn();
+    }
+
+    @WithMockUser
+    @Test
+    public void countEmptyBase() throws Exception {
+        long total = 0;
 
         when(aspspService.count()).thenReturn(total);
 

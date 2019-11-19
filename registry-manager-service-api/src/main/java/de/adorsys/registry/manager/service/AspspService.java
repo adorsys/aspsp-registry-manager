@@ -48,5 +48,5 @@ public interface AspspService {
      *
      * @return integer, representing total elements in the database
      */
-    Long count();
+    long count();
 }

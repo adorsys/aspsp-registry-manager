@@ -67,5 +67,5 @@ public interface AspspRepository {
      *
      * @return total number of elements in the repository
      */
-    Long count();
+    long count();
 }
