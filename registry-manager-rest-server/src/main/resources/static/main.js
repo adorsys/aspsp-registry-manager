@@ -38,7 +38,10 @@ function validateBic(element) {
 
     if (!regex.test(target)) {
         element.classList.add("invalid");
-        element.parentElement.cells[5].classList.add("invalid");
+        if (!element.parentElement.cells[5].classList.contains("invalid")) {
+            validateBankCode(element.parentElement.cells[5]);
+            return;
+        }
         warning("BIC should be 6, 8 or 11 characters long and consist of word characters and numbers only");
     } else {
         element.parentElement.cells[5].classList.remove("invalid");
@@ -76,7 +79,10 @@ function validateBankCode(element) {
 
     if (!regex.test(target)) {
         element.classList.add("invalid");
-        element.parentElement.cells[2].classList.add("invalid");
+        if (!element.parentElement.cells[2].classList.contains("invalid")) {
+            validateBic(element.parentElement.cells[2]);
+            return;
+        }
         warning("Bank Code should be 8 digits long and consist of numbers only");
     } else {
         element.parentElement.cells[2].classList.remove("invalid");
