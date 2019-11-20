@@ -28,6 +28,7 @@ public class AspspRepositoryImplTest {
     private static final UUID ID = UUID.randomUUID();
     private static final int PAGE = 0;
     private static final int SIZE = 10;
+    private static final long TOTAL = 10L;
     private static final String BANK_CODE = "111111";
     private static final String BIC_FIELD_NAME = "bic";
     private static final String BANK_CODE_FIELD_NAME = "bankCode";
@@ -152,5 +153,15 @@ public class AspspRepositoryImplTest {
         assertEquals(target.size(), captor.getValue().size());
         assertThat(target.get(0), is(captor.getValue().get(0)));
         assertThat(target.get(1), is(captor.getValue().get(1)));
+    }
+
+    @Test
+    public void count() {
+        when(jpaRepository.count()).thenReturn(TOTAL);
+
+        long result = repository.count();
+
+        assertEquals(result, TOTAL);
+
     }
 }
