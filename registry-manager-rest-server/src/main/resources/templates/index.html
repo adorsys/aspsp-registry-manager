@@ -17,13 +17,32 @@
 
 <body>
 <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+<div class="validation-layout margin-top__zero hidden">
+    <div class="validation-obfuscator">
+        <div class="validation-modal">
+            <h3 class="validation--header">Validation report</h3>
+            <div class="spinner"><div class="mdl-spinner mdl-js-spinner is-active"></div></div>
+            <div class="verdict hidden">Validation verdict: <span id="verdict"></span></div>
+            <div class="not-valid-amount hidden">Amount of not valid records: <span id="records-amount"></span></div>
+            <div class="example hidden">Example:</div>
+            <textarea class="display hidden" readonly>
+
+            </textarea>
+            <div class="process-buttons">
+                <button class="reject mdl-button mdl-js-button mdl-button--accent padding__top" onclick="rejectButton();">reject</button>
+                <button class="report mdl-button mdl-js-button padding__top" onclick="reportButton();">report</button>
+                <button class="proceed mdl-button mdl-js-button mdl-button--primary padding__top" onclick="proceedButton();">proceed</button>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="flex-nav margin-top__zero">
     <div class="mdl-layout--fixed-drawer mdl-layout mdl-js-layout">
         <div class="mdl-layout__drawer animated is-hidden">
             <nav class="mdl-navigation">
                 <div class="upload-button" id="upload">
                     <input type="file" name="import file" id="import-field" hidden>
-                    <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--fab">
+                    <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--fab" onclick="HIT_BUTTON = 'UPLOAD';">
                         <i class="material-icons">
                             cloud_upload
                         </i>
@@ -41,7 +60,7 @@
                 </div>
                 <div class="merge-button" id="merge">
                     <input type="file" name="merge file" id="merge-field" hidden>
-                    <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--fab mdl-button--primary">
+                    <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--fab mdl-button--primary" onclick="HIT_BUTTON = 'MERGE';">
                         <i class="material-icons">
                             merge_type
                         </i>
