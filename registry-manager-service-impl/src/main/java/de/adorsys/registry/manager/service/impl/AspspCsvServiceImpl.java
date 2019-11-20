@@ -101,6 +101,11 @@ public class AspspCsvServiceImpl implements AspspCsvService {
             boolean matched = false;
 
             for (AspspBO dbItem : database) {
+                if (Objects.equals(inputItem, dbItem)) {
+                    matched = true;
+                    break;
+                }
+
                 if (isAspspModified(inputItem, dbItem)) {
                     difference.add(inputItem);
                     matched = true;
