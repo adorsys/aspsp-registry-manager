@@ -67,5 +67,5 @@ public interface AspspRepository {
      *
      * @return number of ASPSPs in DB
      */
-    long countNumberOfAspsps();
+    long count();
 }

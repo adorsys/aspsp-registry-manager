@@ -85,7 +85,7 @@ public class AspspRepositoryImpl implements AspspRepository {
     }
 
     @Override
-    public long countNumberOfAspsps() {
+    public long count() {
         return repository.count();
     }
 }

@@ -178,7 +178,7 @@ public class AspspCsvServiceImplTest {
 
         CsvFileImportValidationReportBO validationReport = new CsvFileImportValidationReportBO(1, 1, fileValidationReport);
 
-        when(repository.countNumberOfAspsps()).thenReturn(1L);
+        when(repository.count()).thenReturn(1L);
         when(aspspBOConverter.csvRecordListToAspspBOList(List.of(CSV_RECORD))).thenReturn(BOS);
         when(aspspValidationService.validate(BOS)).thenReturn(fileValidationReport);
 
@@ -194,7 +194,7 @@ public class AspspCsvServiceImplTest {
 
         CsvFileImportValidationReportBO validationReport = new CsvFileImportValidationReportBO(1, 1, fileValidationReport);
 
-        when(repository.countNumberOfAspsps()).thenReturn(1L);
+        when(repository.count()).thenReturn(1L);
         when(aspspBOConverter.csvRecordListToAspspBOList(List.of(CSV_RECORD))).thenReturn(BOS);
         when(aspspValidationService.validate(BOS)).thenReturn(fileValidationReport);
 

@@ -1,9 +1,12 @@
 package de.adorsys.registry.manager.resource;
 
 import de.adorsys.registry.manager.converter.CsvFileImportValidationReportTOConverter;
+import de.adorsys.registry.manager.converter.CsvFileMergeValidationReportTOConverter;
 import de.adorsys.registry.manager.model.CsvFileImportValidationReportTO;
+import de.adorsys.registry.manager.model.CsvFileMergeValidationReportTO;
 import de.adorsys.registry.manager.service.AspspCsvService;
 import de.adorsys.registry.manager.service.model.CsvFileImportValidationReportBO;
+import de.adorsys.registry.manager.service.model.CsvFileMergeValidationReportBO;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,11 +27,15 @@ public class AspspCsvResource {
     private static final Logger logger = LoggerFactory.getLogger(AspspCsvResource.class);
 
     private final AspspCsvService aspspCsvService;
-    private final CsvFileImportValidationReportTOConverter validationReportConverter;
+    private final CsvFileImportValidationReportTOConverter importValidationReportConverter;
+    private final CsvFileMergeValidationReportTOConverter mergeValidationReportConverter;
 
-    public AspspCsvResource(AspspCsvService aspspCsvService, CsvFileImportValidationReportTOConverter validationReportConverter) {
+    public AspspCsvResource(AspspCsvService aspspCsvService,
+                            CsvFileImportValidationReportTOConverter importValidationReportConverter,
+                            CsvFileMergeValidationReportTOConverter mergeValidationReportConverter) {
         this.aspspCsvService = aspspCsvService;
-        this.validationReportConverter = validationReportConverter;
+        this.importValidationReportConverter = importValidationReportConverter;
+        this.mergeValidationReportConverter = mergeValidationReportConverter;
     }
 
     @PreAuthorize("isAuthenticated()")
@@ -49,7 +56,7 @@ public class AspspCsvResource {
     }
 
     @PreAuthorize("hasAnyRole('MANAGER','DEPLOYER')")
-    @ApiOperation("Validate CSV file with ASPSPs")
+    @ApiOperation("Validate CSV file with ASPSPs for uploading")
     @PostMapping(value = "/validate/upload", consumes = {"multipart/form-data"})
     public ResponseEntity<CsvFileImportValidationReportTO> validateImportCsv(@RequestParam MultipartFile file) {
         logger.info("Validate the CSV file with ASPSPs");
@@ -57,7 +64,7 @@ public class AspspCsvResource {
         try {
             CsvFileImportValidationReportBO validationReportBO = aspspCsvService.validateImportCsv(file.getBytes());
             CsvFileImportValidationReportTO validationReportTO
-                    = validationReportConverter.toCsvFileImportValidationReportTO(validationReportBO);
+                    = importValidationReportConverter.toCsvFileImportValidationReportTO(validationReportBO);
 
             if (validationReportBO.isNotValid()) {
                 return ResponseEntity.badRequest()
@@ -78,6 +85,28 @@ public class AspspCsvResource {
 
         try {
             aspspCsvService.importCsv(file.getBytes());
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    @PreAuthorize("hasAnyRole('MANAGER','DEPLOYER')")
+    @ApiOperation("Validate CSV file with ASPSPs for merging")
+    @PostMapping(value = "/validate/merge", consumes = {"multipart/form-data"})
+    public ResponseEntity<CsvFileMergeValidationReportTO> validateMergeCsv(@RequestParam MultipartFile file) {
+        logger.info("Validate the CSV file with ASPSPs");
+
+        try {
+            CsvFileMergeValidationReportBO validationReportBO = aspspCsvService.validateMergeCsv(file.getBytes());
+            CsvFileMergeValidationReportTO validationReportTO
+                    = mergeValidationReportConverter.toCsvFileMergeValidationReportTO(validationReportBO);
+
+            if (validationReportBO.isNotValid()) {
+                return ResponseEntity.badRequest()
+                               .body(validationReportTO);
+            }
+
+            return ResponseEntity.ok(validationReportTO);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
