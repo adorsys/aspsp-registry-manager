@@ -228,11 +228,11 @@ public class AspspCsvServiceImplTest {
         bo1.setBic(BIC);
 
         AspspBO bo2 = new AspspBO();
-        bo2.setBankCode("New BankCode");
-        bo2.setBic("New BIC");
+        bo2.setBankCode("99999999");
+        bo2.setBic("BICBIC55XXX");
         bo2.setName("New name");
-        bo2.setUrl("New URL");
-        bo2.setIdpUrl("New IDP URL");
+        bo2.setUrl("https://www.example.com/new");
+        bo2.setIdpUrl("https://www.example.com/idp/new");
 
         List<AspspBO> bos = List.of(BO, bo1, bo2);
 
