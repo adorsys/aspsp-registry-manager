@@ -22,7 +22,7 @@ function initGlobals() {
 
 function validateBankName(element) {
     let target = element.textContent;
-    let regex = /^[\w\-\s\WäöüÄÖÜß]+$/;
+    let regex = /^[\w\s\WäöüÄÖÜß]+$/;
 
     if (!regex.test(target)) {
         element.classList.add("invalid");
@@ -679,8 +679,7 @@ function showButton() {
 const proceedButton = () => {
     if (HIT_BUTTON === "UPLOAD") {
         upload();
-    } 
-    if (HIT_BUTTON === "MERGE") {
+    } else if (HIT_BUTTON === "MERGE") {
         merge();
     }
 
