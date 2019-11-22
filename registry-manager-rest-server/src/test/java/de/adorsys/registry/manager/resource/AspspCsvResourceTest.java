@@ -23,11 +23,13 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import pro.javatar.commons.reader.JsonReader;
 
 import java.util.Arrays;
 import java.util.Set;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -150,10 +152,15 @@ public class AspspCsvResourceTest {
         when(service.validateImportCsv(any())).thenReturn(validationReportBO);
         when(importValidationReportConverter.toCsvFileImportValidationReportTO(validationReportBO)).thenReturn(validationReportTO);
 
-        mockMvc.perform(multipart(BASE_URI + "/validate/upload")
-                                .file("file", "content".getBytes()))
-                .andExpect(status().is(HttpStatus.OK.value()));
+        MvcResult mvcResult = mockMvc.perform(multipart(BASE_URI + "/validate/upload")
+                                                      .file("file", "content".getBytes()))
+                                      .andExpect(status().is(HttpStatus.OK.value()))
+                                      .andReturn();
 
+        CsvFileImportValidationReportTO actual = JsonReader.getInstance()
+                                                         .getObjectFromString(mvcResult.getResponse().getContentAsString(), CsvFileImportValidationReportTO.class);
+
+        assertEquals(validationReportTO, actual);
         verify(service, times(1)).validateImportCsv(any());
         verify(importValidationReportConverter, times(1)).toCsvFileImportValidationReportTO(validationReportBO);
     }
@@ -177,10 +184,15 @@ public class AspspCsvResourceTest {
         when(service.validateImportCsv(any())).thenReturn(validationReportBO);
         when(importValidationReportConverter.toCsvFileImportValidationReportTO(validationReportBO)).thenReturn(validationReportTO);
 
-        mockMvc.perform(multipart(BASE_URI + "/validate/upload")
-                                .file("file", "content".getBytes()))
-                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()));
+        MvcResult mvcResult = mockMvc.perform(multipart(BASE_URI + "/validate/upload")
+                                                      .file("file", "content".getBytes()))
+                                      .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                                      .andReturn();
 
+        CsvFileImportValidationReportTO actual = JsonReader.getInstance()
+                                                         .getObjectFromString(mvcResult.getResponse().getContentAsString(), CsvFileImportValidationReportTO.class);
+
+        assertEquals(validationReportTO, actual);
         verify(service, times(1)).validateImportCsv(any());
         verify(importValidationReportConverter, times(1)).toCsvFileImportValidationReportTO(validationReportBO);
     }
@@ -219,10 +231,15 @@ public class AspspCsvResourceTest {
         when(service.validateMergeCsv(any())).thenReturn(validationReportBO);
         when(mergeValidationReportConverter.toCsvFileMergeValidationReportTO(validationReportBO)).thenReturn(validationReportTO);
 
-        mockMvc.perform(multipart(BASE_URI + "/validate/merge")
-                                .file("file", "content".getBytes()))
-                .andExpect(status().is(HttpStatus.OK.value()));
+        MvcResult mvcResult = mockMvc.perform(multipart(BASE_URI + "/validate/merge")
+                                                      .file("file", "content".getBytes()))
+                                      .andExpect(status().is(HttpStatus.OK.value()))
+                                      .andReturn();
 
+        CsvFileMergeValidationReportTO actual = JsonReader.getInstance()
+                                                        .getObjectFromString(mvcResult.getResponse().getContentAsString(), CsvFileMergeValidationReportTO.class);
+
+        assertEquals(validationReportTO, actual);
         verify(service, times(1)).validateMergeCsv(any());
         verify(mergeValidationReportConverter, times(1)).toCsvFileMergeValidationReportTO(validationReportBO);
     }
@@ -246,10 +263,15 @@ public class AspspCsvResourceTest {
         when(service.validateMergeCsv(any())).thenReturn(validationReportBO);
         when(mergeValidationReportConverter.toCsvFileMergeValidationReportTO(validationReportBO)).thenReturn(validationReportTO);
 
-        mockMvc.perform(multipart(BASE_URI + "/validate/merge")
-                                .file("file", "content".getBytes()))
-                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()));
+        MvcResult mvcResult = mockMvc.perform(multipart(BASE_URI + "/validate/merge")
+                                                      .file("file", "content".getBytes()))
+                                      .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                                      .andReturn();
 
+        CsvFileMergeValidationReportTO actual = JsonReader.getInstance()
+                                                        .getObjectFromString(mvcResult.getResponse().getContentAsString(), CsvFileMergeValidationReportTO.class);
+
+        assertEquals(validationReportTO, actual);
         verify(service, times(1)).validateMergeCsv(any());
         verify(mergeValidationReportConverter, times(1)).toCsvFileMergeValidationReportTO(validationReportBO);
     }
