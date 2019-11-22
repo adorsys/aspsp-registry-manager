@@ -21,17 +21,38 @@
     <div class="validation-obfuscator">
         <div class="validation-modal">
             <h3 class="validation--header">Validation report</h3>
-            <div class="spinner"><div class="mdl-spinner mdl-js-spinner is-active"></div></div>
+            <div class="spinner">
+                <div class="mdl-spinner mdl-js-spinner is-active"></div>
+                <button class="reject mdl-button mdl-js-button mdl-button--accent padding__top"
+                    onclick="rejectCancelButton();">cancel</button>
+            </div>
             <div class="verdict hidden">Validation verdict: <span id="verdict"></span></div>
-            <div class="not-valid-amount hidden">Amount of not valid records: <span id="records-amount"></span></div>
-            <div class="example hidden">Example:</div>
-            <textarea class="display hidden" readonly>
-
-            </textarea>
-            <div class="process-buttons">
-                <button class="reject mdl-button mdl-js-button mdl-button--accent padding__top" onclick="rejectButton();">reject</button>
-                <button class="report mdl-button mdl-js-button padding__top" onclick="reportButton();">report</button>
-                <button class="proceed mdl-button mdl-js-button mdl-button--primary padding__top" onclick="proceedButton();">proceed</button>
+            <div class="validation-report hidden">
+                <div class="not-valid-amount">Amount of not valid records: <span id="records-amount"></span></div>
+                <div class="example">Example:</div>
+                <textarea class="display" readonly></textarea>
+            </div>
+            <div class="merge-request hidden">
+                <div class="new-reocrds">Amount of new enteties: <span id="new-records"></span></div>
+                <div class="altered">Amount of altered enteties: <span id="altered"></span></div>
+                <div class="process-buttons">
+                    <button class="reject mdl-button mdl-js-button mdl-button--accent padding__top"
+                        onclick="rejectCancelButton();">cancel</button>
+                    <button class="confirm mdl-button mdl-js-button mdl-button--primary padding__top"
+                        onclick="confirmButton();">confirm</button>
+                </div>
+            </div>
+            <div class="upload-request hidden">
+                <div class="csv-quantity">Amount of records in the CSV: <span id="csv-quantity"></span></div>
+                <div class="db-size">Amount of records in the database: <span id="db-size"></span></div>
+                <div class="process-buttons">
+                    <button class="reject mdl-button mdl-js-button mdl-button--accent padding__top"
+                        onclick="rejectCancelButton();">reject</button>
+                    <button class="report mdl-button mdl-js-button padding__top"
+                        onclick="reportButton();">report</button>
+                    <button class="proceed mdl-button mdl-js-button mdl-button--primary padding__top"
+                        onclick="proceedButton();">proceed</button>
+                </div>
             </div>
         </div>
     </div>
@@ -42,7 +63,8 @@
             <nav class="mdl-navigation">
                 <div class="upload-button" id="upload">
                     <input type="file" name="import file" id="import-field" hidden>
-                    <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--fab" onclick="HIT_BUTTON = 'UPLOAD';">
+                    <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--fab"
+                        onclick="HIT_BUTTON = 'UPLOAD';">
                         <i class="material-icons">
                             cloud_upload
                         </i>
@@ -60,7 +82,8 @@
                 </div>
                 <div class="merge-button" id="merge">
                     <input type="file" name="merge file" id="merge-field" hidden>
-                    <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--fab mdl-button--primary" onclick="HIT_BUTTON = 'MERGE';">
+                    <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--fab mdl-button--primary"
+                        onclick="HIT_BUTTON = 'MERGE';">
                         <i class="material-icons">
                             merge_type
                         </i>
@@ -168,12 +191,12 @@
             <tbody>
                 <tr class="hidden">
                     <td class="mdl-data-table__cell--non-numeric column__short"></td>
-                    <td class="mdl-data-table__cell--non-numeric invalid" onfocusout="validateBankName(this);"></td>
-                    <td class="mdl-data-table__cell--non-numeric invalid" onfocusout="validateBic(this);"></td>
-                    <td class="mdl-data-table__cell--non-numeric invalid" onfocusout="validateUrl(this);"></td>
-                    <td class="mdl-data-table__cell--non-numeric invalid" onfocusout="validateAdapterId(this);"></td>
-                    <td class="invalid" onfocusout="validateBankCode(this);"></td>
-                    <td class="mdl-data-table__cell--non-numeric idp-url" onfocusout="validateUrl(this);"></td>
+                    <td class="mdl-data-table__cell--non-numeric invalid" onfocusout="validate(bankName, this);"></td>
+                    <td class="mdl-data-table__cell--non-numeric invalid" onfocusout="validate(bic, this);"></td>
+                    <td class="mdl-data-table__cell--non-numeric invalid" onfocusout="validate(url, this);"></td>
+                    <td class="mdl-data-table__cell--non-numeric invalid" onfocusout="validate(adapterId, this);"></td>
+                    <td class="invalid" onfocusout="validate(bankCode, this);"></td>
+                    <td class="mdl-data-table__cell--non-numeric idp-url" onfocusout="validate(url, this);"></td>
                     <td>
                         <div class="approaches">
                             <div id="embedded">
@@ -241,6 +264,8 @@
     </div>
     <div class="alert success">
         <strong>Processed successfully!</strong>
+        <br>
+        <span class="message"></span>
     </div>
     <div class="alert warning">
         <strong>Warning!</strong>
