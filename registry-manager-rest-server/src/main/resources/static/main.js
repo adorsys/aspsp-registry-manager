@@ -1,13 +1,4 @@
-setTimeout(function () {
-    initGlobals();
-    document.querySelector("#upload>button").addEventListener("click", () => FILE_UPLOAD_FIELD.click());
-    FILE_UPLOAD_FIELD.addEventListener("change", validate);
-    document.querySelector("#merge>button").addEventListener("click", () => FILE_MERGE_FIELD.click());
-    FILE_MERGE_FIELD.addEventListener("change", merge);
-    document.querySelectorAll(".mdl-textfield__input").forEach(field => field.addEventListener('keypress', event => onEnterPress(event)));
-}, 0);
-
-function initGlobals() {
+const initGlobals = () => {
     window.FILE_UPLOAD_FIELD = document.querySelector("#import-field");
     window.FILE_MERGE_FIELD = document.querySelector("#merge-field");
     window.HIDDEN_ROW = document.querySelector("tbody>tr.hidden");
@@ -20,19 +11,28 @@ function initGlobals() {
     window.HIT_BUTTON = "NONE";
 }
 
-function validateBankName(element) {
+setTimeout(() => {
+    initGlobals();
+    document.querySelector("#upload>button").addEventListener("click", () => FILE_UPLOAD_FIELD.click());
+    FILE_UPLOAD_FIELD.addEventListener("change", validateUpload);
+    document.querySelector("#merge>button").addEventListener("click", () => FILE_MERGE_FIELD.click());
+    FILE_MERGE_FIELD.addEventListener("change", validateMerge);
+    document.querySelectorAll(".mdl-textfield__input").forEach(field => field.addEventListener('keypress', event => onEnterPress(event)));
+}, 0);
+
+const bankName = (element) => {
     let target = element.textContent;
     let regex = /^[\w\s\WäöüÄÖÜß]+$/;
 
     if (!regex.test(target)) {
         element.classList.add("invalid");
-        warning("Bank name should be a plain text, e.g. there shouldn't be symbols like #, @, *, %, etc.");
+        warning("Bank name should be a plain text and not empty");
     } else {
         element.classList.remove("invalid");
     }
 }
 
-function validateBic(element) {
+const bic = (element) => {
     toUpper(element);
     let target = element.textContent;
     let regex = /^[A-Z]{6}([A-Z0-9]{2})?([A-Z0-9]{5})?$/;
@@ -43,38 +43,38 @@ function validateBic(element) {
             validateBankCode(element.parentElement.cells[5]);
             return;
         }
-        warning("BIC should be 6, 8 or 11 characters long and consist of word characters and numbers only");
+        warning("BIC should be 6, 8 or 11 characters long and consist of word characters and numbers only and not empty");
     } else {
         element.parentElement.cells[5].classList.remove("invalid");
         element.classList.remove("invalid");
     }
 }
 
-function validateUrl(element) {
+const url = (element) => {
     let target = element.textContent;
     let regex = /(https|http):\/\/[\w\-]+\.[^\n\r]+$/;
 
     if (!regex.test(target) && !(target === "" && element.classList.contains("idp-url"))) {
         element.classList.add("invalid");
-        warning("URL format is wrong, e.g. right format is https://example.test");
+        warning("URL format is wrong, e.g. right format is https://example.test, or field is empty");
     } else {
         element.classList.remove("invalid");
     }
 }
 
-function validateAdapterId(element) {
+const adapterId = (element) => {
     let target = element.textContent;
     let regex = /^\w+-adapter$/;
 
     if (!regex.test(target)) {
         element.classList.add("invalid");
-        warning("Adapter Id should consist of aA-zZ, 0-9 and a hyphen(-) only, e.g. 'Adapter-12345'");
+        warning("Adapter Id should consist of a-z, A-Z, 0-9 and a hyphen(-) only, e.g. 'Adapter-12345', and should not be emoty");
     } else {
         element.classList.remove("invalid");
     }
 }
 
-function validateBankCode(element) {
+const bankCode = (element) => {
     let target = element.textContent;
     let regex = /^\d{8}$/;
 
@@ -84,18 +84,22 @@ function validateBankCode(element) {
             validateBic(element.parentElement.cells[2]);
             return;
         }
-        warning("Bank Code should be 8 digits long and consist of numbers only");
+        warning("Bank Code should be 8 digits long and consist of numbers only and not empty");
     } else {
         element.parentElement.cells[2].classList.remove("invalid");
         element.classList.remove("invalid");
     }
 }
 
-function toUpper(element) {
+const validate = (rule, target) => {
+    rule(target);
+}
+
+const toUpper = (element) => {
     element.innerText = element.innerText.toUpperCase();
 }
 
-function forceValidation() {
+const forceValidation = () => {
     let rows = document.querySelectorAll("tr");
     const makeValid = (element) => {
         if (element.classList.contains("invalid")) {
@@ -114,7 +118,7 @@ function forceValidation() {
 }
 
 // Manipulating cells
-function uneditableCells(e) {
+const uneditableCells = (e) => {
     let rowCells = e.parentElement.parentElement.cells;
     let approach = e.parentElement.parentElement.querySelectorAll('input');
 
@@ -127,7 +131,7 @@ function uneditableCells(e) {
     })
 }
 
-function editableCells(e) {
+const editableCells = (e) => {
     let rowCells = e.parentElement.parentElement.cells;
     let approach = e.parentElement.parentElement.querySelectorAll('input');
 
@@ -142,7 +146,7 @@ function editableCells(e) {
 // End of cells part
 
 // Manipulating tables
-function showTable() {
+const showTable = () => {
     let table = HIDDEN_ROW.parentElement.parentElement.parentElement;
     let message = document.querySelector(".welcome-message");
 
@@ -150,7 +154,7 @@ function showTable() {
     message.hidden = true;
 }
 
-function clearTable() {
+const clearTable = () => {
     let body = document.querySelectorAll("tbody>tr");
 
     if (body.length > 1) {
@@ -158,7 +162,7 @@ function clearTable() {
     }
 }
 
-function checkMorePart() {
+const checkMorePart = () => {
     let showMore = document.querySelector(".show-more");
 
     if (!showMore.hidden) {
@@ -166,7 +170,7 @@ function checkMorePart() {
     }
 }
 
-function clearContent() {
+const clearContent = () => {
     clearTable();
     checkMorePart();
 
@@ -174,13 +178,13 @@ function clearContent() {
 }
 // End of table part
 
-function onEnterPress(event) {
+const onEnterPress = (event) => {
     if (event.keyCode === 13) {
         searchButton();
     }
 }
 
-function addTooltips(e) {
+const addTooltips = (e) => {
     let editId = "edit-";
     let updateId = "update-";
     let deleteId = "delete-";
@@ -217,13 +221,13 @@ function addTooltips(e) {
 }
 
 // Manipulating rows
-function purgeRow(e) {
+const purgeRow = (e) => {
     let tableRow = e.parentElement.parentElement;
 
     tableRow.remove();
 }
 
-function assembleRowData(e) {
+const assembleRowData = (e) => {
     let row = e.parentNode.parentNode;
 
     let object = {};
@@ -238,7 +242,7 @@ function assembleRowData(e) {
 
     return JSON.stringify(object);
 
-    function approachParser(data) {
+    function approachParser (data) {
         let inputs = data.querySelectorAll("input");
         let resultString = [];
 
@@ -252,7 +256,7 @@ function assembleRowData(e) {
     }
 }
 
-function buildRow(data) {
+const buildRow = (data) => {
     let clone = HIDDEN_ROW.cloneNode(true);
     clone.removeAttribute("class");
 
@@ -308,14 +312,14 @@ const toggleModal = () => {
     const modal = document.querySelector(".validation-layout");
     const spinner = document.querySelector(".spinner");
     const verdict = document.querySelector(".verdict");
-    const amount = document.querySelector(".not-valid-amount");
-    const example = document.querySelector(".example");
-    const display = document.querySelector(".display");
+    const verdictReport = document.querySelector(".validation-report");
+    const merge = document.querySelector(".merge-request");
+    const upload = document.querySelector(".upload-request");
 
     verdict.classList.add("hidden");
-    amount.classList.add("hidden");
-    example.classList.add("hidden");
-    display.classList.add("hidden");
+    verdictReport.classList.add("hidden");
+    merge.classList.add("hidden");
+    upload.classList.add("hidden");
 
     spinner.classList.remove("hidden");
 
@@ -331,30 +335,25 @@ const createReport = (data) => {
     virtualLink.click();
 }
 function fail(message) {
-    let messageBlock = FAILURE.querySelector(".message");
-    messageBlock.textContent = message;
-    
-    setTimeout(() => { FAILURE.style.opacity = 1 }, 500);
-
-    setTimeout(() => { FAILURE.style.opacity = 0 }, 8000);
+    showMessage(FAILURE, 8000, message);
 }
 
-function success() {
-    setTimeout(() => { SUCCESS.style.opacity = 1 }, 500);
-
-    setTimeout(() => { SUCCESS.style.opacity = 0 }, 8000);
+function success(message) {
+    showMessage(SUCCESS, 8000, message);
 }
 
 function warning(message) {
-    let messageBlock = WARNING.querySelector(".message");
+    showMessage(WARNING, 8000, message);
+}
 
-    if (message) {
-        messageBlock.textContent = message;
-    }
+const showMessage = (messageType, duration, message) => {
+    let messageBlock = messageType.querySelector(".message");
 
-    setTimeout(() => { WARNING.style.opacity = 1 }, 500);
+    messageBlock.textContent = message;
 
-    setTimeout(() => { WARNING.style.opacity = 0 }, 8000);
+    setTimeout(() => { messageType.style.opacity = 1 }, 500);
+
+    setTimeout(() => { messageType.style.opacity = 0 }, duration);
 }
 
 function addRow() {
@@ -379,220 +378,6 @@ function addRow() {
     // updating MDL library for making Tooltip working
     componentHandler.upgradeAllRegistered();
 }
-
-// Requests part
-function saveButton(e) {
-    let row = e.parentElement.parentElement;
-
-    for (let cell of row.cells) {
-        if (cell.classList.contains("invalid")) {
-            warning();
-            return;
-        }
-    }
-
-    fetch(BASE, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: assembleRowData(e)
-    }).then((response) => {
-        if (response.status === 403) {
-            warning("It looks like you don't have enough permissions to perform this action");
-            return;
-        } else if (!response.ok) {
-            throw Error(response.statusText);
-        }
-        row.removeAttribute("class");
-        toggleButtons(e);
-        return response.text();
-    }).then(response => {
-        let output = JSON.parse(response);
-        row.cells[0].textContent = output.id;
-        COUNTUP.update(COUNTUP.endVal + 1);
-    }).catch(() => {
-        fail("Saving process has failed");
-    });
-}
-
-function updateButton(e) {
-    let row = e.parentElement.parentElement;
-
-    for (let cell of row.cells) {
-        if (cell.classList.contains("invalid")) {
-            warning();
-            return;
-        }
-    }
-
-    fetch(BASE, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: assembleRowData(e)
-    }).then((response) => {
-        if (response.status === 403) {
-            warning("It looks like you don't have enough permissions to perform this action");
-            toggleButtons(e);
-            return;
-        } else if (!response.ok) {
-            throw Error(response.statusText);
-        }
-        toggleButtons(e);
-        return response;
-    }).catch(() => {
-        fail("Update process has failed");
-    });
-}
-
-function deleteButton(e) {
-    let uuidCell = e.parentElement.parentElement.cells[0].innerText;
-    let url = BASE + "/" + uuidCell;
-
-    fetch(url, {
-        method: 'DELETE',
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }).then((response) => {
-        if (response.status === 403) {
-            warning("It looks like you don't have enough permissions to perform this action");
-            toggleButtons(e);
-            return;
-        } else if (!response.ok) {
-            throw Error(response.statusText);
-        }
-        purgeRow(e);
-        COUNTUP.update(COUNTUP.endVal - 1);
-    }).catch(() => {
-        fail("Deleting process has failed");
-    });
-}
-
-function upload() {
-    let file = FILE_UPLOAD_FIELD.files[0];
-    let data = new FormData();
-
-    data.append("file", file);
-
-    fetch(BASE + "/csv/upload", {
-        method: 'POST',
-        body: data
-    }).then(response => {
-        if (response.status === 403) {
-            warning("It looks like you don't have enough permissions to perform this action");
-            return;
-        } else if (!response.ok) {
-            throw Error(response.statusText);
-        }
-        success();
-        (async () => { COUNTUP.update(await getTotal()); })()
-    }).catch(() => {
-        fail("Failed to upload the file. It looks like the file has an inappropriate format.");
-    })
-}
-
-async function searchButton() {
-    clearTable();
-
-    let response;
-
-    BASE_URL = BASE + "/?";
-
-    let data = document.querySelector(".search-form");
-
-    if (data[0].value !== "")
-        BASE_URL += "name=" + data[0].value.toLowerCase() + "&";
-
-    if (data[1].value !== "")
-        BASE_URL += "bic=" + data[1].value + "&";
-
-    if (data[2].value !== "")
-        BASE_URL += "bankCode=" + data[2].value + "&";
-
-    try {
-        response = await search(BASE_URL);
-
-        if (response.data.length === 0) {
-            warning("Failed to find any records. Please double check the search conditions");
-            return;
-        }
-
-        PAGINATOR.create(response.data, response.headers);
-    } catch (error) {
-        fail("Oops... Something went wrong");
-        return;
-    }
-
-    if (HIDDEN_ROW.parentElement.parentElement.parentElement.hidden) {
-        showTable();
-    }
-
-    forceValidation();
-}
-
-function merge() {
-    let file = FILE_MERGE_FIELD.files[0];
-    let data = new FormData();
-
-    data.append("file", file);
-
-    fetch(BASE + "/csv/merge", {
-        method: 'POST',
-        body: data
-    }).then(response => {
-        if (response.status === 403) {
-            warning("It looks like you don't have enough permissions to perform this action");
-            return;
-        } else if (!response.ok) {
-            throw Error(response.statusText);
-        }
-        success();
-        (async () => { COUNTUP.update(await getTotal()); })()
-    }).catch(() => {
-        fail("Failed to upload and merge the file.");
-    })
-}
-
-async function search(URI) {
-    let output = {};
-
-    let response = await fetch(URI);
-    output.headers = await response.headers.get("X-Total-Elements");
-    output.data = JSON.parse(await response.text());
-
-    return output;
-}
-
-const validate = () => {
-    let file = FILE_UPLOAD_FIELD.files[0];
-    let data = new FormData();
-
-    data.append("file", file);
-
-    toggleModal();
-
-    fetch(BASE + "/csv/validate", {
-        method: 'POST',
-        body: data
-    }).then(response => {
-        if (response.status === 403) {
-            warning("It looks like you don't have enough permissions to perform this action");
-            return;
-        } else if (!response.ok && response.status !== 400) {
-            throw Error(response.statusText);
-        }
-        success();
-        return response.text()
-    }).then(response => {
-        validationResponseHandler(JSON.parse(response));
-    }).catch(() => {
-        fail("Validation process failed, please check if you provided an appropriately formatted CSV file");
-    })
-}
-// End of requests part
 
 async function showMore() {
 
@@ -677,20 +462,24 @@ function showButton() {
 }
 
 const proceedButton = () => {
-    if (HIT_BUTTON === "UPLOAD") {
-        upload();
-    } else if (HIT_BUTTON === "MERGE") {
-        merge();
-    }
+
+    upload();
+
+    toggleModal();
+}
+
+const confirmButton = () => {
+
+    merge();
 
     toggleModal();
 }
 
 const reportButton = () => {
     createReport(VALIDATOR.data);
-} 
+}
 
-const rejectButton = () => {
+const rejectCancelButton = () => {
     toggleModal();
 }
 let PAGINATOR = {
@@ -759,12 +548,13 @@ const VALIDATOR = {
 const validationResponseHandler = (data) => {
     VALIDATOR.data = data;
 
-    let isValid = data.validationResult === "VALID";
+    let isValid = data.fileValidationReport.validationResult === "VALID";
 
-    const verdict = document.querySelector("#verdict");
-    const amount = document.querySelector("#records-amount");
-    const example = document.querySelector(".display");
     const spinner = document.querySelector(".spinner");
+    const verdict = document.querySelector("#verdict");
+    const report = document.querySelector(".validation-report");
+    const amountNotValid = document.querySelector("#records-amount");
+    const example = document.querySelector(".display");
 
     if (!data) {
         fail("Oops... something went wrong. Please try again to validate");
@@ -772,24 +562,23 @@ const validationResponseHandler = (data) => {
         return;
     }
     
-    verdict.textContent = data.validationResult;
+    verdict.textContent = data.fileValidationReport.validationResult;
     spinner.classList.add("hidden");
 
     if (!isValid) {
-        verdict.classList.add("not-valid");
+        verdict.classList.add("valid", "not-valid");
         verdict.parentElement.classList.remove("hidden");
-        amount.parentElement.classList.remove("hidden");
-        example.classList.remove("hidden");
-        document.querySelector(".example").classList.remove("hidden");
-        amount.textContent = data.totalNotValidRecords;
+        report.classList.remove("hidden");
 
-        example.textContent = buildString(data.aspspValidationErrorReports);
+        amountNotValid.textContent = data.fileValidationReport.totalNotValidRecords;
+        example.textContent = buildString(data.fileValidationReport.aspspValidationErrorReports);
+
+        mergeOrUpload(data);
     } else {
-        verdict.classList.add("valid");
+        verdict.classList.replace("not-valid", "valid");
         verdict.parentElement.classList.remove("hidden");
-        amount.parentElement.classList.add("hidden");
-        example.classList.add("hidden");
-        document.querySelector(".example").classList.add("hidden");
+
+        mergeOrUpload(data);
     }
 
 }
@@ -813,4 +602,263 @@ const buildString = (input) => {
     }
 
     return result;
+}
+
+const mergeOrUpload = (input) => {
+    const merge = document.querySelector(".merge-request");
+    const newRecords = document.querySelector("#new-records");
+    const altered = document.querySelector("#altered");
+
+    const upload = document.querySelector(".upload-request");
+    const csvRecords = document.querySelector("#csv-quantity");
+    const bdSize = document.querySelector("#db-size");
+
+    if (HIT_BUTTON === "MERGE") {
+        merge.classList.remove("hidden");
+
+        newRecords.textContent = input.numberOfNewRecords;
+        altered.textContent = `${input.difference.length} (${(input.difference.length / COUNTUP.endVal) * 100}%)`;
+    } else if (HIT_BUTTON === "UPLOAD") {
+        upload.classList.remove("hidden");
+
+        csvRecords.textContent = input.csvFileRecordsNumber;
+        bdSize.textContent = input.dbRecordsNumber;
+    }
+}
+
+const saveButton = (e) => {
+    let row = e.parentElement.parentElement;
+
+    for (let cell of row.cells) {
+        if (cell.classList.contains("invalid")) {
+            warning();
+            return;
+        }
+    }
+
+    fetch(BASE, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: assembleRowData(e)
+    }).then((response) => {
+        if (response.status === 403) {
+            warning("It looks like you don't have enough permissions to perform this action");
+            return;
+        } else if (!response.ok) {
+            throw Error(response.statusText);
+        }
+        row.removeAttribute("class");
+        toggleButtons(e);
+        return response.text();
+    }).then(response => {
+        let output = JSON.parse(response);
+        row.cells[0].textContent = output.id;
+        COUNTUP.update(COUNTUP.endVal + 1);
+    }).catch(() => {
+        fail("Saving process has failed");
+    });
+}
+
+const updateButton = (e) => {
+    let row = e.parentElement.parentElement;
+
+    for (let cell of row.cells) {
+        if (cell.classList.contains("invalid")) {
+            warning();
+            return;
+        }
+    }
+
+    fetch(BASE, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: assembleRowData(e)
+    }).then((response) => {
+        if (response.status === 403) {
+            warning("It looks like you don't have enough permissions to perform this action");
+            toggleButtons(e);
+            return;
+        } else if (!response.ok) {
+            throw Error(response.statusText);
+        }
+        toggleButtons(e);
+        return response;
+    }).catch(() => {
+        fail("Update process has failed");
+    });
+}
+
+const deleteButton = (e) => {
+    let uuidCell = e.parentElement.parentElement.cells[0].innerText;
+    let url = BASE + "/" + uuidCell;
+
+    fetch(url, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }).then((response) => {
+        if (response.status === 403) {
+            warning("It looks like you don't have enough permissions to perform this action");
+            toggleButtons(e);
+            return;
+        } else if (!response.ok) {
+            throw Error(response.statusText);
+        }
+        purgeRow(e);
+        COUNTUP.update(COUNTUP.endVal - 1);
+    }).catch(() => {
+        fail("Deleting process has failed");
+    });
+}
+
+const upload = () => {
+    let file = FILE_UPLOAD_FIELD.files[0];
+    let data = new FormData();
+
+    data.append("file", file);
+
+    fetch(BASE + "/csv/upload", {
+        method: 'POST',
+        body: data
+    }).then(response => {
+        if (response.status === 403) {
+            warning("It looks like you don't have enough permissions to perform this action");
+            return;
+        } else if (!response.ok) {
+            throw Error(response.statusText);
+        }
+        success();
+        (async () => { COUNTUP.update(await getTotal()); })()
+    }).catch(() => {
+        fail("Failed to upload the file. It looks like the file has an inappropriate format.");
+    })
+}
+
+const searchButton = async () => {
+    clearTable();
+
+    let response;
+
+    BASE_URL = BASE + "/?";
+
+    let data = document.querySelector(".search-form");
+
+    if (data[0].value !== "")
+        BASE_URL += "name=" + data[0].value.toLowerCase() + "&";
+
+    if (data[1].value !== "")
+        BASE_URL += "bic=" + data[1].value + "&";
+
+    if (data[2].value !== "")
+        BASE_URL += "bankCode=" + data[2].value + "&";
+
+    try {
+        response = await search(BASE_URL);
+
+        if (response.data.length === 0) {
+            warning("Failed to find any records. Please double check the search conditions");
+            return;
+        }
+
+        PAGINATOR.create(response.data, response.headers);
+    } catch (error) {
+        fail("Oops... Something went wrong");
+        return;
+    }
+
+    if (HIDDEN_ROW.parentElement.parentElement.parentElement.hidden) {
+        showTable();
+    }
+
+    forceValidation();
+}
+
+const merge = () => {
+    let file = FILE_MERGE_FIELD.files[0];
+    let data = new FormData();
+
+    data.append("file", file);
+
+    fetch(BASE + "/csv/merge", {
+        method: 'POST',
+        body: data
+    }).then(response => {
+        if (response.status === 403) {
+            warning("It looks like you don't have enough permissions to perform this action");
+            return;
+        } else if (!response.ok) {
+            throw Error(response.statusText);
+        }
+        success();
+        (async () => { COUNTUP.update(await getTotal()); })()
+    }).catch(() => {
+        fail("Failed to upload and merge the file.");
+    })
+}
+
+const search = async (URI) => {
+    let output = {};
+
+    let response = await fetch(URI);
+    output.headers = await response.headers.get("X-Total-Elements");
+    output.data = JSON.parse(await response.text());
+
+    return output;
+}
+
+const validateUpload = () => {
+    let file = FILE_UPLOAD_FIELD.files[0];
+    let data = new FormData();
+
+    data.append("file", file);
+
+    toggleModal();
+
+    fetch(BASE + "/csv/validate/upload", {
+        method: 'POST',
+        body: data
+    }).then(response => {
+        if (response.status === 403) {
+            warning("It looks like you don't have enough permissions to perform this action");
+            return;
+        } else if (!response.ok && response.status !== 400) {
+            throw Error(response.statusText);
+        }
+        return response.text()
+    }).then(response => {
+        validationResponseHandler(JSON.parse(response));
+    }).catch(() => {
+        fail("Validation process failed, please check if you provided an appropriately formatted CSV file");
+    })
+}
+
+const validateMerge = () => {
+    let file = FILE_MERGE_FIELD.files[0];
+    let data = new FormData();
+
+    data.append("file", file);
+
+    toggleModal();
+
+    fetch(BASE + "/csv/validate/merge", {
+        method: 'POST',
+        body: data
+    }).then(response => {
+        if (response.status === 403) {
+            warning("It looks like you don't have enough permissions to perform this action");
+            return;
+        } else if (!response.ok && response.status !== 400) {
+            throw Error(response.statusText);
+        }
+        return response.text()
+    }).then(response => {
+        validationResponseHandler(JSON.parse(response));
+    }).catch(() => {
+        fail("Validation process failed, please check if you provided an appropriately formatted CSV file");
+    })
 }
