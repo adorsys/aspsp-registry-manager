@@ -22,11 +22,10 @@ function initGlobals() {
 
 function validateBankName(element) {
     let target = element.textContent;
-    let regex = /^[\w\s\WäöüÄÖÜß]+$/;
 
-    if (!regex.test(target)) {
+    if (target === "") {
         element.classList.add("invalid");
-        warning("Bank name should be a plain text, e.g. there shouldn't be symbols like #, @, *, %, etc.");
+        warning("Bank name should not be empty");
     } else {
         element.classList.remove("invalid");
     }
@@ -184,33 +183,33 @@ function addTooltips(e) {
     let editId = "edit-";
     let updateId = "update-";
     let deleteId = "delete-";
-    
+
     if (e.className.indexOf("edit") > -1) {
         let helper = e.parentNode.childNodes[7];
-        
+
         e.addEventListener("click", () => { editButton(e) });
         e.setAttribute("id", editId + COUNTER);
-        
+
         helper.setAttribute("data-mdl-for", editId + COUNTER);
         helper.setAttribute("class", "mdl-tooltip mdl-tooltip--top");
     }
-    
+
     if (e.className.indexOf("update") > -1) {
         let helper = e.parentNode.childNodes[9];
-        
+
         e.addEventListener("click", () => { greenButton(e) });
         e.setAttribute("id", updateId + COUNTER);
-        
+
         helper.setAttribute("data-mdl-for", updateId + COUNTER);
         helper.setAttribute("class", "mdl-tooltip mdl-tooltip--top");
     }
-    
+
     if (e.className.indexOf("delete") > -1) {
         let helper = e.parentNode.childNodes[11];
-        
+
         e.addEventListener("click", () => { redButton(e) });
         e.setAttribute("id", deleteId + COUNTER);
-        
+
         helper.setAttribute("data-mdl-for", deleteId + COUNTER);
         helper.setAttribute("class", "mdl-tooltip mdl-tooltip--top");
     }
@@ -333,7 +332,7 @@ const createReport = (data) => {
 function fail(message) {
     let messageBlock = FAILURE.querySelector(".message");
     messageBlock.textContent = message;
-    
+
     setTimeout(() => { FAILURE.style.opacity = 1 }, 500);
 
     setTimeout(() => { FAILURE.style.opacity = 0 }, 8000);
@@ -688,7 +687,7 @@ const proceedButton = () => {
 
 const reportButton = () => {
     createReport(VALIDATOR.data);
-} 
+}
 
 const rejectButton = () => {
     toggleModal();
@@ -738,7 +737,7 @@ let PAGINATOR = {
 
 window.onload = async () => {
     window.COUNTUP = new CountUp("total", await getTotal());
-    
+
     COUNTUP.start();
 }
 
@@ -771,7 +770,7 @@ const validationResponseHandler = (data) => {
         toggleModal();
         return;
     }
-    
+
     verdict.textContent = data.validationResult;
     spinner.classList.add("hidden");
 
