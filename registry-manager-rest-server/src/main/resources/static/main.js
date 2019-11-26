@@ -22,11 +22,10 @@ setTimeout(() => {
 
 const bankName = (element) => {
     let target = element.textContent;
-    let regex = /^[\w\s\WäöüÄÖÜß]+$/;
 
-    if (!regex.test(target)) {
+    if (target === "") {
         element.classList.add("invalid");
-        warning("Bank name should be a plain text and not empty");
+        warning("Bank name should not be empty");
     } else {
         element.classList.remove("invalid");
     }
@@ -188,33 +187,33 @@ const addTooltips = (e) => {
     let editId = "edit-";
     let updateId = "update-";
     let deleteId = "delete-";
-    
+
     if (e.className.indexOf("edit") > -1) {
         let helper = e.parentNode.childNodes[7];
-        
+
         e.addEventListener("click", () => { editButton(e) });
         e.setAttribute("id", editId + COUNTER);
-        
+
         helper.setAttribute("data-mdl-for", editId + COUNTER);
         helper.setAttribute("class", "mdl-tooltip mdl-tooltip--top");
     }
-    
+
     if (e.className.indexOf("update") > -1) {
         let helper = e.parentNode.childNodes[9];
-        
+
         e.addEventListener("click", () => { greenButton(e) });
         e.setAttribute("id", updateId + COUNTER);
-        
+
         helper.setAttribute("data-mdl-for", updateId + COUNTER);
         helper.setAttribute("class", "mdl-tooltip mdl-tooltip--top");
     }
-    
+
     if (e.className.indexOf("delete") > -1) {
         let helper = e.parentNode.childNodes[11];
-        
+
         e.addEventListener("click", () => { redButton(e) });
         e.setAttribute("id", deleteId + COUNTER);
-        
+
         helper.setAttribute("data-mdl-for", deleteId + COUNTER);
         helper.setAttribute("class", "mdl-tooltip mdl-tooltip--top");
     }
@@ -527,7 +526,7 @@ let PAGINATOR = {
 
 window.onload = async () => {
     window.COUNTUP = new CountUp("total", await getTotal());
-    
+
     COUNTUP.start();
 }
 
@@ -561,7 +560,7 @@ const validationResponseHandler = (data) => {
         toggleModal();
         return;
     }
-    
+
     verdict.textContent = data.fileValidationReport.validationResult;
     spinner.classList.add("hidden");
 
