@@ -39,7 +39,7 @@ const bic = (element) => {
     if (!regex.test(target)) {
         element.classList.add("invalid");
         if (!element.parentElement.cells[5].classList.contains("invalid")) {
-            validateBankCode(element.parentElement.cells[5]);
+            validate(bankCode, element.parentElement.cells[5]);
             return;
         }
         warning("BIC should be 6, 8 or 11 characters long and consist of word characters and numbers only and not empty");
@@ -63,11 +63,11 @@ const url = (element) => {
 
 const adapterId = (element) => {
     let target = element.textContent;
-    let regex = /^\w+-adapter$/;
+    let regex = /^[\w\-]+-adapter$/;
 
     if (!regex.test(target)) {
         element.classList.add("invalid");
-        warning("Adapter Id should consist of a-z, A-Z, 0-9 and a hyphen(-) only, e.g. 'Adapter-12345', and should not be emoty");
+        warning("Adapter Id should consist of a-z, A-Z, 0-9, a hyphen(-) only and ends with '...-adapter', e.g. '12345-adapter', and should not be emoty");
     } else {
         element.classList.remove("invalid");
     }
@@ -80,7 +80,7 @@ const bankCode = (element) => {
     if (!regex.test(target)) {
         element.classList.add("invalid");
         if (!element.parentElement.cells[2].classList.contains("invalid")) {
-            validateBic(element.parentElement.cells[2]);
+            validate(bic, element.parentElement.cells[2]);
             return;
         }
         warning("Bank Code should be 8 digits long and consist of numbers only and not empty");
@@ -187,33 +187,33 @@ const addTooltips = (e) => {
     let editId = "edit-";
     let updateId = "update-";
     let deleteId = "delete-";
-
+    
     if (e.className.indexOf("edit") > -1) {
         let helper = e.parentNode.childNodes[7];
-
+        
         e.addEventListener("click", () => { editButton(e) });
         e.setAttribute("id", editId + COUNTER);
-
+        
         helper.setAttribute("data-mdl-for", editId + COUNTER);
         helper.setAttribute("class", "mdl-tooltip mdl-tooltip--top");
     }
-
+    
     if (e.className.indexOf("update") > -1) {
         let helper = e.parentNode.childNodes[9];
-
+        
         e.addEventListener("click", () => { greenButton(e) });
         e.setAttribute("id", updateId + COUNTER);
-
+        
         helper.setAttribute("data-mdl-for", updateId + COUNTER);
         helper.setAttribute("class", "mdl-tooltip mdl-tooltip--top");
     }
-
+    
     if (e.className.indexOf("delete") > -1) {
         let helper = e.parentNode.childNodes[11];
-
+        
         e.addEventListener("click", () => { redButton(e) });
         e.setAttribute("id", deleteId + COUNTER);
-
+        
         helper.setAttribute("data-mdl-for", deleteId + COUNTER);
         helper.setAttribute("class", "mdl-tooltip mdl-tooltip--top");
     }
@@ -380,7 +380,7 @@ function addRow() {
 
 async function showMore() {
 
-    let pagination = "&page=" + PAGINATOR.page + "&size=" + PAGINATOR.size;
+    let pagination = "page=" + PAGINATOR.page + "&size=" + PAGINATOR.size;
 
     let nextPageUrl = BASE_URL + pagination;
 
@@ -526,7 +526,7 @@ let PAGINATOR = {
 
 window.onload = async () => {
     window.COUNTUP = new CountUp("total", await getTotal());
-
+    
     COUNTUP.start();
 }
 
@@ -560,7 +560,7 @@ const validationResponseHandler = (data) => {
         toggleModal();
         return;
     }
-
+    
     verdict.textContent = data.fileValidationReport.validationResult;
     spinner.classList.add("hidden");
 
@@ -630,7 +630,7 @@ const saveButton = (e) => {
 
     for (let cell of row.cells) {
         if (cell.classList.contains("invalid")) {
-            warning();
+            warning("Some data is invalid");
             return;
         }
     }
@@ -652,6 +652,9 @@ const saveButton = (e) => {
         toggleButtons(e);
         return response.text();
     }).then(response => {
+        if (!response) {
+            return;
+        }
         let output = JSON.parse(response);
         row.cells[0].textContent = output.id;
         COUNTUP.update(COUNTUP.endVal + 1);
@@ -756,8 +759,11 @@ const searchButton = async () => {
     if (data[2].value !== "")
         BASE_URL += "bankCode=" + data[2].value + "&";
 
+    if (data[3].value !== "")
+        BASE_URL += "adapterId=" + data[3].value + "&";
+
     try {
-        response = await search(BASE_URL);
+        response = await search(BASE_URL.slice(0, -1));
 
         if (response.data.length === 0) {
             warning("Failed to find any records. Please double check the search conditions");
