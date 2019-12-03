@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 public class BicAndBankCodeValidator implements PropertyValidator {
     private static final String BIC_PROPERTY = "BIC";
     private static final String BANK_CODE_PROPERTY = "Bank code";
-    private static final String BIC_REGEX = "^[A-Z]{6}([A-Z0-9]{2})?([A-Z0-9]{3})?$";
+    private static final String BIC_REGEX = "^[A-Z]{6}([A-Z0-9]{2})?([A-Z0-9]{5})?$";
     private static final String BANK_CODE_REGEX = "^[0-9]{8}$";
     private static final Pattern BIC_PATTERN = Pattern.compile(BIC_REGEX);
     private static final Pattern BANK_CODE_PATTERN = Pattern.compile(BANK_CODE_REGEX);

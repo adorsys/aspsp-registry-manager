@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.List;
 import java.util.Objects;
 
-public class CsvFileValidationReportTO {
+public class FileValidationReportTO {
     private ValidationResultTO validationResult;
     private Integer totalNotValidRecords;
 
@@ -38,7 +38,7 @@ public class CsvFileValidationReportTO {
 
     @Override
     public String toString() {
-        return "CsvFileValidationReportTO{" +
+        return "FileValidationReportTO{" +
                        "validationResult=" + validationResult +
                        ", totalNotValidRecords=" + totalNotValidRecords +
                        ", aspspValidationErrorReports=" + aspspValidationErrorReports +
@@ -49,7 +49,7 @@ public class CsvFileValidationReportTO {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        CsvFileValidationReportTO that = (CsvFileValidationReportTO) o;
+        FileValidationReportTO that = (FileValidationReportTO) o;
         return validationResult == that.validationResult &&
                        Objects.equals(totalNotValidRecords, that.totalNotValidRecords) &&
                        Objects.equals(aspspValidationErrorReports, that.aspspValidationErrorReports);

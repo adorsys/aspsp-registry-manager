@@ -12,24 +12,18 @@ import de.adorsys.registry.manager.repository.model.AspspPO;
 import de.adorsys.registry.manager.service.AspspCsvService;
 import de.adorsys.registry.manager.service.converter.AspspBOConverter;
 import de.adorsys.registry.manager.service.converter.AspspCsvRecordConverter;
-import de.adorsys.registry.manager.service.model.AspspBO;
-import de.adorsys.registry.manager.service.model.AspspCsvRecord;
-import de.adorsys.registry.manager.service.model.CsvFileValidationReportBO;
+import de.adorsys.registry.manager.service.model.*;
 import de.adorsys.registry.manager.service.validator.AspspValidationService;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
 public class AspspCsvServiceImpl implements AspspCsvService {
-    private static final String ASPSP_NAME_COLUMN_NAME = "aspspName";
     private static final ObjectReader CSV_OBJECT_READER;
 
     private final AspspRepository aspspRepository;
@@ -39,8 +33,10 @@ public class AspspCsvServiceImpl implements AspspCsvService {
     private final AspspValidationService aspspValidationService;
 
     static {
-        CSV_OBJECT_READER = new CsvMapper()
-                                    .readerWithTypedSchemaFor(AspspCsvRecord.class)
+        CsvMapper csvMapper = new CsvMapper();
+        CSV_OBJECT_READER = csvMapper
+                                    .readerFor(AspspCsvRecord.class)
+                                    .with(csvMapper.typedSchemaFor(AspspCsvRecord.class).withNullValue(""))
                                     .withHandler(new DeserializationProblemHandler() {
                                         @Override
                                         public Object handleWeirdStringValue(DeserializationContext ctxt, Class<?> targetType, String valueToConvert, String failureMsg) {
@@ -75,9 +71,14 @@ public class AspspCsvServiceImpl implements AspspCsvService {
     }
 
     @Override
-    public CsvFileValidationReportBO validateCsv(byte[] file) {
+    public CsvFileImportValidationReportBO validateImportCsv(byte[] file) {
         List<AspspBO> aspsps = readAllRecords(file, aspspBOConverter::csvRecordListToAspspBOList);
-        return aspspValidationService.validate(aspsps);
+
+        long csvFileRecordsNumber = aspsps.size();
+        long dbRecordsNumber = aspspRepository.count();
+        FileValidationReportBO fileValidationReport = aspspValidationService.validate(aspsps);
+
+        return new CsvFileImportValidationReportBO(csvFileRecordsNumber, dbRecordsNumber, fileValidationReport);
     }
 
     @Override
@@ -85,6 +86,50 @@ public class AspspCsvServiceImpl implements AspspCsvService {
         List<AspspPO> aspsps = readAllRecords(file, csvRecordConverter::toAspspPOList);
         aspspRepository.delete();
         aspspRepository.saveAll(uuidGeneratorService.checkAndUpdateUUID(aspsps));
+    }
+
+    @Override
+    public CsvFileMergeValidationReportBO validateMergeCsv(byte[] file) {
+        List<AspspBO> input = readAllRecords(file, aspspBOConverter::csvRecordListToAspspBOList);
+        FileValidationReportBO fileValidationReport = aspspValidationService.validate(input);
+
+        List<AspspBO> database = aspspBOConverter.toAspspBOList(aspspRepository.findAll());
+        Set<AspspBO> difference = new HashSet<>();
+        int numberOfNewRecords = 0;
+
+        for (AspspBO inputItem : input) {
+            boolean matched = false;
+
+            for (AspspBO dbItem : database) {
+                if (Objects.equals(inputItem, dbItem)) {
+                    matched = true;
+                    break;
+                }
+
+                if (isAspspModified(inputItem, dbItem)) {
+                    difference.add(inputItem);
+                    matched = true;
+                    break;
+                }
+            }
+
+            if (!matched) {
+                numberOfNewRecords++;
+            }
+        }
+
+        return new CsvFileMergeValidationReportBO(numberOfNewRecords, difference, fileValidationReport);
+    }
+
+    private boolean isAspspModified(AspspBO inputItem, AspspBO dbItem) {
+        return Objects.equals(inputItem.getBankCode(), dbItem.getBankCode())
+                       && Objects.equals(inputItem.getBic(), dbItem.getBic())
+                       && !(Objects.equals(inputItem.getId(), dbItem.getId())
+                                    && Objects.equals(inputItem.getAdapterId(), dbItem.getAdapterId())
+                                    && Objects.equals(inputItem.getName(), dbItem.getName())
+                                    && Objects.equals(inputItem.getUrl(), dbItem.getUrl())
+                                    && Objects.equals(inputItem.getIdpUrl(), dbItem.getIdpUrl())
+                                    && Objects.equals(inputItem.getScaApproaches(), dbItem.getScaApproaches()));
     }
 
     @Override
