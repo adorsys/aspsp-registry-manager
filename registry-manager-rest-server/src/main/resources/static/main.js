@@ -1,13 +1,4 @@
-setTimeout(function () {
-    initGlobals();
-    document.querySelector("#upload>button").addEventListener("click", () => FILE_UPLOAD_FIELD.click());
-    FILE_UPLOAD_FIELD.addEventListener("change", upload);
-    document.querySelector("#merge>button").addEventListener("click", () => FILE_MERGE_FIELD.click());
-    FILE_MERGE_FIELD.addEventListener("change", mergeButton);
-    document.querySelectorAll(".mdl-textfield__input").forEach(field => field.addEventListener('keypress', event => onEnterPress(event)));
-}, 0);
-
-function initGlobals() {
+const initGlobals = () => {
     window.FILE_UPLOAD_FIELD = document.querySelector("#import-field");
     window.FILE_MERGE_FIELD = document.querySelector("#merge-field");
     window.HIDDEN_ROW = document.querySelector("tbody>tr.hidden");
@@ -17,21 +8,30 @@ function initGlobals() {
     window.COUNTER = 0;
     window.BASE = "/v1/aspsps";
     window.BASE_URL = "";
+    window.HIT_BUTTON = "NONE";
 }
 
-function validateBankName(element) {
-    let target = element.textContent;
-    let regex = /^[\w\-\s\WäöüÄÖÜß]+$/;
+setTimeout(() => {
+    initGlobals();
+    document.querySelector("#upload>button").addEventListener("click", () => FILE_UPLOAD_FIELD.click());
+    FILE_UPLOAD_FIELD.addEventListener("change", validateUpload);
+    document.querySelector("#merge>button").addEventListener("click", () => FILE_MERGE_FIELD.click());
+    FILE_MERGE_FIELD.addEventListener("change", validateMerge);
+    document.querySelectorAll(".mdl-textfield__input").forEach(field => field.addEventListener('keypress', event => onEnterPress(event)));
+}, 0);
 
-    if (!regex.test(target)) {
+const bankName = (element) => {
+    let target = element.textContent;
+
+    if (target === "") {
         element.classList.add("invalid");
-        warning("Bank name should be a plain text, e.g. there shouldn't be symbols like #, @, *, %, etc.");
+        warning("Bank name should not be empty");
     } else {
         element.classList.remove("invalid");
     }
 }
 
-function validateBic(element) {
+const bic = (element) => {
     toUpper(element);
     let target = element.textContent;
     let regex = /^[A-Z]{6}([A-Z0-9]{2})?([A-Z0-9]{5})?$/;
@@ -42,38 +42,38 @@ function validateBic(element) {
             validateBankCode(element.parentElement.cells[5]);
             return;
         }
-        warning("BIC should be 6, 8 or 11 characters long and consist of word characters and numbers only");
+        warning("BIC should be 6, 8 or 11 characters long and consist of word characters and numbers only and not empty");
     } else {
         element.parentElement.cells[5].classList.remove("invalid");
         element.classList.remove("invalid");
     }
 }
 
-function validateUrl(element) {
+const url = (element) => {
     let target = element.textContent;
     let regex = /(https|http):\/\/[\w\-]+\.[^\n\r]+$/;
 
     if (!regex.test(target) && !(target === "" && element.classList.contains("idp-url"))) {
         element.classList.add("invalid");
-        warning("URL format is wrong, e.g. right format is https://example.test");
+        warning("URL format is wrong, e.g. right format is https://example.test, or field is empty");
     } else {
         element.classList.remove("invalid");
     }
 }
 
-function validateAdapterId(element) {
+const adapterId = (element) => {
     let target = element.textContent;
     let regex = /^\w+-adapter$/;
 
     if (!regex.test(target)) {
         element.classList.add("invalid");
-        warning("Adapter Id should consist of aA-zZ, 0-9 and a hyphen(-) only, e.g. 'Adapter-12345'");
+        warning("Adapter Id should consist of a-z, A-Z, 0-9 and a hyphen(-) only, e.g. 'Adapter-12345', and should not be emoty");
     } else {
         element.classList.remove("invalid");
     }
 }
 
-function validateBankCode(element) {
+const bankCode = (element) => {
     let target = element.textContent;
     let regex = /^\d{8}$/;
 
@@ -83,18 +83,22 @@ function validateBankCode(element) {
             validateBic(element.parentElement.cells[2]);
             return;
         }
-        warning("Bank Code should be 8 digits long and consist of numbers only");
+        warning("Bank Code should be 8 digits long and consist of numbers only and not empty");
     } else {
         element.parentElement.cells[2].classList.remove("invalid");
         element.classList.remove("invalid");
     }
 }
 
-function toUpper(element) {
+const validate = (rule, target) => {
+    rule(target);
+}
+
+const toUpper = (element) => {
     element.innerText = element.innerText.toUpperCase();
 }
 
-function forceValidation() {
+const forceValidation = () => {
     let rows = document.querySelectorAll("tr");
     const makeValid = (element) => {
         if (element.classList.contains("invalid")) {
@@ -113,7 +117,7 @@ function forceValidation() {
 }
 
 // Manipulating cells
-function uneditableCells(e) {
+const uneditableCells = (e) => {
     let rowCells = e.parentElement.parentElement.cells;
     let approach = e.parentElement.parentElement.querySelectorAll('input');
 
@@ -126,7 +130,7 @@ function uneditableCells(e) {
     })
 }
 
-function editableCells(e) {
+const editableCells = (e) => {
     let rowCells = e.parentElement.parentElement.cells;
     let approach = e.parentElement.parentElement.querySelectorAll('input');
 
@@ -141,7 +145,7 @@ function editableCells(e) {
 // End of cells part
 
 // Manipulating tables
-function showTable() {
+const showTable = () => {
     let table = HIDDEN_ROW.parentElement.parentElement.parentElement;
     let message = document.querySelector(".welcome-message");
 
@@ -149,7 +153,7 @@ function showTable() {
     message.hidden = true;
 }
 
-function clearTable() {
+const clearTable = () => {
     let body = document.querySelectorAll("tbody>tr");
 
     if (body.length > 1) {
@@ -157,7 +161,7 @@ function clearTable() {
     }
 }
 
-function checkMorePart() {
+const checkMorePart = () => {
     let showMore = document.querySelector(".show-more");
 
     if (!showMore.hidden) {
@@ -165,7 +169,7 @@ function checkMorePart() {
     }
 }
 
-function clearContent() {
+const clearContent = () => {
     clearTable();
     checkMorePart();
 
@@ -173,56 +177,56 @@ function clearContent() {
 }
 // End of table part
 
-function onEnterPress(event) {
+const onEnterPress = (event) => {
     if (event.keyCode === 13) {
         searchButton();
     }
 }
 
-function addTooltips(e) {
+const addTooltips = (e) => {
     let editId = "edit-";
     let updateId = "update-";
     let deleteId = "delete-";
-    
+
     if (e.className.indexOf("edit") > -1) {
         let helper = e.parentNode.childNodes[7];
-        
+
         e.addEventListener("click", () => { editButton(e) });
         e.setAttribute("id", editId + COUNTER);
-        
+
         helper.setAttribute("data-mdl-for", editId + COUNTER);
         helper.setAttribute("class", "mdl-tooltip mdl-tooltip--top");
     }
-    
+
     if (e.className.indexOf("update") > -1) {
         let helper = e.parentNode.childNodes[9];
-        
+
         e.addEventListener("click", () => { greenButton(e) });
         e.setAttribute("id", updateId + COUNTER);
-        
+
         helper.setAttribute("data-mdl-for", updateId + COUNTER);
         helper.setAttribute("class", "mdl-tooltip mdl-tooltip--top");
     }
-    
+
     if (e.className.indexOf("delete") > -1) {
         let helper = e.parentNode.childNodes[11];
-        
+
         e.addEventListener("click", () => { redButton(e) });
         e.setAttribute("id", deleteId + COUNTER);
-        
+
         helper.setAttribute("data-mdl-for", deleteId + COUNTER);
         helper.setAttribute("class", "mdl-tooltip mdl-tooltip--top");
     }
 }
 
 // Manipulating rows
-function purgeRow(e) {
+const purgeRow = (e) => {
     let tableRow = e.parentElement.parentElement;
 
     tableRow.remove();
 }
 
-function assembleRowData(e) {
+const assembleRowData = (e) => {
     let row = e.parentNode.parentNode;
 
     let object = {};
@@ -237,7 +241,7 @@ function assembleRowData(e) {
 
     return JSON.stringify(object);
 
-    function approachParser(data) {
+    function approachParser (data) {
         let inputs = data.querySelectorAll("input");
         let resultString = [];
 
@@ -251,7 +255,7 @@ function assembleRowData(e) {
     }
 }
 
-function buildRow(data) {
+const buildRow = (data) => {
     let clone = HIDDEN_ROW.cloneNode(true);
     clone.removeAttribute("class");
 
@@ -303,31 +307,52 @@ function buildRow(data) {
 }
 // End of row part
 
-function fail(message) {
-    let messageBlock = FAILURE.querySelector(".message");
-    messageBlock.textContent = message;
-    
-    setTimeout(() => { FAILURE.style.opacity = 1 }, 500);
+const toggleModal = () => {
+    const modal = document.querySelector(".validation-layout");
+    const spinner = document.querySelector(".spinner");
+    const verdict = document.querySelector(".verdict");
+    const verdictReport = document.querySelector(".validation-report");
+    const merge = document.querySelector(".merge-request");
+    const upload = document.querySelector(".upload-request");
 
-    setTimeout(() => { FAILURE.style.opacity = 0 }, 8000);
+    verdict.classList.add("hidden");
+    verdictReport.classList.add("hidden");
+    merge.classList.add("hidden");
+    upload.classList.add("hidden");
+
+    spinner.classList.remove("hidden");
+
+    modal.classList.toggle("hidden");
 }
 
-function success() {
-    setTimeout(() => { SUCCESS.style.opacity = 1 }, 500);
+const createReport = (data) => {
+    const temp = new Blob([JSON.stringify(data)]);
+    const virtualLink = document.createElement("a");
+    const virtualUrl = URL.createObjectURL(temp);
+    virtualLink.href = virtualUrl;
+    virtualLink.download = "report.json";
+    virtualLink.click();
+}
+function fail(message) {
+    showMessage(FAILURE, 8000, message);
+}
 
-    setTimeout(() => { SUCCESS.style.opacity = 0 }, 8000);
+function success(message) {
+    showMessage(SUCCESS, 8000, message);
 }
 
 function warning(message) {
-    let messageBlock = WARNING.querySelector(".message");
+    showMessage(WARNING, 8000, message);
+}
 
-    if (message) {
-        messageBlock.textContent = message;
-    }
+const showMessage = (messageType, duration, message) => {
+    let messageBlock = messageType.querySelector(".message");
 
-    setTimeout(() => { WARNING.style.opacity = 1 }, 500);
+    messageBlock.textContent = message;
 
-    setTimeout(() => { WARNING.style.opacity = 0 }, 8000);
+    setTimeout(() => { messageType.style.opacity = 1 }, 500);
+
+    setTimeout(() => { messageType.style.opacity = 0 }, duration);
 }
 
 function addRow() {
@@ -352,194 +377,6 @@ function addRow() {
     // updating MDL library for making Tooltip working
     componentHandler.upgradeAllRegistered();
 }
-
-// Requests part
-function saveButton(e) {
-    let row = e.parentElement.parentElement;
-
-    for (let cell of row.cells) {
-        if (cell.classList.contains("invalid")) {
-            warning();
-            return;
-        }
-    }
-
-    fetch(BASE, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: assembleRowData(e)
-    }).then((response) => {
-        if (response.status === 403) {
-            warning("It looks like you don't have enough permissions to perform this action");
-            return;
-        } else if (!response.ok) {
-            throw Error(response.statusText);
-        }
-        row.removeAttribute("class");
-        toggleButtons(e);
-        return response.text();
-    }).then(response => {
-        if (!response) { return; }
-        let output = JSON.parse(response);
-        row.cells[0].textContent = output.id;
-        COUNTUP.update(COUNTUP.endVal + 1);
-    }).catch(() => {
-        fail("Saving process has failed");
-    });
-}
-
-function updateButton(e) {
-    let row = e.parentElement.parentElement;
-
-    for (let cell of row.cells) {
-        if (cell.classList.contains("invalid")) {
-            warning();
-            return;
-        }
-    }
-
-    fetch(BASE, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: assembleRowData(e)
-    }).then((response) => {
-        if (response.status === 403) {
-            warning("It looks like you don't have enough permissions to perform this action");
-            toggleButtons(e);
-            return;
-        } else if (!response.ok) {
-            throw Error(response.statusText);
-        }
-        toggleButtons(e);
-        return response;
-    }).catch(() => {
-        fail("Update process has failed");
-    });
-}
-
-function deleteButton(e) {
-    let uuidCell = e.parentElement.parentElement.cells[0].innerText;
-    let url = BASE + "/" + uuidCell;
-
-    fetch(url, {
-        method: 'DELETE',
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }).then((response) => {
-        if (response.status === 403) {
-            warning("It looks like you don't have enough permissions to perform this action");
-            toggleButtons(e);
-            return;
-        } else if (!response.ok) {
-            throw Error(response.statusText);
-        }
-        purgeRow(e);
-        COUNTUP.update(COUNTUP.endVal - 1);
-    }).catch(() => {
-        fail("Deleting process has failed");
-    });
-}
-
-function upload() {
-    let file = FILE_UPLOAD_FIELD.files[0];
-    let data = new FormData();
-
-    data.append("file", file);
-
-    fetch(BASE + "/csv/upload", {
-        method: 'POST',
-        body: data
-    }).then(response => {
-        if (response.status === 403) {
-            warning("It looks like you don't have enough permissions to perform this action");
-            return;
-        } else if (!response.ok) {
-            throw Error(response.statusText);
-        }
-        success();
-        (async () => { COUNTUP.update(await getTotal()); })()
-    }).catch(() => {
-        fail("Failed to upload the file. It looks like the file has an inappropriate format.");
-    })
-}
-
-async function searchButton() {
-    clearTable();
-
-    let response;
-
-    BASE_URL = BASE + "/?";
-
-    let data = document.querySelector(".search-form");
-
-    if (data[0].value !== "")
-        BASE_URL += "name=" + data[0].value.toLowerCase() + "&";
-
-    if (data[1].value !== "")
-        BASE_URL += "bic=" + data[1].value + "&";
-
-    if (data[2].value !== "")
-        BASE_URL += "bankCode=" + data[2].value + "&";
-
-    try {
-        response = await search(BASE_URL);
-
-        if (response.data.length === 0) {
-            warning("Failed to find any records. Please double check the search conditions");
-            return;
-        }
-
-        PAGINATOR.create(response.data, response.headers);
-    } catch (error) {
-        fail("Oops... Something went wrong");
-        return;
-    }
-
-    if (HIDDEN_ROW.parentElement.parentElement.parentElement.hidden) {
-        showTable();
-    }
-
-    forceValidation();
-}
-
-function mergeButton() {
-    let file = FILE_MERGE_FIELD.files[0];
-    let data = new FormData();
-
-    data.append("file", file);
-
-    fetch(BASE + "/csv/merge", {
-        method: 'POST',
-        body: data
-    }).then(response => {
-        if (response.status === 403) {
-            warning("It looks like you don't have enough permissions to perform this action");
-            return;
-        } else if (!response.ok) {
-            throw Error(response.statusText);
-        }
-        success();
-        (async () => { COUNTUP.update(await getTotal()); })()
-    }).catch(() => {
-        fail("Failed to upload and merge the file.");
-    })
-}
-
-async function search(URI) {
-    let output = {};
-
-    let response = await fetch(URI);
-    output.headers = await response.headers.get("X-Total-Elements");
-    output.data = JSON.parse(await response.text());
-
-    return output;
-}
-// End of requests part
 
 async function showMore() {
 
@@ -623,6 +460,27 @@ function showButton() {
     icon.classList.toggle("rotate");
 }
 
+const proceedButton = () => {
+
+    upload();
+
+    toggleModal();
+}
+
+const confirmButton = () => {
+
+    merge();
+
+    toggleModal();
+}
+
+const reportButton = () => {
+    createReport(VALIDATOR.data);
+}
+
+const rejectCancelButton = () => {
+    toggleModal();
+}
 let PAGINATOR = {
     data: null,
     page: 0,
@@ -668,7 +526,7 @@ let PAGINATOR = {
 
 window.onload = async () => {
     window.COUNTUP = new CountUp("total", await getTotal());
-    
+
     COUNTUP.start();
 }
 
@@ -681,3 +539,325 @@ let getTotal = async () => {
 // this counter is made by inorgaik https://inorganik.github.io/countUp.js/
 
 var __assign=this&&this.__assign||function(){return(__assign=Object.assign||function(t){for(var i,a=1,s=arguments.length;a<s;a++)for(var n in i=arguments[a])Object.prototype.hasOwnProperty.call(i,n)&&(t[n]=i[n]);return t}).apply(this,arguments)},CountUp=function(){function t(t,i,a){var s=this;this.target=t,this.endVal=i,this.options=a,this.version="2.0.4",this.defaults={startVal:0,decimalPlaces:0,duration:2,useEasing:!0,useGrouping:!0,smartEasingThreshold:999,smartEasingAmount:333,separator:",",decimal:".",prefix:"",suffix:""},this.finalEndVal=null,this.useEasing=!0,this.countDown=!1,this.error="",this.startVal=0,this.paused=!0,this.count=function(t){s.startTime||(s.startTime=t);var i=t-s.startTime;s.remaining=s.duration-i,s.useEasing?s.countDown?s.frameVal=s.startVal-s.easingFn(i,0,s.startVal-s.endVal,s.duration):s.frameVal=s.easingFn(i,s.startVal,s.endVal-s.startVal,s.duration):s.countDown?s.frameVal=s.startVal-(s.startVal-s.endVal)*(i/s.duration):s.frameVal=s.startVal+(s.endVal-s.startVal)*(i/s.duration),s.countDown?s.frameVal=s.frameVal<s.endVal?s.endVal:s.frameVal:s.frameVal=s.frameVal>s.endVal?s.endVal:s.frameVal,s.frameVal=Math.round(s.frameVal*s.decimalMult)/s.decimalMult,s.printValue(s.frameVal),i<s.duration?s.rAF=requestAnimationFrame(s.count):null!==s.finalEndVal?s.update(s.finalEndVal):s.callback&&s.callback()},this.formatNumber=function(t){var i,a,n,e,r,o=t<0?"-":"";if(i=Math.abs(t).toFixed(s.options.decimalPlaces),n=(a=(i+="").split("."))[0],e=a.length>1?s.options.decimal+a[1]:"",s.options.useGrouping){r="";for(var l=0,h=n.length;l<h;++l)0!==l&&l%3==0&&(r=s.options.separator+r),r=n[h-l-1]+r;n=r}return s.options.numerals&&s.options.numerals.length&&(n=n.replace(/[0-9]/g,function(t){return s.options.numerals[+t]}),e=e.replace(/[0-9]/g,function(t){return s.options.numerals[+t]})),o+s.options.prefix+n+e+s.options.suffix},this.easeOutExpo=function(t,i,a,s){return a*(1-Math.pow(2,-10*t/s))*1024/1023+i},this.options=__assign({},this.defaults,a),this.formattingFn=this.options.formattingFn?this.options.formattingFn:this.formatNumber,this.easingFn=this.options.easingFn?this.options.easingFn:this.easeOutExpo,this.startVal=this.validateValue(this.options.startVal),this.frameVal=this.startVal,this.endVal=this.validateValue(i),this.options.decimalPlaces=Math.max(this.options.decimalPlaces),this.decimalMult=Math.pow(10,this.options.decimalPlaces),this.resetDuration(),this.options.separator=String(this.options.separator),this.useEasing=this.options.useEasing,""===this.options.separator&&(this.options.useGrouping=!1),this.el="string"==typeof t?document.getElementById(t):t,this.el?this.printValue(this.startVal):this.error="[CountUp] target is null or undefined"}return t.prototype.determineDirectionAndSmartEasing=function(){var t=this.finalEndVal?this.finalEndVal:this.endVal;this.countDown=this.startVal>t;var i=t-this.startVal;if(Math.abs(i)>this.options.smartEasingThreshold){this.finalEndVal=t;var a=this.countDown?1:-1;this.endVal=t+a*this.options.smartEasingAmount,this.duration=this.duration/2}else this.endVal=t,this.finalEndVal=null;this.finalEndVal?this.useEasing=!1:this.useEasing=this.options.useEasing},t.prototype.start=function(t){this.error||(this.callback=t,this.duration>0?(this.determineDirectionAndSmartEasing(),this.paused=!1,this.rAF=requestAnimationFrame(this.count)):this.printValue(this.endVal))},t.prototype.pauseResume=function(){this.paused?(this.startTime=null,this.duration=this.remaining,this.startVal=this.frameVal,this.determineDirectionAndSmartEasing(),this.rAF=requestAnimationFrame(this.count)):cancelAnimationFrame(this.rAF),this.paused=!this.paused},t.prototype.reset=function(){cancelAnimationFrame(this.rAF),this.paused=!0,this.resetDuration(),this.startVal=this.validateValue(this.options.startVal),this.frameVal=this.startVal,this.printValue(this.startVal)},t.prototype.update=function(t){cancelAnimationFrame(this.rAF),this.startTime=null,this.endVal=this.validateValue(t),this.endVal!==this.frameVal&&(this.startVal=this.frameVal,this.finalEndVal||this.resetDuration(),this.determineDirectionAndSmartEasing(),this.rAF=requestAnimationFrame(this.count))},t.prototype.printValue=function(t){var i=this.formattingFn(t);"INPUT"===this.el.tagName?this.el.value=i:"text"===this.el.tagName||"tspan"===this.el.tagName?this.el.textContent=i:this.el.innerHTML=i},t.prototype.ensureNumber=function(t){return"number"==typeof t&&!isNaN(t)},t.prototype.validateValue=function(t){var i=Number(t);return this.ensureNumber(i)?i:(this.error="[CountUp] invalid start or end value: "+t,null)},t.prototype.resetDuration=function(){this.startTime=null,this.duration=1e3*Number(this.options.duration),this.remaining=this.duration},t}();
+
+const VALIDATOR = {
+    data: null
+}
+
+const validationResponseHandler = (data) => {
+    VALIDATOR.data = data;
+
+    let isValid = data.fileValidationReport.validationResult === "VALID";
+
+    const spinner = document.querySelector(".spinner");
+    const verdict = document.querySelector("#verdict");
+    const report = document.querySelector(".validation-report");
+    const amountNotValid = document.querySelector("#records-amount");
+    const example = document.querySelector(".display");
+
+    if (!data) {
+        fail("Oops... something went wrong. Please try again to validate");
+        toggleModal();
+        return;
+    }
+
+    verdict.textContent = data.fileValidationReport.validationResult;
+    spinner.classList.add("hidden");
+
+    if (!isValid) {
+        verdict.classList.add("valid", "not-valid");
+        verdict.parentElement.classList.remove("hidden");
+        report.classList.remove("hidden");
+
+        amountNotValid.textContent = data.fileValidationReport.totalNotValidRecords;
+        example.textContent = buildString(data.fileValidationReport.aspspValidationErrorReports);
+
+        mergeOrUpload(data);
+    } else {
+        verdict.classList.replace("not-valid", "valid");
+        verdict.parentElement.classList.remove("hidden");
+
+        mergeOrUpload(data);
+    }
+
+}
+
+const buildString = (input) => {
+    let result = "";
+
+    for (let i = 0, limit = Math.min(3, input.length); i < limit; i++) {
+        result += "line number: " + input[i].lineNumberInCsv + "\n"
+            + "validation errors: \n";
+
+        input[i].validationErrors.forEach(element => {
+            result += "\t" + element + "\n";
+        });
+
+        result += "\n";
+    }
+
+    if (input[3]) {
+        result += "\n... ";
+    }
+
+    return result;
+}
+
+const mergeOrUpload = (input) => {
+    const merge = document.querySelector(".merge-request");
+    const newRecords = document.querySelector("#new-records");
+    const altered = document.querySelector("#altered");
+
+    const upload = document.querySelector(".upload-request");
+    const csvRecords = document.querySelector("#csv-quantity");
+    const bdSize = document.querySelector("#db-size");
+
+    if (HIT_BUTTON === "MERGE") {
+        merge.classList.remove("hidden");
+
+        newRecords.textContent = input.numberOfNewRecords;
+        altered.textContent = `${input.difference.length} (${(input.difference.length / COUNTUP.endVal) * 100}%)`;
+    } else if (HIT_BUTTON === "UPLOAD") {
+        upload.classList.remove("hidden");
+
+        csvRecords.textContent = input.csvFileRecordsNumber;
+        bdSize.textContent = input.dbRecordsNumber;
+    }
+}
+
+const saveButton = (e) => {
+    let row = e.parentElement.parentElement;
+
+    for (let cell of row.cells) {
+        if (cell.classList.contains("invalid")) {
+            warning();
+            return;
+        }
+    }
+
+    fetch(BASE, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: assembleRowData(e)
+    }).then((response) => {
+        if (response.status === 403) {
+            warning("It looks like you don't have enough permissions to perform this action");
+            return;
+        } else if (!response.ok) {
+            throw Error(response.statusText);
+        }
+        row.removeAttribute("class");
+        toggleButtons(e);
+        return response.text();
+    }).then(response => {
+        let output = JSON.parse(response);
+        row.cells[0].textContent = output.id;
+        COUNTUP.update(COUNTUP.endVal + 1);
+    }).catch(() => {
+        fail("Saving process has failed");
+    });
+}
+
+const updateButton = (e) => {
+    let row = e.parentElement.parentElement;
+
+    for (let cell of row.cells) {
+        if (cell.classList.contains("invalid")) {
+            warning();
+            return;
+        }
+    }
+
+    fetch(BASE, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: assembleRowData(e)
+    }).then((response) => {
+        if (response.status === 403) {
+            warning("It looks like you don't have enough permissions to perform this action");
+            toggleButtons(e);
+            return;
+        } else if (!response.ok) {
+            throw Error(response.statusText);
+        }
+        toggleButtons(e);
+        return response;
+    }).catch(() => {
+        fail("Update process has failed");
+    });
+}
+
+const deleteButton = (e) => {
+    let uuidCell = e.parentElement.parentElement.cells[0].innerText;
+    let url = BASE + "/" + uuidCell;
+
+    fetch(url, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }).then((response) => {
+        if (response.status === 403) {
+            warning("It looks like you don't have enough permissions to perform this action");
+            toggleButtons(e);
+            return;
+        } else if (!response.ok) {
+            throw Error(response.statusText);
+        }
+        purgeRow(e);
+        COUNTUP.update(COUNTUP.endVal - 1);
+    }).catch(() => {
+        fail("Deleting process has failed");
+    });
+}
+
+const upload = () => {
+    let file = FILE_UPLOAD_FIELD.files[0];
+    let data = new FormData();
+
+    data.append("file", file);
+
+    fetch(BASE + "/csv/upload", {
+        method: 'POST',
+        body: data
+    }).then(response => {
+        if (response.status === 403) {
+            warning("It looks like you don't have enough permissions to perform this action");
+            return;
+        } else if (!response.ok) {
+            throw Error(response.statusText);
+        }
+        success();
+        (async () => { COUNTUP.update(await getTotal()); })()
+    }).catch(() => {
+        fail("Failed to upload the file. It looks like the file has an inappropriate format.");
+    })
+}
+
+const searchButton = async () => {
+    clearTable();
+
+    let response;
+
+    BASE_URL = BASE + "/?";
+
+    let data = document.querySelector(".search-form");
+
+    if (data[0].value !== "")
+        BASE_URL += "name=" + data[0].value.toLowerCase() + "&";
+
+    if (data[1].value !== "")
+        BASE_URL += "bic=" + data[1].value + "&";
+
+    if (data[2].value !== "")
+        BASE_URL += "bankCode=" + data[2].value + "&";
+
+    try {
+        response = await search(BASE_URL);
+
+        if (response.data.length === 0) {
+            warning("Failed to find any records. Please double check the search conditions");
+            return;
+        }
+
+        PAGINATOR.create(response.data, response.headers);
+    } catch (error) {
+        fail("Oops... Something went wrong");
+        return;
+    }
+
+    if (HIDDEN_ROW.parentElement.parentElement.parentElement.hidden) {
+        showTable();
+    }
+
+    forceValidation();
+}
+
+const merge = () => {
+    let file = FILE_MERGE_FIELD.files[0];
+    let data = new FormData();
+
+    data.append("file", file);
+
+    fetch(BASE + "/csv/merge", {
+        method: 'POST',
+        body: data
+    }).then(response => {
+        if (response.status === 403) {
+            warning("It looks like you don't have enough permissions to perform this action");
+            return;
+        } else if (!response.ok) {
+            throw Error(response.statusText);
+        }
+        success();
+        (async () => { COUNTUP.update(await getTotal()); })()
+    }).catch(() => {
+        fail("Failed to upload and merge the file.");
+    })
+}
+
+const search = async (URI) => {
+    let output = {};
+
+    let response = await fetch(URI);
+    output.headers = await response.headers.get("X-Total-Elements");
+    output.data = JSON.parse(await response.text());
+
+    return output;
+}
+
+const validateUpload = () => {
+    let file = FILE_UPLOAD_FIELD.files[0];
+    let data = new FormData();
+
+    data.append("file", file);
+
+    toggleModal();
+
+    fetch(BASE + "/csv/validate/upload", {
+        method: 'POST',
+        body: data
+    }).then(response => {
+        if (response.status === 403) {
+            warning("It looks like you don't have enough permissions to perform this action");
+            return;
+        } else if (!response.ok && response.status !== 400) {
+            throw Error(response.statusText);
+        }
+        return response.text()
+    }).then(response => {
+        validationResponseHandler(JSON.parse(response));
+    }).catch(() => {
+        fail("Validation process failed, please check if you provided an appropriately formatted CSV file");
+    })
+}
+
+const validateMerge = () => {
+    let file = FILE_MERGE_FIELD.files[0];
+    let data = new FormData();
+
+    data.append("file", file);
+
+    toggleModal();
+
+    fetch(BASE + "/csv/validate/merge", {
+        method: 'POST',
+        body: data
+    }).then(response => {
+        if (response.status === 403) {
+            warning("It looks like you don't have enough permissions to perform this action");
+            return;
+        } else if (!response.ok && response.status !== 400) {
+            throw Error(response.statusText);
+        }
+        return response.text()
+    }).then(response => {
+        validationResponseHandler(JSON.parse(response));
+    }).catch(() => {
+        fail("Validation process failed, please check if you provided an appropriately formatted CSV file");
+    })
+}

@@ -36,7 +36,7 @@ public class AspspRepositoryImpl implements AspspRepository {
         AspspEntity entity = converter.toAspspEntity(aspsp);
 
         ExampleMatcher matcher = ExampleMatcher.matchingAny()
-                                         .withStringMatcher(ExampleMatcher.StringMatcher.STARTING)
+                                         .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING)
                                          .withIgnoreCase()
                                          .withIgnoreNullValues();
 
