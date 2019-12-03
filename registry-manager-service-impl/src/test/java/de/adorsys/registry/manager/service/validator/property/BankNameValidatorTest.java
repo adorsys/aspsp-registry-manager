@@ -10,14 +10,13 @@ import static org.junit.Assert.assertThat;
 public class BankNameValidatorTest {
     private static final int LINE_NUMBER_IN_CSV = 1;
     private static final String BANK_NAME_VALID = "Test-Bank Nüremberg";
-    private static final String BANK_NAME_NOT_VALID = "Test Bank *";
+    private static final String BANK_NAME_VALID_NON_WORD_SYMBOLS = "Test-Bank @#$%()";
     private static final String EMPTY_BANK_NAME_VALIDATION_ERROR_MESSAGE = "Bank name is empty";
-    private static final String BANK_NAME_WITH_NOT_VALID_VALUE_VALIDATION_ERROR_MESSAGE = "Bank name property value is not valid: %s";
 
     private BankNameValidator validator = new BankNameValidator();
     private AspspBO aspspValid = buildValidAspsp();
+    private AspspBO aspspValidNonWordSymbols = buildNonWordSymbolsValidAspsp();
     private AspspBO aspspWithEmptyBankName = new AspspBO();
-    private AspspBO aspspWithNotValidBankName = buildAspspWithNotValidBankName();
 
     @Test
     public void validate_Success() {
@@ -30,7 +29,7 @@ public class BankNameValidatorTest {
     }
 
     @Test
-    public void validate_Failure_BankCodeIsEmpty() {
+    public void validate_Failure_BankNameIsEmpty() {
         AspspValidationReportBO validationReport = new AspspValidationReportBO(aspspWithEmptyBankName, LINE_NUMBER_IN_CSV);
 
         AspspValidationReportBO actual = validator.validate(validationReport, aspspWithEmptyBankName);
@@ -42,15 +41,13 @@ public class BankNameValidatorTest {
     }
 
     @Test
-    public void validate_Failure_AdapterIdIsNotValid() {
-        AspspValidationReportBO validationReport = new AspspValidationReportBO(aspspWithNotValidBankName, LINE_NUMBER_IN_CSV);
+    public void validate_Success_NonWordSymbols() {
+        AspspValidationReportBO validationReport = new AspspValidationReportBO(aspspValidNonWordSymbols, LINE_NUMBER_IN_CSV);
 
-        AspspValidationReportBO actual = validator.validate(validationReport, aspspWithNotValidBankName);
+        AspspValidationReportBO actual = validator.validate(validationReport, aspspValidNonWordSymbols);
 
-        assertThat(actual.isNotValid(), is(true));
-        assertThat(actual.getLineNumberInCsv(), is(LINE_NUMBER_IN_CSV));
-        assertThat(actual.getValidationErrors().size(), is(1));
-        assertThat(actual.getValidationErrors().get(0), is(String.format(BANK_NAME_WITH_NOT_VALID_VALUE_VALIDATION_ERROR_MESSAGE, BANK_NAME_NOT_VALID)));
+        assertThat(actual.isNotValid(), is(false));
+        assertThat(actual.getValidationErrors().isEmpty(), is(true));
     }
 
     private AspspBO buildValidAspsp() {
@@ -59,9 +56,9 @@ public class BankNameValidatorTest {
         return aspsp;
     }
 
-    private AspspBO buildAspspWithNotValidBankName() {
+    private AspspBO buildNonWordSymbolsValidAspsp() {
         AspspBO aspsp = new AspspBO();
-        aspsp.setName(BANK_NAME_NOT_VALID);
+        aspsp.setName(BANK_NAME_VALID_NON_WORD_SYMBOLS);
         return aspsp;
     }
 }
