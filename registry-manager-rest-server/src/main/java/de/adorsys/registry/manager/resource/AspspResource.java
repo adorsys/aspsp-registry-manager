@@ -38,6 +38,7 @@ public class AspspResource {
     ResponseEntity<List<AspspTO>> getAspsps(@RequestParam(value = "name", required = false) String name,
                                             @RequestParam(value = "bic", required = false) String bic,
                                             @RequestParam(value = "bankCode", required = false) String bankCode,
+                                            @RequestParam(value = "adapterId", required = false) String adapterId,
                                             @RequestParam(value = "iban", required = false) String iban, // if present - other params ignored
                                             @RequestParam(value = "page", required = false, defaultValue = "0") int page,
                                             @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
@@ -48,7 +49,7 @@ public class AspspResource {
         if (iban != null && !iban.isEmpty()) {
             bos = aspspService.getByIban(iban, page, size);
         } else {
-            bos = aspspService.getByAspsp(buildAspspBO(name, bic, bankCode), page, size);
+            bos = aspspService.getByAspsp(buildAspspBO(name, bic, bankCode, adapterId), page, size);
         }
 
         return ResponseEntity
@@ -57,9 +58,10 @@ public class AspspResource {
                        .body(converter.toAspspTOList(bos.getContent()));
     }
 
-    private AspspBO buildAspspBO(String name, String bic, String bankCode) {
+    private AspspBO buildAspspBO(String name, String bic, String bankCode, String adapterId) {
         AspspBO bo = new AspspBO();
 
+        bo.setAdapterId(adapterId);
         bo.setName(name);
         bo.setBic(bic);
         bo.setBankCode(bankCode);
