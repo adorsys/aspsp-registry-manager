@@ -1,8 +1,8 @@
 package de.adorsys.registry.manager.resource;
 
 import de.adorsys.registry.manager.config.SecurityConfig;
-import de.adorsys.registry.manager.converter.CsvFileImportValidationReportTOConverter;
-import de.adorsys.registry.manager.converter.CsvFileMergeValidationReportTOConverter;
+import de.adorsys.registry.manager.converter.CsvFileImportValidationReportTOConverterImpl;
+import de.adorsys.registry.manager.converter.CsvFileMergeValidationReportTOConverterImpl;
 import de.adorsys.registry.manager.model.CsvFileImportValidationReportTO;
 import de.adorsys.registry.manager.model.CsvFileMergeValidationReportTO;
 import de.adorsys.registry.manager.model.FileValidationReportTO;
@@ -16,6 +16,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -51,10 +52,10 @@ public class AspspCsvResourceTest {
 
     @MockBean
     private AspspCsvService service;
-    @MockBean
-    private CsvFileImportValidationReportTOConverter importValidationReportConverter;
-    @MockBean
-    private CsvFileMergeValidationReportTOConverter mergeValidationReportConverter;
+    @SpyBean
+    private CsvFileImportValidationReportTOConverterImpl importValidationReportConverter;
+    @SpyBean
+    private CsvFileMergeValidationReportTOConverterImpl mergeValidationReportConverter;
 
     @WithMockUser(roles = {"MANAGER", "DEPLOYER", "READER"})
     @Test
@@ -150,7 +151,6 @@ public class AspspCsvResourceTest {
         validationReportTO.setFileValidationReport(fileValidationReportTO);
 
         when(service.validateImportCsv(any())).thenReturn(validationReportBO);
-        when(importValidationReportConverter.toCsvFileImportValidationReportTO(validationReportBO)).thenReturn(validationReportTO);
 
         MvcResult mvcResult = mockMvc.perform(multipart(BASE_URI + "/validate/upload")
                                                       .file("file", "content".getBytes()))
@@ -162,7 +162,6 @@ public class AspspCsvResourceTest {
 
         assertEquals(validationReportTO, actual);
         verify(service, times(1)).validateImportCsv(any());
-        verify(importValidationReportConverter, times(1)).toCsvFileImportValidationReportTO(validationReportBO);
     }
 
     @WithMockUser(roles = {"MANAGER", "DEPLOYER"})
@@ -174,7 +173,8 @@ public class AspspCsvResourceTest {
         CsvFileImportValidationReportBO validationReportBO = new CsvFileImportValidationReportBO(1, 1, fileValidationReportBO);
 
         FileValidationReportTO fileValidationReportTO = new FileValidationReportTO();
-        fileValidationReportTO.setValidationResult(ValidationResultTO.VALID);
+        fileValidationReportTO.setValidationResult(ValidationResultTO.NOT_VALID);
+        fileValidationReportTO.setTotalNotValidRecords(0);
 
         CsvFileImportValidationReportTO validationReportTO = new CsvFileImportValidationReportTO();
         validationReportTO.setCsvFileRecordsNumber(1);
@@ -182,7 +182,6 @@ public class AspspCsvResourceTest {
         validationReportTO.setFileValidationReport(fileValidationReportTO);
 
         when(service.validateImportCsv(any())).thenReturn(validationReportBO);
-        when(importValidationReportConverter.toCsvFileImportValidationReportTO(validationReportBO)).thenReturn(validationReportTO);
 
         MvcResult mvcResult = mockMvc.perform(multipart(BASE_URI + "/validate/upload")
                                                       .file("file", "content".getBytes()))
@@ -194,7 +193,6 @@ public class AspspCsvResourceTest {
 
         assertEquals(validationReportTO, actual);
         verify(service, times(1)).validateImportCsv(any());
-        verify(importValidationReportConverter, times(1)).toCsvFileImportValidationReportTO(validationReportBO);
     }
 
     @WithMockUser(roles = "READER")
@@ -229,7 +227,6 @@ public class AspspCsvResourceTest {
         validationReportTO.setFileValidationReport(fileValidationReportTO);
 
         when(service.validateMergeCsv(any())).thenReturn(validationReportBO);
-        when(mergeValidationReportConverter.toCsvFileMergeValidationReportTO(validationReportBO)).thenReturn(validationReportTO);
 
         MvcResult mvcResult = mockMvc.perform(multipart(BASE_URI + "/validate/merge")
                                                       .file("file", "content".getBytes()))
@@ -241,7 +238,6 @@ public class AspspCsvResourceTest {
 
         assertEquals(validationReportTO, actual);
         verify(service, times(1)).validateMergeCsv(any());
-        verify(mergeValidationReportConverter, times(1)).toCsvFileMergeValidationReportTO(validationReportBO);
     }
 
     @WithMockUser(roles = {"MANAGER", "DEPLOYER"})
@@ -253,7 +249,8 @@ public class AspspCsvResourceTest {
         CsvFileMergeValidationReportBO validationReportBO = new CsvFileMergeValidationReportBO(0, Set.of(), fileValidationReportBO);
 
         FileValidationReportTO fileValidationReportTO = new FileValidationReportTO();
-        fileValidationReportTO.setValidationResult(ValidationResultTO.VALID);
+        fileValidationReportTO.setValidationResult(ValidationResultTO.NOT_VALID);
+        fileValidationReportTO.setTotalNotValidRecords(0);
 
         CsvFileMergeValidationReportTO validationReportTO = new CsvFileMergeValidationReportTO();
         validationReportTO.setNumberOfNewRecords(0);
@@ -261,7 +258,6 @@ public class AspspCsvResourceTest {
         validationReportTO.setFileValidationReport(fileValidationReportTO);
 
         when(service.validateMergeCsv(any())).thenReturn(validationReportBO);
-        when(mergeValidationReportConverter.toCsvFileMergeValidationReportTO(validationReportBO)).thenReturn(validationReportTO);
 
         MvcResult mvcResult = mockMvc.perform(multipart(BASE_URI + "/validate/merge")
                                                       .file("file", "content".getBytes()))
@@ -273,7 +269,6 @@ public class AspspCsvResourceTest {
 
         assertEquals(validationReportTO, actual);
         verify(service, times(1)).validateMergeCsv(any());
-        verify(mergeValidationReportConverter, times(1)).toCsvFileMergeValidationReportTO(validationReportBO);
     }
 
     @WithMockUser(roles = "READER")
