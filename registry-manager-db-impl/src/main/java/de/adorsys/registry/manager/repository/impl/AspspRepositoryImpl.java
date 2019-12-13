@@ -8,13 +8,11 @@ import de.adorsys.registry.manager.repository.model.AspspPO;
 import de.adorsys.registry.manager.repository.model.PagePO;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
 
 @Component
-@Transactional
 public class AspspRepositoryImpl implements AspspRepository {
     private static final String BIC_FIELD_NAME = "bic";
     private static final String BANK_CODE_FIELD_NAME = "bankCode";

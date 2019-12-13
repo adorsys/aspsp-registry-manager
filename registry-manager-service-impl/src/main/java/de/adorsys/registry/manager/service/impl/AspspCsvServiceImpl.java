@@ -15,6 +15,7 @@ import de.adorsys.registry.manager.service.converter.AspspCsvRecordConverter;
 import de.adorsys.registry.manager.service.model.*;
 import de.adorsys.registry.manager.service.validator.AspspValidationService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -23,6 +24,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class AspspCsvServiceImpl implements AspspCsvService {
     private static final ObjectReader CSV_OBJECT_READER;
 

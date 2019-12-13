@@ -13,11 +13,13 @@ import org.iban4j.Iban4jException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
 
 @Service
+@Transactional
 public class AspspServiceImpl implements AspspService {
     private static final Logger logger = LoggerFactory.getLogger(AspspServiceImpl.class);
 
