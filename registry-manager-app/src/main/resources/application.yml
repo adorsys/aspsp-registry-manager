@@ -6,7 +6,7 @@ spring:
 info:
   app:
     name: ${spring.application.name}
-    description: @project.description@
+    description: '@project.description@'
     version: @project.version@
     build: '#@build.number@'
     artifactId: @project.artifactId@
@@ -46,6 +46,7 @@ spring:
         jdbc:
           lob:
             non_contextual_creation: true
+        order_inserts: true
   jackson:
     default-property-inclusion: non_null
     serialization:
