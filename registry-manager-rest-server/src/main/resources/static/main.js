@@ -536,10 +536,6 @@ const reportButton = () => {
     createFile(VALIDATOR.data, "report", "json");
 }
 
-const rejectCancelButton = () => {
-    toggleModal();
-}
-
 const downloadButton = () => {
     download();
 }
@@ -893,11 +889,9 @@ const validateMerge = () => {
 }
 
 const download = () => {
-    
     toggleModal();
 
-    fetch("/v1/aspsps/csv/download")
-    .then(response => {
+    fetch("/v1/aspsps/csv/download").then(response => {
         if (!response) {
             throw Error(response.statusText());
         }
