@@ -15,6 +15,7 @@ import de.adorsys.registry.manager.service.converter.AspspCsvRecordConverter;
 import de.adorsys.registry.manager.service.model.*;
 import de.adorsys.registry.manager.service.validator.AspspValidationService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -82,6 +83,7 @@ public class AspspCsvServiceImpl implements AspspCsvService {
     }
 
     @Override
+    @Transactional
     public void importCsv(byte[] file) {
         List<AspspPO> aspsps = readAllRecords(file, csvRecordConverter::toAspspPOList);
         aspspRepository.delete();
@@ -133,6 +135,7 @@ public class AspspCsvServiceImpl implements AspspCsvService {
     }
 
     @Override
+    @Transactional
     public void merge(byte[] file) {
         List<AspspPO> input = readAllRecords(file, csvRecordConverter::toAspspPOList);
         List<AspspPO> database = aspspRepository.findAll();
