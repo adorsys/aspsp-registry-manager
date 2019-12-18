@@ -46,7 +46,6 @@ spring:
         jdbc:
           lob:
             non_contextual_creation: true
-        order_inserts: true
   jackson:
     default-property-inclusion: non_null
     serialization:
