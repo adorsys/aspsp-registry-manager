@@ -24,7 +24,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
-@Transactional
 public class AspspCsvServiceImpl implements AspspCsvService {
     private static final ObjectReader CSV_OBJECT_READER;
 
@@ -84,6 +83,7 @@ public class AspspCsvServiceImpl implements AspspCsvService {
     }
 
     @Override
+    @Transactional
     public void importCsv(byte[] file) {
         List<AspspPO> aspsps = readAllRecords(file, csvRecordConverter::toAspspPOList);
         aspspRepository.delete();
@@ -135,6 +135,7 @@ public class AspspCsvServiceImpl implements AspspCsvService {
     }
 
     @Override
+    @Transactional
     public void merge(byte[] file) {
         List<AspspPO> input = readAllRecords(file, csvRecordConverter::toAspspPOList);
         List<AspspPO> database = aspspRepository.findAll();

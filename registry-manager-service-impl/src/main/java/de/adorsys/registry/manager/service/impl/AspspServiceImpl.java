@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-@Transactional
 public class AspspServiceImpl implements AspspService {
     private static final Logger logger = LoggerFactory.getLogger(AspspServiceImpl.class);
 
@@ -66,6 +65,7 @@ public class AspspServiceImpl implements AspspService {
     }
 
     @Override
+    @Transactional
     public AspspBO save(AspspBO aspsp) {
         logger.info("Trying to save ASPSP {}", aspsp);
 
@@ -76,6 +76,7 @@ public class AspspServiceImpl implements AspspService {
     }
 
     @Override
+    @Transactional
     public void deleteById(UUID aspspId) {
         logger.info("Deleting ASPSP by id={}", aspspId);
 
@@ -83,6 +84,7 @@ public class AspspServiceImpl implements AspspService {
     }
 
     @Override
+    @Transactional
     public void saveAll(List<AspspBO> aspsps) {
         logger.info("Trying to save ASPSPs {}", aspsps);
 
@@ -92,6 +94,7 @@ public class AspspServiceImpl implements AspspService {
     }
 
     @Override
+    @Transactional
     public void deleteAll() {
         logger.info("Deleting all ASPSPs");
 
