@@ -309,6 +309,13 @@ const buildRow = (data) => {
 
 const toggleModal = () => {
     const modal = document.querySelector(".validation-layout");
+    
+    modal.classList.toggle("hidden");
+
+    showSpinner();
+}
+
+const showSpinner = () => {
     const spinner = document.querySelector(".spinner");
     const verdict = document.querySelector(".verdict");
     const verdictReport = document.querySelector(".validation-report");
@@ -321,16 +328,25 @@ const toggleModal = () => {
     upload.classList.add("hidden");
 
     spinner.classList.remove("hidden");
-
-    modal.classList.toggle("hidden");
 }
 
-const createReport = (data) => {
-    const temp = new Blob([JSON.stringify(data)]);
+const createFile = (data, fileName, fileFormat) => {
+
+    let virtualUrl = null;
+    let temp = null;
+
+    if (fileFormat === "json") {
+        temp = new Blob([JSON.stringify(data)]);
+        virtualUrl = URL.createObjectURL(temp); 
+    } else {
+        temp = new Blob([data], {type: 'text/csv;charset=utf-8;'});
+        virtualUrl = URL.createObjectURL(temp);
+    }
+
     const virtualLink = document.createElement("a");
-    const virtualUrl = URL.createObjectURL(temp);
+     
     virtualLink.href = virtualUrl;
-    virtualLink.download = "report.json";
+    virtualLink.download = fileName + "." + fileFormat;
     virtualLink.click();
 }
 function fail(message) {
@@ -452,6 +468,48 @@ function redButton(e) {
     }
 }
 
+const searchButton = async () => {
+    clearTable();
+
+    let response;
+
+    BASE_URL = BASE + "/?";
+
+    let data = document.querySelector(".search-form");
+
+    if (data[0].value !== "")
+        BASE_URL += "name=" + data[0].value.toLowerCase() + "&";
+
+    if (data[1].value !== "")
+        BASE_URL += "bic=" + data[1].value + "&";
+
+    if (data[2].value !== "")
+        BASE_URL += "bankCode=" + data[2].value + "&";
+
+    if (data[3].value !== "")
+        BASE_URL += "adapterId=" + data[3].value + "&";
+
+    try {
+        response = await search(BASE_URL.slice(0, -1));
+
+        if (response.data.length === 0) {
+            warning("Failed to find any records. Please double check the search conditions");
+            return;
+        }
+
+        PAGINATOR.create(response.data, response.headers);
+    } catch (error) {
+        fail("Oops... Something went wrong");
+        return;
+    }
+
+    if (HIDDEN_ROW.parentElement.parentElement.parentElement.hidden) {
+        showTable();
+    }
+
+    forceValidation();
+}
+
 function showButton() {
     let drawer = document.querySelector(".mdl-layout__drawer");
     let icon = document.querySelector(".expand>button>i");
@@ -464,22 +522,26 @@ const proceedButton = () => {
 
     upload();
 
-    toggleModal();
+    showSpinner();
 }
 
 const confirmButton = () => {
 
     merge();
 
-    toggleModal();
+    showSpinner();
 }
 
 const reportButton = () => {
-    createReport(VALIDATOR.data);
+    createFile(VALIDATOR.data, "report", "json");
 }
 
 const rejectCancelButton = () => {
     toggleModal();
+}
+
+const downloadButton = () => {
+    download();
 }
 let PAGINATOR = {
     data: null,
@@ -546,6 +608,12 @@ const VALIDATOR = {
 
 const validationResponseHandler = (data) => {
     VALIDATOR.data = data;
+    
+    if (!data) {
+        fail("Oops... something went wrong. Please try again to validate");
+        toggleModal();
+        return;
+    }
 
     let isValid = data.fileValidationReport.validationResult === "VALID";
 
@@ -554,12 +622,6 @@ const validationResponseHandler = (data) => {
     const report = document.querySelector(".validation-report");
     const amountNotValid = document.querySelector("#records-amount");
     const example = document.querySelector(".display");
-
-    if (!data) {
-        fail("Oops... something went wrong. Please try again to validate");
-        toggleModal();
-        return;
-    }
     
     verdict.textContent = data.fileValidationReport.validationResult;
     spinner.classList.add("hidden");
@@ -738,49 +800,9 @@ const upload = () => {
         (async () => { COUNTUP.update(await getTotal()); })()
     }).catch(() => {
         fail("Failed to upload the file. It looks like the file has an inappropriate format.");
+    }).finally (() => {
+        toggleModal();
     })
-}
-
-const searchButton = async () => {
-    clearTable();
-
-    let response;
-
-    BASE_URL = BASE + "/?";
-
-    let data = document.querySelector(".search-form");
-
-    if (data[0].value !== "")
-        BASE_URL += "name=" + data[0].value.toLowerCase() + "&";
-
-    if (data[1].value !== "")
-        BASE_URL += "bic=" + data[1].value + "&";
-
-    if (data[2].value !== "")
-        BASE_URL += "bankCode=" + data[2].value + "&";
-
-    if (data[3].value !== "")
-        BASE_URL += "adapterId=" + data[3].value + "&";
-
-    try {
-        response = await search(BASE_URL.slice(0, -1));
-
-        if (response.data.length === 0) {
-            warning("Failed to find any records. Please double check the search conditions");
-            return;
-        }
-
-        PAGINATOR.create(response.data, response.headers);
-    } catch (error) {
-        fail("Oops... Something went wrong");
-        return;
-    }
-
-    if (HIDDEN_ROW.parentElement.parentElement.parentElement.hidden) {
-        showTable();
-    }
-
-    forceValidation();
 }
 
 const merge = () => {
@@ -803,6 +825,8 @@ const merge = () => {
         (async () => { COUNTUP.update(await getTotal()); })()
     }).catch(() => {
         fail("Failed to upload and merge the file.");
+    }).finally (() => {
+        toggleModal();
     })
 }
 
@@ -865,5 +889,24 @@ const validateMerge = () => {
         validationResponseHandler(JSON.parse(response));
     }).catch(() => {
         fail("Validation process failed, please check if you provided an appropriately formatted CSV file");
+    })
+}
+
+const download = () => {
+    
+    toggleModal();
+
+    fetch("/v1/aspsps/csv/download")
+    .then(response => {
+        if (!response) {
+            throw Error(response.statusText());
+        }
+        return response.text();
+    }).then(response => {
+        createFile(response, "aspsps", "csv")
+    }).catch(error => {
+        fail("Failed to upload the file");
+    }).finally(() => {
+        toggleModal();
     })
 }

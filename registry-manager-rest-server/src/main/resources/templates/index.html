@@ -20,7 +20,7 @@
 <div class="validation-layout margin-top__zero hidden">
     <div class="validation-obfuscator">
         <div class="validation-modal">
-            <h3 class="validation--header">Validation report</h3>
+            <h3 class="validation--header">Processing</h3>
             <div class="spinner">
                 <div class="mdl-spinner mdl-js-spinner is-active"></div>
                 <button class="reject mdl-button mdl-js-button mdl-button--accent padding__top"
@@ -71,14 +71,12 @@
                     </button>
                 </div>
                 <div class="download-button" id="download">
-                    <a href="/v1/aspsps/csv/download" download="aspsps.csv">
-                        <button
+                        <button onclick="downloadButton();"
                             class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--fab mdl-button--colored">
                             <i class="material-icons">
                                 cloud_download
                             </i>
                         </button>
-                    </a>
                 </div>
                 <div class="merge-button" id="merge">
                     <input type="file" name="merge file" id="merge-field" hidden>
