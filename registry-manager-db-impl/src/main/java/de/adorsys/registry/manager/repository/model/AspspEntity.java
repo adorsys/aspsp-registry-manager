@@ -10,7 +10,10 @@ import java.util.UUID;
 public class AspspEntity {
 
     @Id
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    private Long id;
+
+    private UUID aspspId;
     private String name;
     private String bic;
     private String bankCode;
@@ -25,12 +28,20 @@ public class AspspEntity {
     private List<AspspScaApproachPO> scaApproaches;
     private String paginationId;
 
-    public UUID getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(Long id) {
         this.id = id;
+    }
+
+    public UUID getAspspId() {
+        return aspspId;
+    }
+
+    public void setAspspId(UUID id) {
+        this.aspspId = id;
     }
 
     public String getName() {
@@ -103,33 +114,35 @@ public class AspspEntity {
         if (o == null || getClass() != o.getClass()) return false;
         AspspEntity that = (AspspEntity) o;
         return Objects.equals(id, that.id) &&
-                       Objects.equals(name, that.name) &&
-                       Objects.equals(bic, that.bic) &&
-                       Objects.equals(bankCode, that.bankCode) &&
-                       Objects.equals(url, that.url) &&
-                       Objects.equals(adapterId, that.adapterId) &&
-                       Objects.equals(idpUrl, that.idpUrl) &&
-                       Objects.equals(scaApproaches, that.scaApproaches) &&
-                       Objects.equals(paginationId, that.paginationId);
+            Objects.equals(aspspId, that.aspspId) &&
+            Objects.equals(name, that.name) &&
+            Objects.equals(bic, that.bic) &&
+            Objects.equals(bankCode, that.bankCode) &&
+            Objects.equals(url, that.url) &&
+            Objects.equals(adapterId, that.adapterId) &&
+            Objects.equals(idpUrl, that.idpUrl) &&
+            Objects.equals(scaApproaches, that.scaApproaches) &&
+            Objects.equals(paginationId, that.paginationId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, bic, bankCode, url, adapterId, idpUrl, scaApproaches, paginationId);
+        return Objects.hash(id, aspspId, name, bic, bankCode, url, adapterId, idpUrl, scaApproaches, paginationId);
     }
 
     @Override
     public String toString() {
         return "AspspEntity{" +
-                       "id='" + id + '\'' +
-                       ", name='" + name + '\'' +
-                       ", bic='" + bic + '\'' +
-                       ", bankCode='" + bankCode + '\'' +
-                       ", url='" + url + '\'' +
-                       ", adapterId='" + adapterId + '\'' +
-                       ", idpUrl='" + idpUrl + '\'' +
-                       ", scaApproaches=" + scaApproaches +
-                       ", paginationId='" + paginationId + '\'' +
-                       '}';
+            "id=" + id +
+            ", aspspId=" + aspspId +
+            ", name='" + name + '\'' +
+            ", bic='" + bic + '\'' +
+            ", bankCode='" + bankCode + '\'' +
+            ", url='" + url + '\'' +
+            ", adapterId='" + adapterId + '\'' +
+            ", idpUrl='" + idpUrl + '\'' +
+            ", scaApproaches=" + scaApproaches +
+            ", paginationId='" + paginationId + '\'' +
+            '}';
     }
 }

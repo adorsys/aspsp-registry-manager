@@ -28,7 +28,7 @@ public class AspspRepositoryImpl implements AspspRepository {
 
     @Override
     public List<AspspPO> findAll() {
-        return converter.toAspspPOList(repository.findAll());
+        return converter.toAspspPOList(repository.findAllByOrderByIdAsc());
     }
 
     @Override
@@ -61,8 +61,17 @@ public class AspspRepositoryImpl implements AspspRepository {
     @Override
     public AspspPO save(AspspPO aspsp) {
         AspspEntity entity = converter.toAspspEntity(aspsp);
+        checkPresenceByAspspId(entity);
         AspspEntity saved = repository.save(entity);
         return converter.toAspspPO(saved);
+    }
+
+    private void checkPresenceByAspspId(AspspEntity entity) {
+        AspspEntity checker = repository.findByAspspId(entity.getAspspId());
+
+        if (checker != null) {
+            entity.setId(checker.getId());
+        }
     }
 
     @Override
@@ -72,7 +81,7 @@ public class AspspRepositoryImpl implements AspspRepository {
 
     @Override
     public void deleteById(UUID aspspId) {
-        repository.deleteById(aspspId);
+        repository.deleteByAspspId(aspspId);
     }
 
     @Override

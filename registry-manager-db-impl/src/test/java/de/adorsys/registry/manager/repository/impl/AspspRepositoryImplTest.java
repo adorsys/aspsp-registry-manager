@@ -65,7 +65,7 @@ public class AspspRepositoryImplTest {
         List<AspspEntity> entities = List.of(entity);
         List<AspspPO> pos = List.of(po);
 
-        when(jpaRepository.findAll()).thenReturn(entities);
+        when(jpaRepository.findAllByOrderByIdAsc()).thenReturn(entities);
         when(converter.toAspspPOList(any())).thenReturn(pos);
 
         List<AspspPO> result = repository.findAll();
@@ -131,11 +131,11 @@ public class AspspRepositoryImplTest {
     @Test
     public void delete() {
 
-        doNothing().when(jpaRepository).deleteById(ID);
+        doNothing().when(jpaRepository).deleteByAspspId(ID);
 
         repository.deleteById(ID);
 
-        verify(jpaRepository, times(1)).deleteById(ID);
+        verify(jpaRepository, times(1)).deleteByAspspId(ID);
     }
 
     @Test

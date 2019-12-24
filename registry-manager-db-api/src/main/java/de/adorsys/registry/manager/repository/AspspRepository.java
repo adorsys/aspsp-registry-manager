@@ -48,6 +48,11 @@ public interface AspspRepository {
      */
     void saveAll(List<AspspPO> aspsps);
 
+    /**
+     * Deletes entity by UUID
+     *
+     * @param aspspId
+     */
     void deleteById(UUID aspspId);
 
     /**

@@ -6,10 +6,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.UUID;
 
 @Repository
-public interface AspspJpaRepository extends JpaRepository<AspspEntity, UUID> {
+public interface AspspJpaRepository extends JpaRepository<AspspEntity, Long>{
 
     /**
      * Looks for ASPSPs by Bank Code with correlating results with provided {@link Pageable}
@@ -22,4 +23,21 @@ public interface AspspJpaRepository extends JpaRepository<AspspEntity, UUID> {
      * information related to the pagination (page, size, order, etc.)
      */
     Page<AspspEntity> findByBankCode(String bankCode, Pageable pageable);
+
+    /**
+     * Looks for an entity by provided UUID
+     *
+     * @param aspspId of {@link UUID} type
+     * @return {@link AspspEntity} if exists or null
+     */
+    AspspEntity findByAspspId(UUID aspspId);
+
+    /**
+     * Deletes an entity by provided UUID
+     *
+     * @param uuid of {@link UUID} type
+     */
+    void deleteByAspspId(UUID uuid);
+
+    List<AspspEntity> findAllByOrderByIdAsc();
 }
