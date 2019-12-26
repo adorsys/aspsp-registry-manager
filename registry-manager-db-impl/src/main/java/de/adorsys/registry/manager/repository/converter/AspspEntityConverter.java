@@ -10,11 +10,8 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface AspspEntityConverter {
 
-    @Mapping(target = "id", source = "aspspId")
     AspspPO toAspspPO(AspspEntity entity);
 
-    @Mapping(target = "aspspId", source = "id")
-    @Mapping(target = "id", ignore = true)
     AspspEntity toAspspEntity(AspspPO po);
 
     List<AspspPO> toAspspPOList(List<AspspEntity> list);

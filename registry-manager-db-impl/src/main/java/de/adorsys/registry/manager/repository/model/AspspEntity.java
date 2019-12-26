@@ -10,10 +10,7 @@ import java.util.UUID;
 public class AspspEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private Long id;
-
-    private UUID aspspId;
+    private UUID id;
     private String name;
     private String bic;
     private String bankCode;
@@ -28,20 +25,15 @@ public class AspspEntity {
     private List<AspspScaApproachPO> scaApproaches;
     private String paginationId;
 
-    public Long getId() {
+    @Column(insertable = false, updatable = false, columnDefinition = "serial")
+    private Integer lineNumber;
+
+    public UUID getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(UUID id) {
         this.id = id;
-    }
-
-    public UUID getAspspId() {
-        return aspspId;
-    }
-
-    public void setAspspId(UUID id) {
-        this.aspspId = id;
     }
 
     public String getName() {
@@ -108,13 +100,20 @@ public class AspspEntity {
         this.paginationId = paginationId;
     }
 
+    public Integer getLineNumber() {
+        return lineNumber;
+    }
+
+    public void setLineNumber(Integer lineNumber) {
+        this.lineNumber = lineNumber;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         AspspEntity that = (AspspEntity) o;
         return Objects.equals(id, that.id) &&
-            Objects.equals(aspspId, that.aspspId) &&
             Objects.equals(name, that.name) &&
             Objects.equals(bic, that.bic) &&
             Objects.equals(bankCode, that.bankCode) &&
@@ -122,19 +121,19 @@ public class AspspEntity {
             Objects.equals(adapterId, that.adapterId) &&
             Objects.equals(idpUrl, that.idpUrl) &&
             Objects.equals(scaApproaches, that.scaApproaches) &&
-            Objects.equals(paginationId, that.paginationId);
+            Objects.equals(paginationId, that.paginationId) &&
+            Objects.equals(lineNumber, that.lineNumber);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, aspspId, name, bic, bankCode, url, adapterId, idpUrl, scaApproaches, paginationId);
+        return Objects.hash(id, name, bic, bankCode, url, adapterId, idpUrl, scaApproaches, paginationId, lineNumber);
     }
 
     @Override
     public String toString() {
         return "AspspEntity{" +
             "id=" + id +
-            ", aspspId=" + aspspId +
             ", name='" + name + '\'' +
             ", bic='" + bic + '\'' +
             ", bankCode='" + bankCode + '\'' +
@@ -143,6 +142,7 @@ public class AspspEntity {
             ", idpUrl='" + idpUrl + '\'' +
             ", scaApproaches=" + scaApproaches +
             ", paginationId='" + paginationId + '\'' +
+            ", lineNumber=" + lineNumber +
             '}';
     }
 }
