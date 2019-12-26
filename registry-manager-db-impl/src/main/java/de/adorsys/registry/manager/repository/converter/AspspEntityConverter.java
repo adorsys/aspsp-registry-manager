@@ -3,7 +3,6 @@ package de.adorsys.registry.manager.repository.converter;
 import de.adorsys.registry.manager.repository.model.AspspEntity;
 import de.adorsys.registry.manager.repository.model.AspspPO;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 
 import java.util.List;
 
