@@ -12,11 +12,13 @@ import java.util.List;
 public interface AspspBOConverter {
     AspspBO toAspspBO(AspspPO po);
 
+    @Mapping(target = "id", source = "id", defaultExpression = "java(java.util.UUID.randomUUID())")
     AspspPO toAspspPO(AspspBO bo);
 
     @Mapping(source = "aspspName", target = "name")
     @Mapping(source = "aspspScaApproaches", target = "scaApproaches")
     @Mapping(target = "paginationId", ignore = true)
+    @Mapping(target = "id", source = "id", defaultExpression = "java(java.util.UUID.randomUUID())")
     AspspBO toAspspBO(AspspCsvRecord csvRecord);
 
     List<AspspBO> toAspspBOList(List<AspspPO> list);

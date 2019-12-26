@@ -13,6 +13,7 @@ public interface AspspCsvRecordConverter {
     @Mapping(source = "aspspName", target = "name")
     @Mapping(source = "aspspScaApproaches", target = "scaApproaches")
     @Mapping(target = "paginationId", ignore = true)
+    @Mapping(target = "id", source = "id", defaultExpression = "java(java.util.UUID.randomUUID())")
     AspspPO toAspspPO(AspspCsvRecord aspspCsvRecord);
 
     List<AspspPO> toAspspPOList(List<AspspCsvRecord> aspspCsvRecordList);

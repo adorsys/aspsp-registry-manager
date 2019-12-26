@@ -24,12 +24,10 @@ public class AspspServiceImpl implements AspspService {
 
     private final AspspRepository repository;
     private final AspspBOConverter converter;
-    private final UUIDGeneratorService uuidGeneratorService;
 
-    public AspspServiceImpl(AspspRepository repository, AspspBOConverter converter, UUIDGeneratorService uuidGeneratorService) {
+    public AspspServiceImpl(AspspRepository repository, AspspBOConverter converter) {
         this.repository = repository;
         this.converter = converter;
-        this.uuidGeneratorService = uuidGeneratorService;
     }
 
     @Override
@@ -70,7 +68,7 @@ public class AspspServiceImpl implements AspspService {
         logger.info("Trying to save ASPSP {}", aspsp);
 
         AspspPO po = converter.toAspspPO(aspsp);
-        AspspPO saved = repository.save(uuidGeneratorService.checkAndUpdateUUID(po));
+        AspspPO saved = repository.save(po);
 
         return converter.toAspspBO(saved);
     }
@@ -90,7 +88,7 @@ public class AspspServiceImpl implements AspspService {
 
         List<AspspPO> aspspPOList = converter.toAspspPOList(aspsps);
 
-        repository.saveAll(uuidGeneratorService.checkAndUpdateUUID(aspspPOList));
+        repository.saveAll(aspspPOList);
     }
 
     @Override

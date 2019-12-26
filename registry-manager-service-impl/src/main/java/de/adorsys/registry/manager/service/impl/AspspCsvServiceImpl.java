@@ -30,7 +30,6 @@ public class AspspCsvServiceImpl implements AspspCsvService {
     private final AspspRepository aspspRepository;
     private final AspspCsvRecordConverter csvRecordConverter;
     private final AspspBOConverter aspspBOConverter;
-    private final UUIDGeneratorService uuidGeneratorService;
     private final AspspValidationService aspspValidationService;
 
     static {
@@ -51,12 +50,10 @@ public class AspspCsvServiceImpl implements AspspCsvService {
     }
 
     public AspspCsvServiceImpl(AspspRepository aspspRepository, AspspCsvRecordConverter csvRecordConverter,
-                               AspspBOConverter aspspBOConverter, UUIDGeneratorService uuidGeneratorService,
-                               AspspValidationService aspspValidationService) {
+                               AspspBOConverter aspspBOConverter, AspspValidationService aspspValidationService) {
         this.aspspRepository = aspspRepository;
         this.csvRecordConverter = csvRecordConverter;
         this.aspspBOConverter = aspspBOConverter;
-        this.uuidGeneratorService = uuidGeneratorService;
         this.aspspValidationService = aspspValidationService;
     }
 
@@ -87,7 +84,7 @@ public class AspspCsvServiceImpl implements AspspCsvService {
     public void importCsv(byte[] file) {
         List<AspspPO> aspsps = readAllRecords(file, csvRecordConverter::toAspspPOList);
         aspspRepository.delete();
-        aspspRepository.saveAll(uuidGeneratorService.checkAndUpdateUUID(aspsps));
+        aspspRepository.saveAll(aspsps);
     }
 
     @Override
@@ -160,7 +157,7 @@ public class AspspCsvServiceImpl implements AspspCsvService {
         aspspRepository.delete(forDeleting);
 
 //        everything that has been matched by id, no match by id (new entries), id is NULL and matched by BIC and BLZ and no match with NULL id (new entries)
-        aspspRepository.saveAll(uuidGeneratorService.checkAndUpdateUUID(new LinkedList<>(forSave)));
+        aspspRepository.saveAll(new LinkedList<>(forSave));
     }
 
     private void logicForProcessingWithNullId(List<AspspPO> input, Set<AspspPO> forSave, AspspPO dbItem, AspspPO inputItem) {

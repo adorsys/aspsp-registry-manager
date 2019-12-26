@@ -12,6 +12,7 @@ import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
 public class AspspCsvRecordConverterTest {
@@ -32,6 +33,16 @@ public class AspspCsvRecordConverterTest {
         AspspPO actual = converter.toAspspPO(csvRecord);
 
         assertThat(actual, is(po));
+    }
+
+    @Test
+    public void toAspspPO_withNoId() {
+        AspspCsvRecord withNoId = csvRecord;
+        withNoId.setId(null);
+
+        AspspPO actual = converter.toAspspPO(withNoId);
+
+        assertNotNull(actual.getId());
     }
 
     @Test
