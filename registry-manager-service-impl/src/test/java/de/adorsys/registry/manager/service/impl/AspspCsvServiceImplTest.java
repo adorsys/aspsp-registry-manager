@@ -53,8 +53,6 @@ public class AspspCsvServiceImplTest {
     AspspBOConverter aspspBOConverter;
     @Spy
     private AspspCsvRecordConverter converter = new AspspCsvRecordConverterImpl();
-    @Spy
-    private UUIDGeneratorService uuidGeneratorService;
     @Mock
     private AspspValidationService aspspValidationService;
 
@@ -78,12 +76,10 @@ public class AspspCsvServiceImplTest {
     public void importCsv() {
         doNothing().when(repository).delete();
         when(converter.toAspspPOList(CSV_RECORDS)).thenReturn(POS);
-        when(uuidGeneratorService.checkAndUpdateUUID(anyListOf(AspspPO.class))).thenReturn(POS);
         doNothing().when(repository).saveAll(POS);
 
         service.importCsv(STORED_BYTES_TEMPLATE);
 
-        verify(uuidGeneratorService, times(1)).checkAndUpdateUUID(anyListOf(AspspPO.class));
         verify(repository, times(1)).delete();
         verify(repository, times(1)).saveAll(POS);
     }
@@ -92,12 +88,10 @@ public class AspspCsvServiceImplTest {
     public void importCsv_scaApproachesWithSpaces() {
         doNothing().when(repository).delete();
         when(converter.toAspspPOList(CSV_RECORDS)).thenReturn(POS);
-        when(uuidGeneratorService.checkAndUpdateUUID(anyListOf(AspspPO.class))).thenReturn(POS);
         doNothing().when(repository).saveAll(POS);
 
         service.importCsv(STORED_BYTES_TEMPLATE_WITH_SPACES_IN_SCA_APPROACHES);
 
-        verify(uuidGeneratorService, times(1)).checkAndUpdateUUID(anyListOf(AspspPO.class));
         verify(repository, times(1)).delete();
         verify(repository, times(1)).saveAll(POS);
     }
@@ -106,12 +100,10 @@ public class AspspCsvServiceImplTest {
     public void importCsv_lowercaseScaApproaches() {
         doNothing().when(repository).delete();
         when(converter.toAspspPOList(CSV_RECORDS)).thenReturn(POS);
-        when(uuidGeneratorService.checkAndUpdateUUID(anyListOf(AspspPO.class))).thenReturn(POS);
         doNothing().when(repository).saveAll(POS);
 
         service.importCsv(STORED_BYTES_TEMPLATE_WITH_LOWERCASE_SCA_APPROACHES);
 
-        verify(uuidGeneratorService, times(1)).checkAndUpdateUUID(anyListOf(AspspPO.class));
         verify(repository, times(1)).delete();
         verify(repository, times(1)).saveAll(POS);
     }
@@ -129,7 +121,6 @@ public class AspspCsvServiceImplTest {
 
         service.merge(input);
 
-        verify(uuidGeneratorService, times(1)).checkAndUpdateUUID(anyListOf(AspspPO.class));
         verify(repository, times(1)).findAll();
         verify(repository, times(1)).saveAll(captor.capture());
         verify(repository, times(1)).delete(anyListOf(AspspPO.class));
@@ -150,11 +141,9 @@ public class AspspCsvServiceImplTest {
         doNothing().when(repository).delete(anyListOf(AspspPO.class));
         when(repository.findAll()).thenReturn(POS);
         when(converter.toAspspPOList(anyListOf(AspspCsvRecord.class))).thenReturn(test);
-        when(uuidGeneratorService.checkAndUpdateUUID(anyListOf(AspspPO.class))).thenReturn(test);
 
         service.merge(STORED_BYTES_TEMPLATE);
 
-        verify(uuidGeneratorService, times(1)).checkAndUpdateUUID(anyListOf(AspspPO.class));
         verify(converter, times(1)).toAspspPOList(anyListOf(AspspCsvRecord.class));
         verify(repository, times(1)).findAll();
         verify(repository, times(1)).saveAll(captor.capture());
