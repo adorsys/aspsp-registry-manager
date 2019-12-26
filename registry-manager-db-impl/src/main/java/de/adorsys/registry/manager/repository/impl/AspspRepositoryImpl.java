@@ -28,7 +28,7 @@ public class AspspRepositoryImpl implements AspspRepository {
 
     @Override
     public List<AspspPO> findAll() {
-        return converter.toAspspPOList(repository.findAll());
+        return converter.toAspspPOList(repository.findAll(Sort.by("lineNumber")));
     }
 
     @Override

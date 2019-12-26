@@ -25,6 +25,9 @@ public class AspspEntity {
     private List<AspspScaApproachPO> scaApproaches;
     private String paginationId;
 
+    @Column(insertable = false, updatable = false, columnDefinition = "serial")
+    private Integer lineNumber;
+
     public UUID getId() {
         return id;
     }
@@ -97,39 +100,49 @@ public class AspspEntity {
         this.paginationId = paginationId;
     }
 
+    public Integer getLineNumber() {
+        return lineNumber;
+    }
+
+    public void setLineNumber(Integer lineNumber) {
+        this.lineNumber = lineNumber;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         AspspEntity that = (AspspEntity) o;
         return Objects.equals(id, that.id) &&
-                       Objects.equals(name, that.name) &&
-                       Objects.equals(bic, that.bic) &&
-                       Objects.equals(bankCode, that.bankCode) &&
-                       Objects.equals(url, that.url) &&
-                       Objects.equals(adapterId, that.adapterId) &&
-                       Objects.equals(idpUrl, that.idpUrl) &&
-                       Objects.equals(scaApproaches, that.scaApproaches) &&
-                       Objects.equals(paginationId, that.paginationId);
+            Objects.equals(name, that.name) &&
+            Objects.equals(bic, that.bic) &&
+            Objects.equals(bankCode, that.bankCode) &&
+            Objects.equals(url, that.url) &&
+            Objects.equals(adapterId, that.adapterId) &&
+            Objects.equals(idpUrl, that.idpUrl) &&
+            Objects.equals(scaApproaches, that.scaApproaches) &&
+            Objects.equals(paginationId, that.paginationId) &&
+            Objects.equals(lineNumber, that.lineNumber);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, bic, bankCode, url, adapterId, idpUrl, scaApproaches, paginationId);
+        return Objects.hash(id, name, bic, bankCode, url, adapterId, idpUrl, scaApproaches, paginationId, lineNumber);
     }
 
     @Override
     public String toString() {
         return "AspspEntity{" +
-                       "id='" + id + '\'' +
-                       ", name='" + name + '\'' +
-                       ", bic='" + bic + '\'' +
-                       ", bankCode='" + bankCode + '\'' +
-                       ", url='" + url + '\'' +
-                       ", adapterId='" + adapterId + '\'' +
-                       ", idpUrl='" + idpUrl + '\'' +
-                       ", scaApproaches=" + scaApproaches +
-                       ", paginationId='" + paginationId + '\'' +
-                       '}';
+            "id=" + id +
+            ", name='" + name + '\'' +
+            ", bic='" + bic + '\'' +
+            ", bankCode='" + bankCode + '\'' +
+            ", url='" + url + '\'' +
+            ", adapterId='" + adapterId + '\'' +
+            ", idpUrl='" + idpUrl + '\'' +
+            ", scaApproaches=" + scaApproaches +
+            ", paginationId='" + paginationId + '\'' +
+            ", lineNumber=" + lineNumber +
+            '}';
     }
 }

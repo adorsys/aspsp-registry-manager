@@ -65,7 +65,7 @@ public class AspspRepositoryImplTest {
         List<AspspEntity> entities = List.of(entity);
         List<AspspPO> pos = List.of(po);
 
-        when(jpaRepository.findAll()).thenReturn(entities);
+        when(jpaRepository.findAll(Sort.by("lineNumber"))).thenReturn(entities);
         when(converter.toAspspPOList(any())).thenReturn(pos);
 
         List<AspspPO> result = repository.findAll();
