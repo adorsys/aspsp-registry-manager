@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.util.UUID;
 
 @Repository
-public interface AspspJpaRepository extends JpaRepository<AspspEntity, UUID>{
+public interface AspspJpaRepository extends JpaRepository<AspspEntity, UUID> {
 
     /**
      * Looks for ASPSPs by Bank Code with correlating results with provided {@link Pageable}
