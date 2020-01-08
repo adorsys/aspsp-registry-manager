@@ -539,6 +539,10 @@ const reportButton = () => {
 const downloadButton = () => {
     download();
 }
+
+const rejectCancelButton = () => {
+    toggleModal();
+}
 let PAGINATOR = {
     data: null,
     page: 0,
@@ -798,6 +802,7 @@ const upload = () => {
         fail("Failed to upload the file. It looks like the file has an inappropriate format.");
     }).finally (() => {
         toggleModal();
+        FILE_UPLOAD_FIELD.value = "";
     })
 }
 
@@ -823,6 +828,7 @@ const merge = () => {
         fail("Failed to upload and merge the file.");
     }).finally (() => {
         toggleModal();
+        FILE_MERGE_FIELD.value = "";
     })
 }
 
