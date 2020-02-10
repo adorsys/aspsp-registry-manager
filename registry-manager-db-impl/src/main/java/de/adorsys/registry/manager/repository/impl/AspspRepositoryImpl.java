@@ -53,6 +53,22 @@ public class AspspRepositoryImpl implements AspspRepository {
     }
 
     @Override
+    public PagePO findExactByExample(AspspPO example, int page, int size) {
+        AspspEntity entity = converter.toAspspEntity(example);
+
+        ExampleMatcher matcher = ExampleMatcher.matchingAll()
+            .withStringMatcher(ExampleMatcher.StringMatcher.EXACT)
+            .withIgnoreCase()
+            .withIgnoreNullValues();
+
+        Page<AspspEntity> entities = repository.findAll(
+            Example.of(entity, matcher),
+            PageRequest.of(page, size));
+
+        return new PagePO(converter.toAspspPOList(entities.getContent()), entities.getTotalElements());
+    }
+
+    @Override
     public PagePO findByBankCode(String bankCode, int page, int size) {
         Page<AspspEntity> entities = repository.findByBankCode(bankCode, PageRequest.of(page, size));
         return new PagePO(converter.toAspspPOList(entities.getContent()), entities.getTotalElements());

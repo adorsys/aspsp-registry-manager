@@ -19,6 +19,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import pro.javatar.commons.reader.JsonReader;
 import pro.javatar.commons.reader.YamlReader;
@@ -28,6 +29,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static de.adorsys.registry.manager.resource.AspspResource.ASPSP_URI;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -115,6 +117,47 @@ public class AspspResourceTest {
                 .andDo(print())
                 .andExpect(status().is(HttpStatus.FORBIDDEN.value()))
                 .andReturn();
+    }
+
+    @WithMockUser(roles = {"MANAGER", "DEPLOYER"})
+    @Test
+    public void checkNewAspsp() throws Exception {
+        AspspBO output = new AspspBO();
+
+        when(aspspService.checkNewAspsp(bo)).thenReturn(output);
+
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders
+            .post(ASPSP_URI + "/validate")
+            .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+            .content(serialize(to)))
+            .andDo(print())
+            .andExpect(status().is(HttpStatus.OK.value()))
+            .andReturn();
+
+        verify(aspspService, times(1)).checkNewAspsp(any());
+
+        assertThat(result.getResponse().getContentAsByteArray()).isEqualTo(output.toString().getBytes());
+    }
+
+    @Test
+    public void checkNewAspspRedirectToLoginPage() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+            .post(ASPSP_URI + "/validate")
+            .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+            .content(serialize(to)))
+            .andDo(print())
+            .andExpect(status().is(HttpStatus.FOUND.value()));
+    }
+
+    @WithMockUser(roles = "READER")
+    @Test
+    public void checkNewAspspForbidden() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders
+            .post(ASPSP_URI + "/validate")
+            .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+            .content(serialize(to)))
+            .andDo(print())
+            .andExpect(status().is(HttpStatus.FORBIDDEN.value()));
     }
 
     @WithMockUser(roles = {"MANAGER", "DEPLOYER"})

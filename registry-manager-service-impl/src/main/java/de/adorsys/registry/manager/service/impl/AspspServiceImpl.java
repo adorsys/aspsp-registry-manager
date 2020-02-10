@@ -74,6 +74,13 @@ public class AspspServiceImpl implements AspspService {
     }
 
     @Override
+    public AspspBO checkNewAspsp(AspspBO aspsp) {
+        logger.info("Checking new ASPSP... {}", aspsp);
+
+        return checkForDuplicates(converter.toAspspPO(aspsp));
+    }
+
+    @Override
     @Transactional
     public void deleteById(UUID aspspId) {
         logger.info("Deleting ASPSP by id={}", aspspId);
@@ -104,5 +111,22 @@ public class AspspServiceImpl implements AspspService {
         logger.info("Counting all available ASPSPs");
 
         return repository.count();
+    }
+
+    private AspspBO checkForDuplicates(AspspPO target) {
+        AspspPO example = copyAspsp(target);
+
+        PagePO results = repository.findExactByExample(example, 0, 1);
+
+        return results.getContent() == null || results.getContent().isEmpty() ? null : converter.toAspspBO(results.getContent().get(0));
+    }
+
+    private AspspPO copyAspsp(AspspPO input) {
+        AspspPO copy = new AspspPO();
+
+        copy.setBankCode(input.getBankCode());
+        copy.setBic(input.getBic());
+
+        return copy;
     }
 }

@@ -84,6 +84,16 @@ public class AspspResource {
     }
 
     @PreAuthorize("hasAnyRole('MANAGER','DEPLOYER')")
+    @ApiOperation("Check for duplicates")
+    @PostMapping("/validate")
+    public ResponseEntity<AspspTO> checkNewAspsp(@RequestBody AspspTO aspsp) {
+        logger.info("Check ASPSP for duplicate={}", aspsp);
+        AspspBO response = aspspService.checkNewAspsp(converter.toAspspBO(aspsp));
+
+        return ResponseEntity.status(HttpStatus.OK).body(converter.toAspspTO(response));
+    }
+
+    @PreAuthorize("hasAnyRole('MANAGER','DEPLOYER')")
     @ApiOperation("Update ASPSP")
     @PutMapping
     public ResponseEntity update(@RequestBody AspspTO aspsp) {

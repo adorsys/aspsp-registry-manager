@@ -68,4 +68,16 @@ public interface AspspRepository {
      * @return total number of elements in the repository
      */
     long count();
+
+    /**
+     * Returns a {@link PagePO} with results of exact matching the provided example
+     * entity
+     *
+     * @param example for lookup
+     * @param page starting page for lookup
+     * @param size the maximum size of output
+     * @return a PagePO entity with results of lookup
+     */
+
+    PagePO findExactByExample(AspspPO example, int page, int size);
 }

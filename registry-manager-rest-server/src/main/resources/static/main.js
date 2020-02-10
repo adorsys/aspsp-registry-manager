@@ -349,6 +349,20 @@ const createFile = (data, fileName, fileFormat) => {
     virtualLink.download = fileName + "." + fileFormat;
     virtualLink.click();
 }
+
+const resolveResponseJson = (json) => {
+    if (!json) {
+        return "It's save to proceed";
+    } 
+
+    let output = "Duplicate found: \n";
+
+    for (let key in json) {
+        output += key + ": " + json[key] + "\n";
+    }
+
+    return output += "\nAre you sure you want to proceed?";
+}
 function fail(message) {
     showMessage(FAILURE, 8000, message);
 }
@@ -442,15 +456,22 @@ function greenButton(e) {
     let tableRow = e.parentElement.parentElement;
 
     if (tableRow.className) {
-        if (window.confirm("Are you sure you want to save the new entry?")) {
-            saveButton(e);
-        }
+        let isDuplicate;
+        checkForDuplicates(e)
+            .then(response => isDuplicate = response)
+            .finally(() => {
+                if (window.confirm(resolveResponseJson(isDuplicate))) {
+                    saveButton(e);
+                }
+            });
+        return;
+    }
+
+
+    if (window.confirm(`Are you sure you want to update the aspsp?`)) {
+        updateButton(e);
     } else {
-        if (window.confirm("Are you sure you want to update the aspsp?")) {
-            updateButton(e);
-        } else {
-            toggleButtons(e);
-        }
+        toggleButtons(e);
     }
 }
 
@@ -687,7 +708,7 @@ const mergeOrUpload = (input) => {
     }
 }
 
-const saveButton = (e) => {
+const checkForDuplicates = (e) => {
     let row = e.parentElement.parentElement;
 
     for (let cell of row.cells) {
@@ -697,6 +718,16 @@ const saveButton = (e) => {
         }
     }
 
+    return fetch(BASE + "/validate", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: assembleRowData(e)
+    }).then(r => r.json());
+}
+
+const saveButton = (e) => {
     fetch(BASE, {
         method: 'POST',
         headers: {
@@ -726,15 +757,6 @@ const saveButton = (e) => {
 }
 
 const updateButton = (e) => {
-    let row = e.parentElement.parentElement;
-
-    for (let cell of row.cells) {
-        if (cell.classList.contains("invalid")) {
-            warning();
-            return;
-        }
-    }
-
     fetch(BASE, {
         method: 'PUT',
         headers: {
