@@ -164,4 +164,8 @@ public class AspspRepositoryImplTest {
         assertEquals(result, TOTAL);
 
     }
+
+    @Test
+    public void findExactByExample() {
+    }
 }

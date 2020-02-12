@@ -102,13 +102,13 @@ public class AspspServiceImplTest {
     @Test
     public void checkingNewAspsp() {
         when(converter.toAspspPO(bo)).thenReturn(po);
-        when(repository.findByExample(any(), anyInt(), anyInt())).thenReturn(new PagePO(List.of(po), anyLong()));
+        when(repository.findExactByExample(any(), anyInt(), anyInt())).thenReturn(new PagePO(List.of(po), anyLong()));
         when(converter.toAspspBO(po)).thenReturn(bo);
 
         AspspBO actual = aspspService.checkNewAspsp(bo);
 
         verify(converter, times(1)).toAspspPO(bo);
-        verify(repository, times(1)).findByExample(any(), anyInt(), anyInt());
+        verify(repository, times(1)).findExactByExample(any(), anyInt(), anyInt());
         verify(converter, times(1)).toAspspBO(po);
 
         assertEquals(actual, bo);

@@ -137,7 +137,7 @@ public class AspspCsvResourceTest {
     @WithMockUser(roles = {"MANAGER", "DEPLOYER"})
     @Test
     public void validateImportCsv_Success() throws Exception {
-        FileValidationReportBO fileValidationReportBO = new FileValidationReportBO();
+        FileValidationReportBO fileValidationReportBO = new FileValidationReportBO(aspspDuplicatsReports);
         fileValidationReportBO.valid();
 
         CsvFileImportValidationReportBO validationReportBO = new CsvFileImportValidationReportBO(1, 1, fileValidationReportBO);
@@ -167,7 +167,7 @@ public class AspspCsvResourceTest {
     @WithMockUser(roles = {"MANAGER", "DEPLOYER"})
     @Test
     public void validateImportCsv_Failure() throws Exception {
-        FileValidationReportBO fileValidationReportBO = new FileValidationReportBO();
+        FileValidationReportBO fileValidationReportBO = new FileValidationReportBO(aspspDuplicatsReports);
         fileValidationReportBO.notValid();
 
         CsvFileImportValidationReportBO validationReportBO = new CsvFileImportValidationReportBO(1, 1, fileValidationReportBO);
@@ -213,7 +213,7 @@ public class AspspCsvResourceTest {
     @WithMockUser(roles = {"MANAGER", "DEPLOYER"})
     @Test
     public void validateMergeCsv_Success() throws Exception {
-        FileValidationReportBO fileValidationReportBO = new FileValidationReportBO();
+        FileValidationReportBO fileValidationReportBO = new FileValidationReportBO(aspspDuplicatsReports);
         fileValidationReportBO.valid();
 
         CsvFileMergeValidationReportBO validationReportBO = new CsvFileMergeValidationReportBO(0, Set.of(), fileValidationReportBO);
@@ -243,7 +243,7 @@ public class AspspCsvResourceTest {
     @WithMockUser(roles = {"MANAGER", "DEPLOYER"})
     @Test
     public void validateMergeCsv_Failure() throws Exception {
-        FileValidationReportBO fileValidationReportBO = new FileValidationReportBO();
+        FileValidationReportBO fileValidationReportBO = new FileValidationReportBO(aspspDuplicatsReports);
         fileValidationReportBO.notValid();
 
         CsvFileMergeValidationReportBO validationReportBO = new CsvFileMergeValidationReportBO(0, Set.of(), fileValidationReportBO);

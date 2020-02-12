@@ -9,6 +9,8 @@ public class FileValidationReportTO {
     private ValidationResultTO validationResult;
     private Integer totalNotValidRecords;
 
+    // todo: adjust TO models to the new schema
+
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<AspspValidationReportTO> aspspValidationErrorReports;
 
