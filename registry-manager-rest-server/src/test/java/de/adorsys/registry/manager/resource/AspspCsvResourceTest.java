@@ -137,7 +137,7 @@ public class AspspCsvResourceTest {
     @WithMockUser(roles = {"MANAGER", "DEPLOYER"})
     @Test
     public void validateImportCsv_Success() throws Exception {
-        FileValidationReportBO fileValidationReportBO = new FileValidationReportBO(aspspDuplicatsReports);
+        FileValidationReportBO fileValidationReportBO = new FileValidationReportBO();
         fileValidationReportBO.valid();
 
         CsvFileImportValidationReportBO validationReportBO = new CsvFileImportValidationReportBO(1, 1, fileValidationReportBO);
@@ -167,7 +167,7 @@ public class AspspCsvResourceTest {
     @WithMockUser(roles = {"MANAGER", "DEPLOYER"})
     @Test
     public void validateImportCsv_Failure() throws Exception {
-        FileValidationReportBO fileValidationReportBO = new FileValidationReportBO(aspspDuplicatsReports);
+        FileValidationReportBO fileValidationReportBO = new FileValidationReportBO();
         fileValidationReportBO.notValid();
 
         CsvFileImportValidationReportBO validationReportBO = new CsvFileImportValidationReportBO(1, 1, fileValidationReportBO);
@@ -175,6 +175,7 @@ public class AspspCsvResourceTest {
         FileValidationReportTO fileValidationReportTO = new FileValidationReportTO();
         fileValidationReportTO.setValidationResult(ValidationResultTO.NOT_VALID);
         fileValidationReportTO.setTotalNotValidRecords(0);
+        fileValidationReportTO.setEquivalentRecords(0);
 
         CsvFileImportValidationReportTO validationReportTO = new CsvFileImportValidationReportTO();
         validationReportTO.setCsvFileRecordsNumber(1);
@@ -213,7 +214,7 @@ public class AspspCsvResourceTest {
     @WithMockUser(roles = {"MANAGER", "DEPLOYER"})
     @Test
     public void validateMergeCsv_Success() throws Exception {
-        FileValidationReportBO fileValidationReportBO = new FileValidationReportBO(aspspDuplicatsReports);
+        FileValidationReportBO fileValidationReportBO = new FileValidationReportBO();
         fileValidationReportBO.valid();
 
         CsvFileMergeValidationReportBO validationReportBO = new CsvFileMergeValidationReportBO(0, Set.of(), fileValidationReportBO);
@@ -243,7 +244,7 @@ public class AspspCsvResourceTest {
     @WithMockUser(roles = {"MANAGER", "DEPLOYER"})
     @Test
     public void validateMergeCsv_Failure() throws Exception {
-        FileValidationReportBO fileValidationReportBO = new FileValidationReportBO(aspspDuplicatsReports);
+        FileValidationReportBO fileValidationReportBO = new FileValidationReportBO();
         fileValidationReportBO.notValid();
 
         CsvFileMergeValidationReportBO validationReportBO = new CsvFileMergeValidationReportBO(0, Set.of(), fileValidationReportBO);
@@ -251,6 +252,7 @@ public class AspspCsvResourceTest {
         FileValidationReportTO fileValidationReportTO = new FileValidationReportTO();
         fileValidationReportTO.setValidationResult(ValidationResultTO.NOT_VALID);
         fileValidationReportTO.setTotalNotValidRecords(0);
+        fileValidationReportTO.setEquivalentRecords(0);
 
         CsvFileMergeValidationReportTO validationReportTO = new CsvFileMergeValidationReportTO();
         validationReportTO.setNumberOfNewRecords(0);

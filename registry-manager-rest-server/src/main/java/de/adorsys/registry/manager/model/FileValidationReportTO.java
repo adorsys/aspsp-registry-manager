@@ -9,10 +9,12 @@ public class FileValidationReportTO {
     private ValidationResultTO validationResult;
     private Integer totalNotValidRecords;
 
-    // todo: adjust TO models to the new schema
-
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<AspspValidationReportTO> aspspValidationErrorReports;
+    private Integer equivalentRecords;
+
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private List<AspspEquivalentsReportTO> aspspEquivalentsReports;
 
     public ValidationResultTO getValidationResult() {
         return validationResult;
@@ -38,13 +40,31 @@ public class FileValidationReportTO {
         this.aspspValidationErrorReports = aspspValidationErrorReports;
     }
 
+    public Integer getEquivalentRecords() {
+        return equivalentRecords;
+    }
+
+    public void setEquivalentRecords(Integer equivalentRecords) {
+        this.equivalentRecords = equivalentRecords;
+    }
+
+    public List<AspspEquivalentsReportTO> getAspspEquivalentsReports() {
+        return aspspEquivalentsReports;
+    }
+
+    public void setAspspEquivalentsReports(List<AspspEquivalentsReportTO> aspspEquivalentsReports) {
+        this.aspspEquivalentsReports = aspspEquivalentsReports;
+    }
+
     @Override
     public String toString() {
         return "FileValidationReportTO{" +
-                       "validationResult=" + validationResult +
-                       ", totalNotValidRecords=" + totalNotValidRecords +
-                       ", aspspValidationErrorReports=" + aspspValidationErrorReports +
-                       '}';
+            "validationResult=" + validationResult +
+            ", totalNotValidRecords=" + totalNotValidRecords +
+            ", aspspValidationErrorReports=" + aspspValidationErrorReports +
+            ", totalEquivalentRecords=" + equivalentRecords +
+            ", aspspEquivalentsReport=" + aspspEquivalentsReports +
+            '}';
     }
 
     @Override
@@ -53,13 +73,15 @@ public class FileValidationReportTO {
         if (o == null || getClass() != o.getClass()) return false;
         FileValidationReportTO that = (FileValidationReportTO) o;
         return validationResult == that.validationResult &&
-                       Objects.equals(totalNotValidRecords, that.totalNotValidRecords) &&
-                       Objects.equals(aspspValidationErrorReports, that.aspspValidationErrorReports);
+            Objects.equals(totalNotValidRecords, that.totalNotValidRecords) &&
+            Objects.equals(aspspValidationErrorReports, that.aspspValidationErrorReports) &&
+            Objects.equals(equivalentRecords, that.equivalentRecords) &&
+            Objects.equals(aspspEquivalentsReports, that.aspspEquivalentsReports);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(validationResult, totalNotValidRecords, aspspValidationErrorReports);
+        return Objects.hash(validationResult, totalNotValidRecords, aspspValidationErrorReports, equivalentRecords, aspspEquivalentsReports);
     }
 
     public enum ValidationResultTO {

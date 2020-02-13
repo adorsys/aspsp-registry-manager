@@ -33,3 +33,16 @@ aspspValidationErrorReports:
     validationErrors:
       - Adapter ID is empty
       - Bank code is empty
+equivalentRecords: 1
+aspspEquivalentsReports:
+  - aspsp:
+      id: 054fc7ab-60b8-4bcf-9b76-1890b255d671
+      name: TestBank
+      bic: BANKABICXXX
+      bankCode: 11111111
+      url: https://example.com
+      adapterId: test-bank-adapter
+      idpUrl: https://example.com/idp
+    linesWithSimilarEntities:
+      - 12
+      - 27

@@ -122,6 +122,7 @@ public class AspspResourceTest {
     @WithMockUser(roles = {"MANAGER", "DEPLOYER"})
     @Test
     public void checkNewAspsp() throws Exception {
+        ObjectMapper mapper = new ObjectMapper();
         AspspBO output = new AspspBO();
 
         when(aspspService.checkNewAspsp(bo)).thenReturn(output);
@@ -136,7 +137,7 @@ public class AspspResourceTest {
 
         verify(aspspService, times(1)).checkNewAspsp(any());
 
-        assertThat(result.getResponse().getContentAsByteArray()).isEqualTo(output.toString().getBytes());
+        assertThat(result.getResponse().getContentAsByteArray()).isEqualTo(mapper.writeValueAsBytes(output));
     }
 
     @Test
