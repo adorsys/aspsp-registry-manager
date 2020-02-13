@@ -1,3 +1,5 @@
+"use strict";
+
 const initGlobals = () => {
     window.FILE_UPLOAD_FIELD = document.querySelector("#import-field");
     window.FILE_MERGE_FIELD = document.querySelector("#merge-field");
@@ -187,33 +189,33 @@ const addTooltips = (e) => {
     let editId = "edit-";
     let updateId = "update-";
     let deleteId = "delete-";
-    
+
     if (e.className.indexOf("edit") > -1) {
         let helper = e.parentNode.childNodes[7];
-        
+
         e.addEventListener("click", () => { editButton(e) });
         e.setAttribute("id", editId + COUNTER);
-        
+
         helper.setAttribute("data-mdl-for", editId + COUNTER);
         helper.setAttribute("class", "mdl-tooltip mdl-tooltip--top");
     }
-    
+
     if (e.className.indexOf("update") > -1) {
         let helper = e.parentNode.childNodes[9];
-        
+
         e.addEventListener("click", () => { greenButton(e) });
         e.setAttribute("id", updateId + COUNTER);
-        
+
         helper.setAttribute("data-mdl-for", updateId + COUNTER);
         helper.setAttribute("class", "mdl-tooltip mdl-tooltip--top");
     }
-    
+
     if (e.className.indexOf("delete") > -1) {
         let helper = e.parentNode.childNodes[11];
-        
+
         e.addEventListener("click", () => { redButton(e) });
         e.setAttribute("id", deleteId + COUNTER);
-        
+
         helper.setAttribute("data-mdl-for", deleteId + COUNTER);
         helper.setAttribute("class", "mdl-tooltip mdl-tooltip--top");
     }
@@ -309,7 +311,7 @@ const buildRow = (data) => {
 
 const toggleModal = () => {
     const modal = document.querySelector(".validation-layout");
-    
+
     modal.classList.toggle("hidden");
 
     showSpinner();
@@ -319,11 +321,13 @@ const showSpinner = () => {
     const spinner = document.querySelector(".spinner");
     const verdict = document.querySelector(".verdict");
     const verdictReport = document.querySelector(".validation-report");
+    const duplicatesReport = document.querySelector(".duplicates-report");
     const merge = document.querySelector(".merge-request");
     const upload = document.querySelector(".upload-request");
 
     verdict.classList.add("hidden");
     verdictReport.classList.add("hidden");
+    duplicatesReport.classList.add("hidden");
     merge.classList.add("hidden");
     upload.classList.add("hidden");
 
@@ -337,14 +341,14 @@ const createFile = (data, fileName, fileFormat) => {
 
     if (fileFormat === "json") {
         temp = new Blob([JSON.stringify(data)]);
-        virtualUrl = URL.createObjectURL(temp); 
+        virtualUrl = URL.createObjectURL(temp);
     } else {
         temp = new Blob([data], {type: 'text/csv;charset=utf-8;'});
         virtualUrl = URL.createObjectURL(temp);
     }
 
     const virtualLink = document.createElement("a");
-     
+
     virtualLink.href = virtualUrl;
     virtualLink.download = fileName + "." + fileFormat;
     virtualLink.click();
@@ -353,7 +357,7 @@ const createFile = (data, fileName, fileFormat) => {
 const resolveResponseJson = (json) => {
     if (!json) {
         return "It's save to proceed";
-    } 
+    }
 
     let output = "Duplicate found: \n";
 
@@ -563,6 +567,10 @@ const downloadButton = () => {
 
 const rejectCancelButton = () => {
     toggleModal();
+
+    // fixing Chrome bug
+    FILE_MERGE_FIELD.value = "";
+    FILE_UPLOAD_FIELD.value = "";
 }
 let PAGINATOR = {
     data: null,
@@ -609,7 +617,7 @@ let PAGINATOR = {
 
 window.onload = async () => {
     window.COUNTUP = new CountUp("total", await getTotal());
-    
+
     COUNTUP.start();
 }
 
@@ -629,7 +637,7 @@ const VALIDATOR = {
 
 const validationResponseHandler = (data) => {
     VALIDATOR.data = data;
-    
+
     if (!data) {
         fail("Oops... something went wrong. Please try again to validate");
         toggleModal();
@@ -641,19 +649,30 @@ const validationResponseHandler = (data) => {
     const spinner = document.querySelector(".spinner");
     const verdict = document.querySelector("#verdict");
     const report = document.querySelector(".validation-report");
+    const duplicatesReport = document.querySelector(".duplicates-report");
     const amountNotValid = document.querySelector("#records-amount");
     const example = document.querySelector(".display");
-    
+    const amountDuplicates = document.querySelector("#entries-amount");
+    const exampleDuplicates = document.querySelector(".display-duplicates");
+
     verdict.textContent = data.fileValidationReport.validationResult;
     spinner.classList.add("hidden");
 
     if (!isValid) {
         verdict.classList.add("valid", "not-valid");
         verdict.parentElement.classList.remove("hidden");
-        report.classList.remove("hidden");
 
-        amountNotValid.textContent = data.fileValidationReport.totalNotValidRecords;
-        example.textContent = buildString(data.fileValidationReport.aspspValidationErrorReports);
+        if (data.fileValidationReport.aspspValidationErrorReports) {
+            report.classList.remove("hidden");
+            amountNotValid.textContent = data.fileValidationReport.totalNotValidRecords;
+            example.textContent = buildString(data.fileValidationReport.aspspValidationErrorReports);
+        }
+
+        if (data.fileValidationReport.aspspEquivalentsReports) {
+            duplicatesReport.classList.remove("hidden");
+            amountDuplicates.textContent = data.fileValidationReport.equivalentRecords;
+            exampleDuplicates.textContent = buildStringForDuplicates(data.fileValidationReport.aspspEquivalentsReports);
+        }
 
         mergeOrUpload(data);
     } else {
@@ -680,6 +699,33 @@ const buildString = (input) => {
     }
 
     if (input[3]) {
+        result += "\n... ";
+    }
+
+    return result;
+}
+
+const buildStringForDuplicates = (input) => {
+    let result = "";
+
+    for (let i = 0, limit = Math.min(2, input.length); i < limit; i++) {
+        let entity = input[i].aspsp;
+        result += "Entities similar to this: \n";
+
+        for (let field in entity) {
+            result += "\t" + field + ": " + entity[field] + "\n";
+        }
+
+        result += "occur on lines: ";
+
+        input[i].linesWithSimilarEntities.forEach(element => {
+            result += " " + element + ",";
+        });
+
+        result = result.substr(0, result.length - 1) + "\n";
+    }
+
+    if (input[2]) {
         result += "\n... ";
     }
 
