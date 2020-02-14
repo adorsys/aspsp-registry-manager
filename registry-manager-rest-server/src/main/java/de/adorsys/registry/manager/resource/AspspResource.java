@@ -88,7 +88,7 @@ public class AspspResource {
     @PostMapping("/validate")
     public ResponseEntity<AspspTO> checkNewAspsp(@RequestBody AspspTO aspsp) {
         logger.info("Check ASPSP for duplicate={}", aspsp);
-        AspspBO response = aspspService.checkNewAspsp(converter.toAspspBO(aspsp));
+        AspspBO response = aspspService.lookForDuplicate(converter.toAspspBO(aspsp));
 
         return ResponseEntity.status(HttpStatus.OK).body(converter.toAspspTO(response));
     }

@@ -105,7 +105,7 @@ public class AspspServiceImplTest {
         when(repository.findExactByExample(any(), anyInt(), anyInt())).thenReturn(new PagePO(List.of(po), 1L));
         when(converter.toAspspBO(po)).thenReturn(bo);
 
-        AspspBO actual = aspspService.checkNewAspsp(bo);
+        AspspBO actual = aspspService.lookForDuplicate(bo);
 
         verify(converter, times(1)).toAspspPO(bo);
         verify(repository, times(1)).findExactByExample(any(), anyInt(), anyInt());
@@ -119,7 +119,7 @@ public class AspspServiceImplTest {
         when(converter.toAspspPO(bo)).thenReturn(po);
         when(repository.findExactByExample(any(), anyInt(), anyInt())).thenReturn(new PagePO(List.of(), 0L));
 
-        AspspBO actual = aspspService.checkNewAspsp(bo);
+        AspspBO actual = aspspService.lookForDuplicate(bo);
 
         verify(converter, times(1)).toAspspPO(bo);
         verify(repository, times(1)).findExactByExample(any(), anyInt(), anyInt());

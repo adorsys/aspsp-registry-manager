@@ -74,10 +74,10 @@ public class AspspServiceImpl implements AspspService {
     }
 
     @Override
-    public AspspBO checkNewAspsp(AspspBO aspsp) {
-        logger.info("Checking new ASPSP... {}", aspsp);
+    public AspspBO lookForDuplicate(AspspBO aspsp) {
+        logger.info("Looking for duplicates... {}", aspsp);
 
-        return checkForDuplicates(converter.toAspspPO(aspsp));
+        return findOneDuplicate(converter.toAspspPO(aspsp));
     }
 
     @Override
@@ -113,7 +113,7 @@ public class AspspServiceImpl implements AspspService {
         return repository.count();
     }
 
-    private AspspBO checkForDuplicates(AspspPO target) {
+    private AspspBO findOneDuplicate(AspspPO target) {
         AspspPO example = copyAspsp(target);
 
         PagePO results = repository.findExactByExample(example, 0, 1);

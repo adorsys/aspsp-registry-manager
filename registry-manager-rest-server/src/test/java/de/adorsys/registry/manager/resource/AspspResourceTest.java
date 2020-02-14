@@ -125,7 +125,7 @@ public class AspspResourceTest {
         ObjectMapper mapper = new ObjectMapper();
         AspspBO output = new AspspBO();
 
-        when(aspspService.checkNewAspsp(bo)).thenReturn(output);
+        when(aspspService.lookForDuplicate(bo)).thenReturn(output);
 
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders
             .post(ASPSP_URI + "/validate")
@@ -135,7 +135,7 @@ public class AspspResourceTest {
             .andExpect(status().is(HttpStatus.OK.value()))
             .andReturn();
 
-        verify(aspspService, times(1)).checkNewAspsp(any());
+        verify(aspspService, times(1)).lookForDuplicate(any());
 
         assertThat(result.getResponse().getContentAsByteArray()).isEqualTo(mapper.writeValueAsBytes(output));
     }

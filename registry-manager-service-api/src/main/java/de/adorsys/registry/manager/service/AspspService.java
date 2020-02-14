@@ -43,7 +43,7 @@ public interface AspspService {
      * @param aspsp to check
      * @return result if there are any duplicates
      */
-    AspspBO checkNewAspsp(AspspBO aspsp);
+    AspspBO lookForDuplicate(AspspBO aspsp);
 
     void saveAll(List<AspspBO> aspsps);
 
