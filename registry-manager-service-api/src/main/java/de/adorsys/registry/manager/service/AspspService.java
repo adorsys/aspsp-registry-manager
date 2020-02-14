@@ -38,7 +38,7 @@ public interface AspspService {
     AspspBO save(AspspBO aspsp);
 
     /**
-     * Checks if incoming Aspsp record is already represented in the database
+     * Checks if an incoming Aspsp record is already represented in the database
      *
      * @param aspsp to check
      * @return result if there are any duplicates

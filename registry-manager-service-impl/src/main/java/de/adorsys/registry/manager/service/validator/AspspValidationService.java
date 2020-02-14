@@ -31,7 +31,6 @@ public class AspspValidationService {
             AspspBO aspsp = aspsps.get(i);
             AspspValidationReportBO aspspValidationReport = validator.validate(new AspspValidationReportBO(aspsp, i + 1), aspsp);
 
-
             if (aspspValidationReport.isNotValid()) {
                 fileValidationReport.addAspspValidationReport(aspspValidationReport);
             }
