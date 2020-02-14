@@ -118,7 +118,7 @@ public class AspspServiceImpl implements AspspService {
 
         PagePO results = repository.findExactByExample(example, 0, 1);
 
-        return results.getContent() == null || results.getContent().isEmpty() ? null : converter.toAspspBO(results.getContent().get(0));
+        return results.getTotalElements() > 0L ? converter.toAspspBO(results.getContent().get(0)) : null;
     }
 
     private AspspPO copyAspsp(AspspPO input) {
