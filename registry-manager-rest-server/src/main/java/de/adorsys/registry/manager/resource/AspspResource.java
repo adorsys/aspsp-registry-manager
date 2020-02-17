@@ -83,7 +83,6 @@ public class AspspResource {
                        .body(converter.toAspspTO(bo));
     }
 
-    @PreAuthorize("hasAnyRole('MANAGER','DEPLOYER')")
     @ApiOperation("Check for duplicates")
     @PostMapping("/validate")
     public ResponseEntity<AspspTO> checkNewAspsp(@RequestBody AspspTO aspsp) {

@@ -119,7 +119,6 @@ public class AspspResourceTest {
                 .andReturn();
     }
 
-    @WithMockUser(roles = {"MANAGER", "DEPLOYER"})
     @Test
     public void checkNewAspsp() throws Exception {
         ObjectMapper mapper = new ObjectMapper();
@@ -138,27 +137,6 @@ public class AspspResourceTest {
         verify(aspspService, times(1)).lookForDuplicate(any());
 
         assertThat(result.getResponse().getContentAsByteArray()).isEqualTo(mapper.writeValueAsBytes(output));
-    }
-
-    @Test
-    public void checkNewAspspRedirectToLoginPage() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders
-            .post(ASPSP_URI + "/validate")
-            .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
-            .content(serialize(to)))
-            .andDo(print())
-            .andExpect(status().is(HttpStatus.FOUND.value()));
-    }
-
-    @WithMockUser(roles = "READER")
-    @Test
-    public void checkNewAspspForbidden() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders
-            .post(ASPSP_URI + "/validate")
-            .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
-            .content(serialize(to)))
-            .andDo(print())
-            .andExpect(status().is(HttpStatus.FORBIDDEN.value()));
     }
 
     @WithMockUser(roles = {"MANAGER", "DEPLOYER"})

@@ -38,7 +38,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .csrf().disable()
-                .authorizeRequests().anyRequest().authenticated()
+                .authorizeRequests()
+                .antMatchers("/v1/aspsps/validate").permitAll()
+                .antMatchers("/v1/aspsps/csv/validate/**").permitAll()
+                .anyRequest().authenticated()
                 .and()
                 .formLogin()
                 .defaultSuccessUrl("/manager", true)
