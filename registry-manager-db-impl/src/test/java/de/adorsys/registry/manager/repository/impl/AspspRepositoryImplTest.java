@@ -14,10 +14,7 @@ import org.mockito.*;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.data.domain.*;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
@@ -163,5 +160,20 @@ public class AspspRepositoryImplTest {
 
         assertEquals(result, TOTAL);
 
+    }
+
+    @Test
+    public void findExactByExample() {
+        List<AspspPO> pos = List.of(po);
+
+        when(converter.toAspspEntity(any())).thenReturn(entity);
+        when(jpaRepository.findAll(any(), any(PageRequest.class))).thenReturn(new PageImpl<>(List.of(entity)));
+        when(converter.toAspspPOList(anyList())).thenReturn(pos);
+
+        PagePO actual = repository.findExactByExample(po, PAGE, SIZE);
+
+        assertNotNull(actual);
+        assertEquals(actual.getContent().size(), 1);
+        assertEquals(actual.getContent().get(0), po);
     }
 }

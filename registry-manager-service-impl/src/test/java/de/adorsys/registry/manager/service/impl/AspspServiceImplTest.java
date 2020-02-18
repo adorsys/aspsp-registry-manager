@@ -100,6 +100,32 @@ public class AspspServiceImplTest {
     }
 
     @Test
+    public void checkingNewAspsp() {
+        when(converter.toAspspPO(bo)).thenReturn(po);
+        when(repository.findExactByExample(any(), anyInt(), anyInt())).thenReturn(new PagePO(List.of(po), 1L));
+
+        boolean actual = aspspService.hasDuplicate(bo);
+
+        verify(converter, times(1)).toAspspPO(bo);
+        verify(repository, times(1)).findExactByExample(any(), anyInt(), anyInt());
+
+        assertTrue(actual);
+    }
+
+    @Test
+    public void checkingNewAspsp_noMatches() {
+        when(converter.toAspspPO(bo)).thenReturn(po);
+        when(repository.findExactByExample(any(), anyInt(), anyInt())).thenReturn(new PagePO(List.of(), 0L));
+
+        boolean actual = aspspService.hasDuplicate(bo);
+
+        verify(converter, times(1)).toAspspPO(bo);
+        verify(repository, times(1)).findExactByExample(any(), anyInt(), anyInt());
+
+        assertFalse(actual);
+    }
+
+    @Test
     public void saveAll() {
         List<AspspPO> pos = List.of(po);
         List<AspspBO> bos = List.of(bo);

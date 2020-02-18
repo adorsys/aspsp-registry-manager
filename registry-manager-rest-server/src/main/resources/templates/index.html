@@ -30,12 +30,19 @@
                 <div class="example">Example:</div>
                 <textarea class="display" readonly></textarea>
             </div>
+            <div class="duplicates-report hidden">
+                <div class="similar-entries">Amount of recurring entries: <span id="entries-amount"></span></div>
+                <div class="example-duplicates">Example:</div>
+                <textarea class="display-duplicates" readonly></textarea>
+            </div>
             <div class="merge-request hidden">
-                <div class="new-reocrds">Amount of new enteties: <span id="new-records"></span></div>
-                <div class="altered">Amount of altered enteties: <span id="altered"></span></div>
+                <div class="new-records">Amount of new entities: <span id="new-records"></span></div>
+                <div class="altered">Amount of altered entities: <span id="altered"></span></div>
                 <div class="process-buttons">
                     <button class="reject mdl-button mdl-js-button mdl-button--accent padding__top"
                         onclick="rejectCancelButton();">cancel</button>
+                    <button class="report mdl-button mdl-js-button padding__top"
+                        onclick="reportButton();">report</button>
                     <button class="confirm mdl-button mdl-js-button mdl-button--primary padding__top"
                         onclick="confirmButton();">confirm</button>
                 </div>

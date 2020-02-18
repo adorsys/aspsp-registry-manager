@@ -134,7 +134,6 @@ public class AspspCsvResourceTest {
                 .andExpect(status().is(HttpStatus.FORBIDDEN.value()));
     }
 
-    @WithMockUser(roles = {"MANAGER", "DEPLOYER"})
     @Test
     public void validateImportCsv_Success() throws Exception {
         FileValidationReportBO fileValidationReportBO = new FileValidationReportBO();
@@ -164,7 +163,6 @@ public class AspspCsvResourceTest {
         verify(service, times(1)).validateImportCsv(any());
     }
 
-    @WithMockUser(roles = {"MANAGER", "DEPLOYER"})
     @Test
     public void validateImportCsv_Failure() throws Exception {
         FileValidationReportBO fileValidationReportBO = new FileValidationReportBO();
@@ -175,6 +173,7 @@ public class AspspCsvResourceTest {
         FileValidationReportTO fileValidationReportTO = new FileValidationReportTO();
         fileValidationReportTO.setValidationResult(ValidationResultTO.NOT_VALID);
         fileValidationReportTO.setTotalNotValidRecords(0);
+        fileValidationReportTO.setEquivalentRecords(0);
 
         CsvFileImportValidationReportTO validationReportTO = new CsvFileImportValidationReportTO();
         validationReportTO.setCsvFileRecordsNumber(1);
@@ -195,22 +194,6 @@ public class AspspCsvResourceTest {
         verify(service, times(1)).validateImportCsv(any());
     }
 
-    @WithMockUser(roles = "READER")
-    @Test
-    public void validateImportCsvForbidden() throws Exception {
-        mockMvc.perform(multipart(BASE_URI + "/validate/upload")
-                                .file("file", "content".getBytes()))
-                .andExpect(status().is(HttpStatus.FORBIDDEN.value()));
-    }
-
-    @Test
-    public void validateImportCsvRedirectToLoginPage() throws Exception {
-        mockMvc.perform(multipart(BASE_URI + "/validate/upload")
-                                .file("file", "content".getBytes()))
-                .andExpect(status().is(HttpStatus.FOUND.value()));
-    }
-
-    @WithMockUser(roles = {"MANAGER", "DEPLOYER"})
     @Test
     public void validateMergeCsv_Success() throws Exception {
         FileValidationReportBO fileValidationReportBO = new FileValidationReportBO();
@@ -240,7 +223,6 @@ public class AspspCsvResourceTest {
         verify(service, times(1)).validateMergeCsv(any());
     }
 
-    @WithMockUser(roles = {"MANAGER", "DEPLOYER"})
     @Test
     public void validateMergeCsv_Failure() throws Exception {
         FileValidationReportBO fileValidationReportBO = new FileValidationReportBO();
@@ -251,6 +233,7 @@ public class AspspCsvResourceTest {
         FileValidationReportTO fileValidationReportTO = new FileValidationReportTO();
         fileValidationReportTO.setValidationResult(ValidationResultTO.NOT_VALID);
         fileValidationReportTO.setTotalNotValidRecords(0);
+        fileValidationReportTO.setEquivalentRecords(0);
 
         CsvFileMergeValidationReportTO validationReportTO = new CsvFileMergeValidationReportTO();
         validationReportTO.setNumberOfNewRecords(0);
@@ -269,20 +252,5 @@ public class AspspCsvResourceTest {
 
         assertEquals(validationReportTO, actual);
         verify(service, times(1)).validateMergeCsv(any());
-    }
-
-    @WithMockUser(roles = "READER")
-    @Test
-    public void validateMergeCsvForbidden() throws Exception {
-        mockMvc.perform(multipart(BASE_URI + "/validate/merge")
-                                .file("file", "content".getBytes()))
-                .andExpect(status().is(HttpStatus.FORBIDDEN.value()));
-    }
-
-    @Test
-    public void validateMergeCsvRedirectToLoginPage() throws Exception {
-        mockMvc.perform(multipart(BASE_URI + "/validate/merge")
-                                .file("file", "content".getBytes()))
-                .andExpect(status().is(HttpStatus.FOUND.value()));
     }
 }

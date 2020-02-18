@@ -55,7 +55,6 @@ public class AspspCsvResource {
         return new ResponseEntity<>(response, responseHeaders, HttpStatus.OK);
     }
 
-    @PreAuthorize("hasAnyRole('MANAGER','DEPLOYER')")
     @ApiOperation("Validate CSV file with ASPSPs for uploading")
     @PostMapping(value = "/validate/upload", consumes = {"multipart/form-data"})
     public ResponseEntity<CsvFileImportValidationReportTO> validateImportCsv(@RequestParam MultipartFile file) {
@@ -90,7 +89,6 @@ public class AspspCsvResource {
         }
     }
 
-    @PreAuthorize("hasAnyRole('MANAGER','DEPLOYER')")
     @ApiOperation("Validate CSV file with ASPSPs for merging")
     @PostMapping(value = "/validate/merge", consumes = {"multipart/form-data"})
     public ResponseEntity<CsvFileMergeValidationReportTO> validateMergeCsv(@RequestParam MultipartFile file) {

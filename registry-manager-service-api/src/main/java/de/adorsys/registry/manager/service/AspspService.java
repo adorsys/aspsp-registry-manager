@@ -37,6 +37,14 @@ public interface AspspService {
 
     AspspBO save(AspspBO aspsp);
 
+    /**
+     * Checks if an incoming Aspsp record is already represented in the database
+     *
+     * @param aspsp to check
+     * @return true if there are any duplicates otherwise false
+     */
+    boolean hasDuplicate(AspspBO aspsp);
+
     void saveAll(List<AspspBO> aspsps);
 
     void deleteById(UUID aspspId);
