@@ -34,6 +34,7 @@ public class AspspEquivalentsReportTO {
             ", lines=" + Arrays.toString(linesWithSimilarEntities) +
             '}';
     }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

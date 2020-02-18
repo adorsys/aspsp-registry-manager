@@ -354,19 +354,14 @@ const createFile = (data, fileName, fileFormat) => {
     virtualLink.click();
 }
 
-const resolveResponseJson = (json) => {
-    if (!json) {
-        return "It's save to proceed";
+const resolveResponse = (hasDuplicates) => {
+    if (hasDuplicates === "false") {
+        return "No duplicates found.\nIt's save to proceed";
     }
 
-    let output = "Duplicate found: \n";
-
-    for (let key in json) {
-        output += key + ": " + json[key] + "\n";
-    }
-
-    return output += "\nAre you sure you want to proceed?";
+    return "Currently, at least one more record with the same BIC and Bank Code exists in the database.\nAre you sure you want to proceed?";
 }
+
 function fail(message) {
     showMessage(FAILURE, 8000, message);
 }
@@ -464,7 +459,7 @@ function greenButton(e) {
         checkForDuplicates(e)
             .then(response => isDuplicate = response)
             .finally(() => {
-                if (window.confirm(resolveResponseJson(isDuplicate))) {
+                if (window.confirm(resolveResponse(isDuplicate))) {
                     saveButton(e);
                 }
             });
@@ -770,7 +765,7 @@ const checkForDuplicates = (e) => {
             'Content-Type': 'application/json'
         },
         body: assembleRowData(e)
-    }).then(r => r.json());
+    }).then(r => r.text());
 }
 
 const saveButton = (e) => {

@@ -41,9 +41,9 @@ public interface AspspService {
      * Checks if an incoming Aspsp record is already represented in the database
      *
      * @param aspsp to check
-     * @return result if there are any duplicates
+     * @return true if there are any duplicates otherwise false
      */
-    AspspBO lookForDuplicate(AspspBO aspsp);
+    boolean hasDuplicate(AspspBO aspsp);
 
     void saveAll(List<AspspBO> aspsps);
 

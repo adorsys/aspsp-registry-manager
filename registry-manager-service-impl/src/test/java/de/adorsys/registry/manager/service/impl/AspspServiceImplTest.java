@@ -103,15 +103,13 @@ public class AspspServiceImplTest {
     public void checkingNewAspsp() {
         when(converter.toAspspPO(bo)).thenReturn(po);
         when(repository.findExactByExample(any(), anyInt(), anyInt())).thenReturn(new PagePO(List.of(po), 1L));
-        when(converter.toAspspBO(po)).thenReturn(bo);
 
-        AspspBO actual = aspspService.lookForDuplicate(bo);
+        boolean actual = aspspService.hasDuplicate(bo);
 
         verify(converter, times(1)).toAspspPO(bo);
         verify(repository, times(1)).findExactByExample(any(), anyInt(), anyInt());
-        verify(converter, times(1)).toAspspBO(po);
 
-        assertEquals(actual, bo);
+        assertTrue(actual);
     }
 
     @Test
@@ -119,12 +117,12 @@ public class AspspServiceImplTest {
         when(converter.toAspspPO(bo)).thenReturn(po);
         when(repository.findExactByExample(any(), anyInt(), anyInt())).thenReturn(new PagePO(List.of(), 0L));
 
-        AspspBO actual = aspspService.lookForDuplicate(bo);
+        boolean actual = aspspService.hasDuplicate(bo);
 
         verify(converter, times(1)).toAspspPO(bo);
         verify(repository, times(1)).findExactByExample(any(), anyInt(), anyInt());
 
-        assertNull(actual);
+        assertFalse(actual);
     }
 
     @Test
