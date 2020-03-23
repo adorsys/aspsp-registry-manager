@@ -769,6 +769,7 @@ const checkForDuplicates = (e) => {
 }
 
 const saveButton = (e) => {
+    let row = e.parentNode.parentNode;
     fetch(BASE, {
         method: 'POST',
         headers: {
